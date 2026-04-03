@@ -1,0 +1,2487 @@
+{
+  "Navbar": {
+    "login": "Connexion",
+    "language": "Langue",
+    "currency": "Devise",
+    "mobileMenuTitle": "Explorer",
+    "mobileMenuLabel": "Ouvrir le menu"
+  },
+  "LanguageCurrency": {
+    "title": "Langue & Devise",
+    "subtitle": "Préférences de langue et de devise",
+    "languageLabel": "Langue",
+    "languageDescription": "Sélectionnez votre langue d'interface préférée.",
+    "currencyLabel": "Devise",
+    "currencyDescription": "Les prix seront affichés dans la devise sélectionnée.",
+    "saveButton": "Enregistrer",
+    "savingButton": "Enregistrement…",
+    "successMessage": "Préférences enregistrées"
+  },
+  "DestinationPicker": {
+    "triggerAriaLabel": "Choisir une destination",
+    "title": "Choisir une destination",
+    "subtitle": "Sélectionnez où vous explorez",
+    "searchPlaceholder": "Rechercher une ville ou un pays…",
+    "allCountries": "Tout",
+    "emptyTitle": "Aucune destination trouvée",
+    "emptySubtitle": "Essayez un autre nom de ville ou de pays",
+    "clearFilters": "Effacer les filtres"
+  },
+  "UserMenu": {
+    "accountSection": "Compte",
+    "dashboardsSection": "Tableaux de bord",
+    "myBookings": "Mes réservations",
+    "myReviews": "Mes avis",
+    "myOrders": "Mes commandes",
+    "wishlist": "Liste de souhaits",
+    "profile": "Profil",
+    "adminDashboard": "Tableau Admin",
+    "partnerDashboard": "Tableau Partenaire",
+    "agentDashboard": "Tableau Agent",
+    "signOut": "Se déconnecter",
+    "roleAdmin": "Admin",
+    "rolePartner": "Partenaire",
+    "roleAgent": "Agent"
+  },
+  "LoginPage": {
+    "title": "Bienvenue sur Guidni",
+    "subtitle": "Connectez-vous pour réserver des activités, hébergements, restaurants et plus encore.",
+    "continueGoogle": "Continuer avec Google",
+    "signingIn": "Connexion…",
+    "or": "ou",
+    "continueEmail": "Continuer avec l'email",
+    "soon": "Bientôt",
+    "trustSecure": "Connexion sécurisée",
+    "trustInstant": "Accès instantané",
+    "trustLanguages": "3 langues",
+    "legalPrefix": "En continuant, vous acceptez nos",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité"
+  },
+  "Footer": {
+    "tagline": "Tout ce dont un voyageur a besoin, en un seul endroit.",
+    "explore": "Explorer",
+    "experiences": "Expériences",
+    "company": "Société",
+    "support": "Support",
+    "djerba": "Djerba",
+    "dubai": "Dubaï",
+    "destinations": "Toutes les destinations",
+    "attractions": "Attractions",
+    "activities": "Activités",
+    "stays": "Hébergements",
+    "restaurants": "Restaurants",
+    "passes": "Pass Explorateur",
+    "transport": "Transport",
+    "shops": "Boutiques",
+    "planner": "Planificateur IA",
+    "about": "À propos",
+    "becomePartner": "Devenir partenaire",
+    "becomeAgent": "Devenir agent",
+    "agentLeaderboard": "Classement des agents",
+    "blog": "Blog",
+    "careers": "Carrières",
+    "partners": "Partenaires",
+    "badges": "Badges vérifiés",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "howItWorks": "Comment ça marche",
+    "terms": "CGU",
+    "privacy": "Confidentialité",
+    "cookies": "Cookies",
+    "rightsReserved": "Tous droits réservés.",
+    "dir": "ltr"
+  },
+  "HomePage": {
+    "hero": {
+      "headline": "Votre prochaine aventure commence sur",
+      "brand": "Guidni",
+      "subtitle": "Réservez des activités, séjours et restaurants. Découvrez des guides locaux et laissez l'IA planifier votre voyage parfait — tout pour votre trip, au même endroit.",
+      "ctaPlanner": "Planifier mon voyage",
+      "ctaExplore": "Explorer les destinations"
+    },
+    "trust": {
+      "item1Label": "Annonces vérifiées",
+      "item1Desc": "Chaque partenaire est contrôlé",
+      "item2Label": "Expériences sélectionnées",
+      "item2Desc": "Qualité choisie à la main",
+      "item3Label": "Réservation flexible",
+      "item3Desc": "Annulation gratuite sur la plupart",
+      "item4Label": "Expertise locale",
+      "item4Desc": "Des guides qui vivent ici"
+    },
+    "spotlight": {
+      "activities": "Activités",
+      "stays": "Séjours",
+      "restaurants": "Restaurants",
+      "seeGuide": "Voir le guide"
+    },
+    "planner": {
+      "badge": "Planificateur IA",
+      "headline": "Votre voyage parfait,",
+      "headlineAccent": "planifié en quelques secondes",
+      "subtitle": "Dites-nous où vous allez, combien de temps vous restez, et ce que vous aimez — notre IA construit un itinéraire jour par jour adapté à vous.",
+      "step1": "Choisissez votre destination",
+      "step2": "Définissez vos dates et durée",
+      "step3": "Partagez vos intérêts",
+      "step4": "Obtenez votre itinéraire personnalisé",
+      "cta": "Planifier mon voyage",
+      "previewHeader": "Djerba · 4 nuits",
+      "previewSubheader": "2 adultes · Culture & Gastronomie",
+      "previewBadge": "Généré par IA",
+      "previewMoreDays": "+ 2 autres jours dans votre plan…",
+      "previewCta": "Générez le vôtre",
+      "day1": "Jour 1",
+      "day2": "Jour 2"
+    },
+    "agent": {
+      "eyebrow": "Programme Agent Local",
+      "headline": "Vous connaissez votre destination ?",
+      "headlineAccent": "Soyez payé pour ça.",
+      "subtitle": "Partagez des liens de réservation personnalisés avec les touristes et gagnez des commissions sur chaque réservation.",
+      "perk1": "Gagnez 5 à 10% de commission sur chaque réservation générée",
+      "perk2": "Montez en niveau : Starter → Pro → Elite avec des récompenses",
+      "perk3": "Travaillez de n'importe où — sans bureau, sans horaires fixes",
+      "stat1Value": "25 DT",
+      "stat1Label": "Seuil minimum de paiement",
+      "stat2Value": "105 pts",
+      "stat2Label": "Points max par parrainage",
+      "stat3Value": "3 niveaux",
+      "stat3Label": "Starter · Pro · Elite",
+      "stat4Value": "Gratuit",
+      "stat4Label": "Toujours gratuit",
+      "cta": "Devenir agent",
+      "leaderboard": "Voir le classement"
+    },
+    "destinations": {
+      "title": "Destinations Populaires"
+    },
+    "activities": {
+      "title": "Activités Populaires",
+      "subtitle": "Des expériences triées sur le volet à Djerba",
+      "viewAll": "Voir toutes les activités"
+    },
+    "packages": {
+      "title": "Passes Voyage",
+      "subtitle": "Regroupez vos aventures et économisez",
+      "viewAll": "Voir tous les passes",
+      "popular": "Populaire",
+      "perPerson": "par personne",
+      "included": "activités incluses",
+      "optional": "activités au choix",
+      "bookNow": "Réserver"
+    },
+    "stays": {
+      "title": "Où Séjourner",
+      "subtitle": "Villas, appartements et séjours uniques",
+      "viewAll": "Voir tous les hébergements"
+    },
+    "restaurants": {
+      "title": "Restaurants & Cafés",
+      "subtitle": "Les meilleurs endroits pour manger et boire",
+      "viewAll": "Voir tous les restaurants"
+    },
+    "exploring": {
+      "readyToExplore": "Prêt à Explorer Djerba ?",
+      "intro": "Une île méditerranéenne avec 3 000 ans d'histoire, des plages immaculées et une culture vibrante.",
+      "historyTitle": "Histoire Riche",
+      "historyDesc": "L'une des plus anciennes communautés juives du monde et un héritage phénicien antique.",
+      "weatherTitle": "Climat Idéal",
+      "weatherDesc": "Plus de 300 jours ensoleillés par an. Idéal d'avril à octobre.",
+      "cuisineTitle": "Cuisine Locale",
+      "cuisineDesc": "Fruits de mer frais, plats tunisiens traditionnels et les fameux palmiers dattiers de Djerba.",
+      "stayTitle": "Hébergements Uniques",
+      "stayDesc": "Des villas en bord de mer aux demeures traditionnelles dans la médina.",
+      "budgetTitle": "Excellent Rapport Qualité-Prix",
+      "budgetDesc": "L'une des destinations méditerranéennes les plus abordables.",
+      "attractionsTitle": "Sites Exceptionnels",
+      "attractionsDesc": "Musée de Guellala, synagogue El Ghriba, Djerba Heritage et plages immaculées.",
+      "ctaParagraph": "Commencez à planifier votre voyage parfait à Djerba dès aujourd'hui.",
+      "exploreBtn": "Explorer Djerba",
+      "generateBtn": "Générer un itinéraire"
+    },
+    "info": {
+      "title": "Pourquoi Choisir Guidni ?",
+      "subtitle": "Nous rendons la planification de voyage sans effort pour que vous puissiez vous concentrer sur l'expérience.",
+      "features": {
+        "trusted": {
+          "title": "Partenaires Vérifiés",
+          "description": "Chaque entreprise sur Guidni est vérifiée. Nous sélectionnons personnellement nos partenaires."
+        },
+        "curated": {
+          "title": "Expériences Triées",
+          "description": "Activités et hébergements sélectionnés à la main par notre équipe locale."
+        },
+        "payments": {
+          "title": "Paiements Sécurisés",
+          "description": "Payez en toute sécurité par carte, PayPal ou Konnect pour les voyageurs tunisiens."
+        },
+        "price": {
+          "title": "Meilleur Prix Garanti",
+          "description": "Nous travaillons directement avec les entreprises locales pour garantir les meilleurs prix."
+        },
+        "rescheduling": {
+          "title": "Annulations Faciles",
+          "description": "Politiques d'annulation flexibles. La vie arrive — nous comprenons."
+        },
+        "experts": {
+          "title": "Experts Locaux",
+          "description": "Notre équipe vit à Djerba. De vrais conseils, de vraies recommandations."
+        }
+      },
+      "partners": {
+        "eyebrow": "Pour les entreprises",
+        "title": "Développez-vous avec Guidni",
+        "description": "Rejoignez les entreprises locales qui atteignent déjà des voyageurs via Guidni. Gérez vos annonces, réservations et revenus depuis un seul tableau de bord.",
+        "learnButton": "En savoir plus",
+        "joinButton": "Commencer",
+        "benefit1": "Listez des activités, séjours, restaurants et plus",
+        "benefit2": "Recevez des réservations et gérez-les facilement",
+        "benefit3": "Tableau de bord analytique pour revenus et avis",
+        "benefit4": "Atteignez des voyageurs dans plusieurs destinations",
+        "statActivities": "Activités listées",
+        "statStays": "Séjours disponibles",
+        "statRestaurants": "Restaurants présentés",
+        "statDestinations": "Destinations"
+      }
+    },
+    "shops": {
+      "shopsTitle": "Boutiques locales",
+      "shopsSubtitle": "Produits artisanaux et locaux de boutiques sélectionnées",
+      "viewAllShops": "Voir toutes les boutiques",
+      "productsTitle": "Créations artisanales",
+      "productsSubtitle": "Produits uniques faits main par des artisans locaux",
+      "viewAllProducts": "Voir tous les produits",
+      "handmade": "Fait main"
+    },
+    "transfers": {
+      "title": "Circuler facilement",
+      "subtitle": "Transferts aéroport, taxis et chauffeurs privés",
+      "viewAll": "Voir tous les transferts"
+    },
+    "attractions": {
+      "title": "Sites Incontournables",
+      "subtitle": "Les lieux et monuments à ne pas manquer à votre destination",
+      "viewAll": "Explorer toutes les attractions"
+    },
+    "guides": {
+      "title": "Guides Locaux",
+      "subtitle": "Des itinéraires créés par des personnes qui vivent ici",
+      "viewAll": "Voir tous les guides"
+    }
+  },
+  "PlannerLanding": {
+    "badge": "Planification de voyage",
+    "heroPrefix": "Planifiez votre voyage à",
+    "heroSuffix": "",
+    "defaultCity": "destination",
+    "heroSubtitle": "Obtenez un itinéraire jour par jour en quelques secondes avec l'IA, ou choisissez un plan conçu par un expert local.",
+    "aiTitle": "Planificateur IA",
+    "aiPopular": "Populaire",
+    "aiSubtitle": "Répondez à quelques questions et obtenez un itinéraire personnalisé complet en quelques secondes.",
+    "aiFeature1": "Prêt en moins de 30 secondes",
+    "aiFeature2": "Adapté à votre budget et groupe",
+    "aiFeature3": "Couvre toute votre destination",
+    "aiFeature4": "Échangez les activités qui ne vous conviennent pas",
+    "aiCta": "Planifier avec l'IA",
+    "guidesTitle": "Guides locaux",
+    "guidesSubtitle": "Parcourez des plans conçus par des locaux qui connaissent chaque coin caché et la meilleure table en ville.",
+    "guidesFeature1": "Connaissances réelles de gens du coin",
+    "guidesFeature2": "Experts locaux vérifiés",
+    "guidesFeature3": "Posez vos questions au guide",
+    "guidesFeature4": "Évalués par d'autres voyageurs",
+    "guidesCta": "Parcourir les guides locaux",
+    "trustNote": "Gratuit · Pas de compte requis pour naviguer · Réservez instantanément quand vous êtes prêt"
+  },
+  "AIPlannerPage": {
+    "backLink": "Retour au planificateur",
+    "title": "Planifiez votre voyage à",
+    "defaultCity": "destination",
+    "subtitle": "Répondez à quelques questions — votre itinéraire sera prêt en quelques secondes."
+  },
+  "GuidesListing": {
+    "pageLabel": "Guides locaux",
+    "headingPrefix": "Rencontrez les experts à",
+    "headingFallbackCity": "votre destination",
+    "subheading": "Des plans créés par des gens qui vivent ici — pas l'IA, pas des algorithmes. Une vraie connaissance locale.",
+    "guideCount": "{count, plural, one {# guide} other {# guides}}",
+    "noGuidesSpec": "Aucun guide avec cette spécialisation",
+    "noGuidesSpecHint": "Essayez un autre filtre ou parcourez tous les guides.",
+    "noGuides": "Aucun guide encore pour cette destination",
+    "noGuidesHint": "Revenez bientôt — notre réseau de guides est en plein essor.",
+    "backLink": "Retour au planificateur",
+    "filterAll": "Tous",
+    "sortBy": "Trier par",
+    "sortFeatured": "Mis en avant",
+    "sortMostPlans": "Plus de plans",
+    "sortTopRated": "Les mieux notés",
+    "sortNewest": "Les plus récents",
+    "specAdventures": "Aventures",
+    "specWaterSports": "Sports nautiques",
+    "specCulture": "Culture",
+    "specFoodDrink": "Gastronomie",
+    "specNature": "Nature",
+    "specShopping": "Shopping",
+    "specWellness": "Bien-être",
+    "specFamily": "Famille",
+    "specSightseeing": "Visites",
+    "specWorkshops": "Ateliers"
+  },
+  "GuideProfile": {
+    "backLink": "Tous les guides",
+    "verified": "Vérifié",
+    "reviewCount": "({count, plural, one {# avis} other {# avis}})",
+    "planCountLabel": "{count, plural, one {# plan} other {# plans}}",
+    "aboutHeading": "À propos de {firstName}",
+    "specializationsHeading": "Spécialisations",
+    "guideInfoHeading": "Infos guide",
+    "languagesLabel": "Langues",
+    "experienceLabel": "Expérience",
+    "experienceYears": "{years, plural, one {# an} other {# ans}}",
+    "basedInLabel": "Basé à",
+    "plansHeading": "Plans de {firstName}",
+    "plansCount": "({count})",
+    "noPlans": "Aucun plan publié pour le moment.",
+    "planTypeFree": "Gratuit",
+    "planTypePaid": "Payant",
+    "planDuration": "{count, plural, one {# jour} other {# jours}}",
+    "tripsPlanned": "{count} voyages planifiés",
+    "planViews": "{count} vues",
+    "noReviews": "Aucun avis pour l'instant — soyez le premier à partager votre expérience.",
+    "reviewButtonLabel": "Écrire un avis",
+    "reviewDialogTitle": "Évaluer {name}",
+    "reviewRatingLabel": "Note",
+    "reviewTitleLabel": "Titre",
+    "reviewTitlePlaceholder": "Résumez votre expérience",
+    "reviewCommentLabel": "Votre avis",
+    "reviewCommentPlaceholder": "Comment s'est passée l'expérience avec les plans de ce guide ?",
+    "reviewSubmit": "Soumettre l'avis",
+    "reviewSubmitting": "Envoi en cours…",
+    "reviewCancel": "Annuler",
+    "reviewSuccess": "Avis soumis — merci !",
+    "notFoundTitle": "Guide introuvable",
+    "notFoundDesc": "Ce profil de guide n'existe pas ou a été désactivé.",
+    "notFoundCta": "Parcourir tous les guides"
+  },
+  "GuideCard": {
+    "planCount": "{count, plural, one {# plan} other {# plans}}"
+  },
+  "PlannerWizard": {
+    "stepDestination": "Destination",
+    "stepDestinationDesc": "Où allez-vous et pour combien de temps ?",
+    "stepInterests": "Centres d'intérêt",
+    "stepInterestsDesc": "Qu'est-ce que vous souhaitez vivre ?",
+    "stepBudget": "Budget & Groupe",
+    "stepBudgetDesc": "Indiquez votre budget et qui voyage.",
+    "stepLogistics": "Logistique",
+    "stepLogisticsDesc": "Transferts et transport pour votre voyage.",
+    "stepItinerary": "Votre itinéraire",
+    "stepItineraryDesc": "Votre programme personnalisé jour par jour.",
+    "stepOf": "Étape {step} sur {total}",
+    "back": "Retour",
+    "next": "Suivant",
+    "generatePlan": "Générer mon plan",
+    "savePlan": "Sauvegarder",
+    "share": "Partager",
+    "generatingTitle": "Construction de votre itinéraire…",
+    "generatingSubtitle": "Nous préparons le plan parfait pour votre voyage.",
+    "errorGenerate": "Échec de la génération. Veuillez réessayer.",
+    "errorSave": "Échec de la sauvegarde.",
+    "savedSuccess": "Plan sauvegardé !",
+    "linkCopied": "Lien copié !"
+  },
+  "PlannerStepDestination": {
+    "whereGoing": "Où allez-vous ?",
+    "whenArriving": "Quand arrivez-vous ?",
+    "optional": "(optionnel)",
+    "dateHelp": "Nous aide à vérifier les horaires des restaurants et à planifier votre journée d'arrivée.",
+    "howManyDays": "Combien de jours ?",
+    "travelStyle": "Quel est votre style de voyage ?",
+    "styleRelaxed": "Détendu",
+    "styleRelaxedDesc": "Rythme calme, beaucoup de temps libre",
+    "styleBalanced": "Équilibré",
+    "styleBalancedDesc": "Mix d'activités et de repos",
+    "styleActive": "Actif",
+    "styleActiveDesc": "Programme chargé, profitez au maximum"
+  },
+  "PlannerStepInterests": {
+    "title": "Qu'est-ce qui vous intéresse le plus ?",
+    "subtitle": "Sélectionnez tout ce qui vous attire — nous construirons votre plan autour de ça.",
+    "selectedCount": "{count} sélectionné(s)",
+    "hint": "Sélectionnez au moins un centre d'intérêt pour obtenir des recommandations personnalisées.",
+    "adventures": "Aventures",
+    "waterSports": "Sports nautiques",
+    "culture": "Culture",
+    "foodDrink": "Gastronomie",
+    "natureWildlife": "Nature & Faune",
+    "attractions": "Attractions",
+    "sightseeing": "Visites",
+    "workshops": "Ateliers",
+    "wellness": "Bien-être & Spa",
+    "shopping": "Shopping",
+    "familyFriendly": "En famille",
+    "events": "Événements & Musique",
+    "dayTrips": "Excursions"
+  },
+  "PlannerStepBudget": {
+    "budgetTitle": "Quel est votre budget ?",
+    "budgetLabel": "Économique",
+    "budgetRange": "~TND 50–150/jour",
+    "midrangeLabel": "Moyen",
+    "midrangeRange": "~TND 150–400/jour",
+    "luxuryLabel": "Luxe",
+    "luxuryRange": "TND 400+/jour",
+    "groupTitle": "Qui voyage ?",
+    "solo": "Solo",
+    "couple": "Couple",
+    "family": "Famille",
+    "friends": "Amis",
+    "accommodationTitle": "Où logerez-vous ?",
+    "hotel": "Hôtel",
+    "hotelDesc": "Service complet",
+    "riad": "Riad",
+    "riadDesc": "Charme local",
+    "apartment": "Appartement",
+    "apartmentDesc": "Comme à la maison",
+    "hostel": "Auberge",
+    "hostelDesc": "Petit budget"
+  },
+  "PlannerStepLogistics": {
+    "title": "Se rendre et se déplacer",
+    "subtitle": "Nous inclurons les meilleures options de nos partenaires vérifiés.",
+    "airportPickupLabel": "Transfert aéroport à l'arrivée",
+    "airportPickupDesc": "Nous inclurons le meilleur partenaire de transfert pour vous accueillir.",
+    "returnTransferLabel": "Transfert retour vers l'aéroport",
+    "returnTransferDesc": "Un transfert le jour de votre départ pour ne jamais rater votre vol.",
+    "rentalLabel": "Louer un véhicule",
+    "rentalDesc": "Voiture, vélo ou scooter pour explorer à votre rythme.",
+    "rentalTypeTitle": "Quel type de location ?",
+    "car": "Voiture",
+    "bike": "Vélo",
+    "scooter": "Scooter",
+    "skipNote": "Vous pouvez ignorer tout cela — la logistique s'ajoute simplement par-dessus votre plan d'activités."
+  },
+  "PlanView": {
+    "backLink": "Retour au planificateur",
+    "localGuide": "Guide local",
+    "defaultTitle": "Voyage de {days} jours à {city}",
+    "titlePlaceholder": "Nommez votre voyage…",
+    "editTitle": "Modifier le titre",
+    "dayCount": "{count} jour{count, plural, one {} other {s}}",
+    "reviewCount": "({count} avis)",
+    "unknownCity": "Inconnu",
+    "groupSolo": "Voyageur solo",
+    "groupCouple": "Couple",
+    "groupFamily": "Famille",
+    "groupFriends": "Amis",
+    "budgetBudget": "Économique",
+    "budgetMidrange": "Moyen",
+    "budgetLuxury": "Luxe",
+    "public": "Public",
+    "private": "Privé",
+    "makePublic": "Rendre public",
+    "makePrivate": "Rendre privé",
+    "copyLink": "Copier le lien",
+    "deletePlan": "Supprimer le plan",
+    "confirmDelete": "Supprimer ce plan ? Cette action est irréversible.",
+    "madePublic": "Le plan est maintenant public",
+    "madePrivate": "Le plan est maintenant privé",
+    "linkCopied": "Lien copié",
+    "errorUpdate": "Échec de la mise à jour",
+    "errorSaveTitle": "Échec de la sauvegarde du titre",
+    "errorDelete": "Échec de la suppression",
+    "reviewsTitle": "Avis",
+    "noReviews": "Pas encore d'avis — soyez le premier à partager votre expérience.",
+    "reviewButtonLabel": "Écrire un avis",
+    "reviewDialogTitle": "Évaluer ce plan",
+    "reviewRatingLabel": "Note",
+    "reviewTitleLabel": "Titre",
+    "reviewTitlePlaceholder": "Résumez votre expérience",
+    "reviewCommentLabel": "Votre avis",
+    "reviewCommentPlaceholder": "Avez-vous suivi ce plan ? Quelle a été votre expérience ?",
+    "reviewSubmit": "Soumettre",
+    "reviewSubmitting": "Envoi…",
+    "reviewCancel": "Annuler",
+    "reviewSuccess": "Avis soumis — merci !"
+  },
+  "PlanItinerary": {
+    "slotMorning": "Matin",
+    "slotLunch": "Déjeuner",
+    "slotAfternoon": "Après-midi",
+    "slotEvening": "Soir",
+    "itemCount": "{count} activité{count, plural, one {} other {s}}",
+    "regenerateDay": "Régénérer cette journée",
+    "dropHere": "Déposer ici",
+    "typeActivity": "Activité",
+    "typeAttraction": "Attraction",
+    "typeRestaurant": "Restaurant",
+    "typeTransfer": "Transfert",
+    "typeRental": "Location",
+    "typeStay": "Hébergement",
+    "free": "Gratuit",
+    "swapItem": "Remplacer",
+    "book": "Réserver",
+    "estimatedTotal": "Total estimé",
+    "overBudget": "Hors budget",
+    "perPerson": "/ pers.",
+    "budgetEmpty": "Les coûts apparaîtront au fur et à mesure de la construction de votre itinéraire"
+  },
+  "CategoriesNav": {
+    "home": "Guidni",
+    "activities": "Activités",
+    "stays": "Séjours",
+    "restaurants": "Restaurants",
+    "passes": "Passes",
+    "transport": "Transport",
+    "shops": "Boutiques",
+    "destinations": "Destinations",
+    "planner": "Planificateur"
+  },
+  "Destinations": {
+    "title": "Destinations",
+    "heroTitle": "Explorez",
+    "heroAccent": "le Monde",
+    "subtitle": "Explorez le monde avec Guidni",
+    "heroSubtitle": "Découvrez des destinations époustouflantes, des activités sélectionnées avec soin et des séjours inoubliables — le tout en un seul endroit.",
+    "allDestinations": "Toutes les Destinations",
+    "exploreIn": "Explorer à",
+    "activities": "Activités",
+    "stays": "Séjours",
+    "filterAll": "Tous les Pays",
+    "countrySelectPlaceholder": "Pays",
+    "count": "{count} destination",
+    "countPlural": "{count} destinations",
+    "resultsCount": "{count, plural, one {# destination} other {# destinations}}",
+    "searchPlaceholder": "Rechercher des destinations…",
+    "clearSearch": "Effacer",
+    "noResults": "Aucune destination trouvée",
+    "noResultsHint": "Essayez un autre pays ou effacez votre recherche.",
+    "featuredLabel": "En vedette",
+    "featuredTitle": "Destinations Phares",
+    "featuredSubtitle": "Nos destinations les plus populaires en ce moment",
+    "activitiesCount": "{count} activités",
+    "staysCount": "{count} séjours",
+    "restaurantsCount": "{count} restaurants"
+  },
+  "AttractionPage": {
+    "about": "À Propos de Cette Attraction",
+    "practicalInfo": "Informations Pratiques",
+    "hours": "Horaires d'Ouverture",
+    "admission": "Entrée",
+    "free": "Entrée gratuite",
+    "location": "Emplacement",
+    "viewMap": "Voir sur la Carte",
+    "ticketTitle": "Réservez Votre Visite",
+    "bookTour": "Réserver une Excursion",
+    "relatedActivities": "Activités Incluant Cette Attraction",
+    "relatedAttractions": "Plus d'Attractions à Proximité",
+    "backToDestination": "Retour à {city}",
+    "breadcrumbDestinations": "Destinations",
+    "breadcrumbAttractions": "Attractions",
+    "categoryBadge": {
+      "culture": "Culture",
+      "religion": "Religion",
+      "beach": "Plage",
+      "nature": "Nature",
+      "history": "Histoire",
+      "entertainment": "Divertissement"
+    }
+  },
+  "DestinationGuide": {
+    "overview": "Présentation",
+    "weather": "Météo",
+    "food": "Gastronomie",
+    "transport": "Se déplacer",
+    "budget": "Budget",
+    "safety": "Sécurité",
+    "packing": "Quoi emporter",
+    "quickFacts": "Faits essentiels",
+    "highlights": "Points forts",
+    "culture": "Culture et Coutumes",
+    "bestTime": "Meilleure période",
+    "climate": "Climat",
+    "gettingThere": "Comment y aller",
+    "movingAround": "Se déplacer sur place",
+    "budgetLevels": "Budget journalier",
+    "priceExamples": "Exemples de prix",
+    "moneyTips": "Conseils financiers",
+    "safetyTips": "Conseils de sécurité",
+    "emergency": "Numéros d'urgence",
+    "essentials": "Essentiels",
+    "summer": "Été",
+    "winter": "Hiver",
+    "currency": "Devise",
+    "activities": "Activités",
+    "stays": "Hébergements",
+    "restaurants": "Restaurants",
+    "attractions": "Top Attractions",
+    "readyToExplore": "Prêt à explorer {city} ?",
+    "exploreSubtitle": "Réservez des activités, trouvez un hébergement et découvrez les meilleurs restaurants."
+  },
+  "ActivitiesPage": {
+    "titlePrefix": "Activités à",
+    "titleDefault": "Activités",
+    "titleFallback": "toutes les destinations",
+    "subtitle": "Plongez dans l'aventure — explorez, détendez-vous et profitez. Votre expérience vous attend.",
+    "allActivities": "Toutes les activités",
+    "resultsCount": "{count, plural, one {# activité} other {# activités}}",
+    "searchPlaceholder": "Rechercher des activités…",
+    "noActivities": "Aucune activité trouvée",
+    "noActivitiesHint": "Essayez une autre catégorie ou effacez votre recherche.",
+    "clearSearch": "Effacer la recherche",
+    "page": "Page",
+    "of": "sur",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "perPage": "par page",
+    "filtersLabel": "Filtres",
+    "clearFilters": "Tout effacer"
+  },
+  "RestaurantsPage": {
+    "titlePrefix": "Où manger à",
+    "titleDefault": "Où manger",
+    "titleFallback": "toutes les destinations",
+    "subtitle": "Des adresses secrètes aux tables incontournables — mangez comme un vrai local.",
+    "resultsCount": "{count, plural, one {# établissement} other {# établissements}}",
+    "searchPlaceholder": "Rechercher des restaurants…",
+    "clearSearch": "Effacer la recherche",
+    "noResults": "Aucun restaurant trouvé",
+    "noResultsHint": "Essayez une autre ambiance, cuisine ou effacez votre recherche.",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "showFilters": "Filtres",
+    "hideFilters": "Masquer les filtres",
+    "activeFilters": "{count, plural, one {# filtre} other {# filtres}}",
+    "filtersLabel": "Filtres",
+    "filter": {
+      "cuisinePlaceholder": "Cuisine",
+      "typePlaceholder": "Type d'établissement",
+      "mealPlaceholder": "Repas",
+      "foodTypePlaceholder": "Type de plat",
+      "dietPlaceholder": "Régime",
+      "attributesPlaceholder": "Ambiance & Équipements",
+      "typeRestaurants": "Restaurants",
+      "typeCafes": "Cafés",
+      "reservation": "Réservation",
+      "clearAll": "Effacer les filtres",
+      "mealBreakfast": "Petit-déjeuner",
+      "mealBrunch": "Brunch",
+      "mealLunch": "Déjeuner",
+      "mealDinner": "Dîner",
+      "mealSnacks": "Snacks",
+      "search": "Rechercher...",
+      "noResults": "Aucun résultat.",
+      "selectAll": "Tout sélectionner",
+      "clear": "Effacer",
+      "close": "Fermer"
+    },
+    "cuisines": {
+      "tunisian": "Tunisienne",
+      "moroccan": "Marocaine",
+      "north_african": "Nord-africaine",
+      "middle_eastern": "Moyen-orientale",
+      "lebanese": "Libanaise",
+      "syrian": "Syrienne",
+      "turkish": "Turque",
+      "mediterranean": "Méditerranéenne",
+      "greek": "Grecque",
+      "italian": "Italienne",
+      "french": "Française",
+      "spanish": "Espagnole",
+      "american": "Américaine",
+      "mexican": "Mexicaine",
+      "asian": "Asiatique",
+      "japanese": "Japonaise",
+      "chinese": "Chinoise",
+      "indian": "Indienne",
+      "thai": "Thaïlandaise",
+      "international": "Internationale"
+    },
+    "foodTypes": {
+      "seafood": "Fruits de mer",
+      "grill": "Grill & BBQ",
+      "pizza": "Pizza",
+      "burgers": "Burgers",
+      "street_food": "Street Food",
+      "fast_food": "Fast Food",
+      "bakery": "Boulangerie & Pâtisserie",
+      "cafe": "Café & Coffee"
+    },
+    "dietTypes": {
+      "halal": "Halal",
+      "vegetarian": "Végétarien",
+      "vegan": "Végétalien"
+    },
+    "attributes": {
+      "romantic": "Atmosphère romantique",
+      "cosy": "Cosy & intime",
+      "quiet": "Calme & paisible",
+      "live_music": "Musique live",
+      "sea_view": "Vue sur la mer",
+      "panoramic_view": "Vue panoramique",
+      "rooftop": "Terrasse sur le toit",
+      "terrace": "Terrasse extérieure",
+      "family_friendly": "Adapté aux familles",
+      "children_menu": "Menu enfants",
+      "baby_space": "Espace bébé/poussette",
+      "board_games": "Jeux de société",
+      "sports_screen": "Retransmission sportive",
+      "wifi": "WiFi gratuit",
+      "air_conditioned": "Climatisé",
+      "parking": "Parking disponible",
+      "pet_friendly": "Animaux acceptés",
+      "private_dining": "Salle privée"
+    },
+    "intents": {
+      "all": "Tous",
+      "breakfast": "Petit-déjeuner",
+      "brunch": "Brunch",
+      "work": "Travail & Étude",
+      "date": "Rendez-vous",
+      "hangout": "Entre amis",
+      "night": "Soirée",
+      "cheap": "Petit budget",
+      "cosy": "Cosy & Détente",
+      "scenic": "Vue panoramique",
+      "local": "Cuisine locale",
+      "family": "En famille"
+    }
+  },
+  "RestaurantPage": {
+    "reviews": "avis",
+    "reviewsTitle": "Avis",
+    "noReviews": "Aucun avis pour l'instant. Soyez le premier à partager votre expérience.",
+    "outOf": "sur 5",
+    "share": "Partager",
+    "shareCopied": "Lien copié !",
+    "allPhotos": "Voir toutes les photos",
+    "photos": "photos",
+    "showMore": "Voir plus",
+    "showLess": "Voir moins",
+    "breadcrumb": "Restaurants",
+    "about": "À propos",
+    "relatedTitle": "Plus de restaurants à {city}",
+    "type": {
+      "RESTAURANT": "Restaurant",
+      "CAFEE_SHOP": "Café",
+      "BOTH": "Restaurant & Café"
+    },
+    "nav": {
+      "overview": "Aperçu",
+      "menu": "Menu",
+      "location": "Localisation",
+      "reviews": "Avis"
+    },
+    "menu": {
+      "title": "Menu",
+      "noMenu": "Aucun menu disponible pour l'instant.",
+      "groupBy": "Grouper par catégorie",
+      "showAll": "Afficher tous les articles",
+      "other": "Autre",
+      "items": "articles",
+      "viewFull": "Voir le menu complet"
+    },
+    "location": {
+      "title": "Localisation",
+      "viewOnMaps": "Voir sur Google Maps",
+      "website": "Site web",
+      "instagram": "Instagram",
+      "facebook": "Facebook"
+    },
+    "hours": {
+      "title": "Horaires d'ouverture",
+      "closed": "Fermé",
+      "open24h": "Ouvert 24h/24"
+    },
+    "widget": {
+      "title": "Réserver une table",
+      "date": "Date",
+      "time": "Heure",
+      "guests": "Couverts",
+      "maxGuests": "Max {n} couverts par réservation",
+      "notes": "Demandes spéciales (optionnel)",
+      "notesPlaceholder": "Allergies, chaise haute, anniversaire…",
+      "submit": "Demande de réservation",
+      "submitting": "Envoi en cours…",
+      "cancelNote": "Annulation gratuite jusqu'à 24h avant votre visite",
+      "successTitle": "Demande de réservation envoyée !",
+      "successMessage": "Nous confirmerons votre table chez {name} sous peu."
+    },
+    "visitCard": {
+      "title": "Nous rendre visite",
+      "walkin": "Sans réservation bienvenu"
+    },
+    "mobileBar": {
+      "bookTable": "Réserver une table",
+      "viewMenu": "Voir le menu"
+    },
+    "menuPage": {
+      "backToRestaurant": "Retour au restaurant",
+      "table": "Table {n}",
+      "fullMenu": "Menu complet",
+      "poweredBy": "Propulsé par Guidni"
+    },
+    "qrTab": {
+      "title": "Codes QR",
+      "description": "Générez des codes QR pour vos tables. Les clients scannent pour voir le menu directement sur leur téléphone.",
+      "tableLabel": "Numéro de table",
+      "general": "Général (sans table)",
+      "previewLabel": "Aperçu du code QR",
+      "linkLabel": "Redirige vers",
+      "download": "Télécharger PNG",
+      "tableMode": "Table",
+      "generalMode": "Général"
+    },
+    "reviewForm": {
+      "buttonLabel": "Écrire un avis",
+      "dialogTitle": "Partagez votre expérience",
+      "ratingLabel": "Votre note",
+      "titleLabel": "Titre (optionnel)",
+      "titlePlaceholder": "Résumez votre visite",
+      "commentLabel": "Commentaire (optionnel)",
+      "commentPlaceholder": "Parlez-nous de la nourriture, du service et de l'ambiance...",
+      "submit": "Soumettre l'avis",
+      "submitting": "Envoi en cours...",
+      "cancel": "Annuler",
+      "success": "Avis soumis avec succès !",
+      "partnerReply": "Réponse du restaurant"
+    },
+    "guidniReview": {
+      "title": "Évalué par Guidni",
+      "by": "Évalué par",
+      "visited": "Visité",
+      "score": "Score Guidni",
+      "accuracy": "Exactitude",
+      "quality": "Qualité",
+      "value": "Rapport qualité-prix",
+      "presentation": "Présentation",
+      "host": "Hôte",
+      "fullReview": "Avis complet",
+      "loved": "Ce qu'on a adoré",
+      "worth": "À savoir",
+      "bestFor": "Idéal pour",
+      "partnerReply": "Réponse du partenaire",
+      "outOf": "/ 10"
+    }
+  },
+  "StaysPage": {
+    "titlePrefix": "Où dormir à",
+    "titleDefault": "Où dormir",
+    "titleFallback": "toutes les destinations",
+    "subtitle": "Des resorts de luxe aux maisons d'hôtes cosy — trouvez votre hébergement parfait.",
+    "allStays": "Tous les séjours",
+    "resultsCount": "{count, plural, one {# séjour} other {# séjours}}",
+    "searchPlaceholder": "Rechercher des séjours…",
+    "clearSearch": "Effacer la recherche",
+    "noStays": "Aucun séjour trouvé",
+    "noStaysHint": "Essayez une autre catégorie ou effacez votre recherche.",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "filtersLabel": "Filtres",
+    "clearFilters": "Tout effacer"
+  },
+  "StayPage": {
+    "about": "À propos du logement",
+    "perNight": "par nuit",
+    "cleaningFee": "Frais de ménage",
+    "serviceFee": "Frais de service",
+    "taxes": "Taxes (TVA 9%)",
+    "discount": "Remise",
+    "total": "Total",
+    "allPhotos": "Voir toutes les photos",
+    "photos": "photos",
+    "minNights": "Séjour minimum de {n} nuits",
+    "outOf": "sur 5",
+    "share": "Partager",
+    "shareCopied": "Lien copié !",
+    "bookNow": "Réserver",
+    "bookingNote": "Aucun paiement requis pour l'instant",
+    "reviews": "avis",
+    "reviewsTitle": "Avis",
+    "noReviews": "Pas encore d'avis. Soyez le premier à partager votre expérience.",
+    "breadcrumb": {
+      "stays": "Hébergements"
+    },
+    "host": {
+      "hostedBy": "{type} entier géré par {name}",
+      "speaks": "Parle",
+      "defaultName": "Hôte"
+    },
+    "showMore": "Voir plus",
+    "showLess": "Voir moins",
+    "memberSince": "Membre depuis",
+    "relatedTitle": "Plus de séjours à {city}",
+    "night": "nuit",
+    "nights": "nuits",
+    "nav": {
+      "overview": "Aperçu",
+      "amenities": "Équipements",
+      "location": "Localisation",
+      "reviews": "Avis"
+    },
+    "highlights": {
+      "freeCancel": "Annulation gratuite",
+      "pool": "Piscine privée",
+      "wifi": "Wi-Fi gratuit",
+      "parking": "Parking gratuit",
+      "kitchen": "Cuisine complète",
+      "garden": "Jardin",
+      "balcony": "Balcon",
+      "topRated": "Coup de cœur voyageurs"
+    },
+    "location": {
+      "title": "Où vous serez",
+      "viewOnMaps": "Voir sur Google Maps"
+    },
+    "thingsToKnow": {
+      "title": "Bon à savoir",
+      "houseRules": "Règles de la maison",
+      "safety": "Sécurité et accessibilité",
+      "cancellation": "Politique d'annulation",
+      "safetyItem1": "Détecteur de monoxyde de carbone",
+      "safetyItem2": "Détecteur de fumée",
+      "safetyItem3": "Trousse de premiers secours"
+    },
+    "reviewForm": {
+      "buttonLabel": "Laisser un avis",
+      "dialogTitle": "Partagez votre expérience",
+      "ratingLabel": "Votre note",
+      "titleLabel": "Titre (facultatif)",
+      "titlePlaceholder": "Résumez votre expérience",
+      "commentLabel": "Commentaire (facultatif)",
+      "commentPlaceholder": "Dites-nous en plus sur votre expérience...",
+      "submit": "Soumettre l'avis",
+      "submitting": "Envoi en cours...",
+      "cancel": "Annuler",
+      "success": "Avis soumis avec succès !",
+      "partnerReply": "Réponse de l'hôte"
+    },
+    "details": {
+      "title": "L'espace",
+      "guests": "voyageurs",
+      "bedrooms": "chambres",
+      "beds": "lits",
+      "bathrooms": "salles de bain",
+      "cancellation": "Politique d'annulation",
+      "cancelation": {
+        "flexible": "Flexible — annulez jusqu'à 24h avant l'arrivée pour un remboursement complet.",
+        "moderate": "Modérée — annulez jusqu'à 5 jours avant l'arrivée pour un remboursement complet.",
+        "strict": "Stricte — annulez jusqu'à 14 jours avant l'arrivée pour un remboursement complet.",
+        "non_refundable": "Non remboursable — cette réservation ne peut pas être annulée."
+      }
+    },
+    "amenities": {
+      "title": "Équipements",
+      "wifi": "Wi-Fi",
+      "kitchen": "Cuisine",
+      "ac": "Climatisation",
+      "heating": "Chauffage",
+      "pool": "Piscine",
+      "garden": "Jardin",
+      "balcony": "Balcon",
+      "parking": "Parking gratuit",
+      "security": "Caméras de sécurité",
+      "concierge": "Conciergerie",
+      "wheelchair": "Accessible en fauteuil roulant",
+      "elevator": "Ascenseur",
+      "groupEssentials": "Essentiels",
+      "groupOutdoors": "Extérieur et extras",
+      "groupSafety": "Sécurité et accessibilité",
+      "showAll": "Voir les {n} équipements",
+      "showLess": "Voir moins"
+    },
+    "houseRules": {
+      "title": "Règlement intérieur",
+      "checkIn": "Arrivée",
+      "checkOut": "Départ",
+      "after": "À partir de",
+      "before": "Avant",
+      "pets": "Animaux",
+      "smoking": "Tabac",
+      "allowed": "Autorisé",
+      "notAllowed": "Non autorisé",
+      "cancelPolicies": {
+        "flexible": "Flexible — remboursement complet jusqu'à 24h avant l'arrivée.",
+        "moderate": "Modérée — remboursement complet jusqu'à 5 jours avant l'arrivée.",
+        "strict": "Stricte — remboursement complet jusqu'à 14 jours avant l'arrivée.",
+        "non_refundable": "Non remboursable."
+      }
+    },
+    "booking": {
+      "checkIn": "Arrivée",
+      "checkOut": "Départ",
+      "adults": "Adultes",
+      "children": "Enfants",
+      "maxGuests": "Nombre maximum de voyageurs dépassé"
+    },
+    "guidniReview": {
+      "title": "Évalué par Guidni",
+      "by": "Évalué par",
+      "visited": "Visité",
+      "score": "Score Guidni",
+      "accuracy": "Exactitude",
+      "quality": "Qualité",
+      "value": "Rapport qualité-prix",
+      "presentation": "Présentation",
+      "host": "Hôte",
+      "fullReview": "Avis complet",
+      "loved": "Ce qu'on a adoré",
+      "worth": "À savoir",
+      "bestFor": "Idéal pour",
+      "partnerReply": "Réponse du partenaire",
+      "outOf": "/ 10"
+    }
+  },
+  "BookingsPage": {
+    "title": "Mes réservations",
+    "subtitle": "Consultez et gérez toutes vos réservations.",
+    "activities": "Activités",
+    "stays": "Hébergements",
+    "passes": "Passes",
+    "rentals": "Locations",
+    "transfers": "Transferts",
+    "noActivities": "Vous n'avez pas encore réservé d'activités.",
+    "noStays": "Vous n'avez pas encore réservé d'hébergements.",
+    "noPasses": "Vous n'avez pas encore réservé de passes.",
+    "noRentals": "Vous n'avez pas encore réservé de locations.",
+    "noTransfers": "Vous n'avez pas encore réservé de transferts.",
+    "browseActivities": "Parcourir les activités",
+    "browseStays": "Parcourir les hébergements",
+    "browsePasses": "Parcourir les passes",
+    "browseRentals": "Parcourir les locations",
+    "browseTransfers": "Parcourir les transferts",
+    "viewDetails": "Voir les détails",
+    "bookingRef": "Réf",
+    "adults": "adultes",
+    "children": "enfants",
+    "nights": "nuits",
+    "days": "jours",
+    "passengers": "passagers",
+    "participants": "participants",
+    "validUntil": "Valide jusqu'au"
+  },
+  "BookingDetail": {
+    "backToBookings": "Retour aux réservations",
+    "activityTitle": "Réservation d'activité",
+    "stayTitle": "Réservation d'hébergement",
+    "date": "Date",
+    "time": "Heure",
+    "participants": "Participants",
+    "checkIn": "Arrivée",
+    "checkOut": "Départ",
+    "nights": "nuits",
+    "guests": "Voyageurs",
+    "adults": "adultes",
+    "children": "enfants",
+    "priceBreakdown": "Détail du prix",
+    "taxes": "Taxes",
+    "serviceFee": "Frais de service",
+    "cleaningFee": "Frais de ménage",
+    "total": "Total",
+    "payment": "Paiement",
+    "method": "Méthode",
+    "paymentOption": "Option",
+    "payNow": "Payé en ligne",
+    "payLater": "Payer à l'arrivée",
+    "contact": "Coordonnées",
+    "bookingRef": "Référence de réservation",
+    "cancel": "Annuler la réservation",
+    "confirmCancel": "Oui, annuler",
+    "keepBooking": "Conserver la réservation"
+  },
+  "ProfilePage": {
+    "title": "Mon profil",
+    "memberSince": "Membre depuis",
+    "editTitle": "Modifier vos informations",
+    "editSubtitle": "Mettez à jour vos informations personnelles.",
+    "name": "Nom complet",
+    "phone": "Numéro de téléphone",
+    "bio": "Bio",
+    "city": "Ville",
+    "country": "Pays",
+    "address": "Adresse",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "saved": "Profil mis à jour avec succès.",
+    "error": "Échec de la mise à jour. Veuillez réessayer."
+  },
+  "Checkout": {
+    "title": "Finaliser la réservation",
+    "backTo": "Retour à",
+    "orderSummary": "Récapitulatif",
+    "goBack": "Réessayer",
+    "bookAnother": "Faire une autre réservation",
+    "viewBookings": "Voir mes réservations",
+    "error": "Une erreur s'est produite. Veuillez réessayer.",
+    "contact": {
+      "title": "Vos coordonnées",
+      "subtitle": "Nous utiliserons ces informations pour envoyer votre confirmation.",
+      "infoNote": "Vos coordonnées sont uniquement utilisées pour la confirmation de réservation et la communication avec l'hôte.",
+      "name": "Nom complet",
+      "email": "Adresse e-mail",
+      "phone": "Numéro de téléphone",
+      "namePlaceholder": "Votre nom complet",
+      "emailPlaceholder": "votre@email.com",
+      "phonePlaceholder": "+216 XX XXX XXX",
+      "next": "Continuer"
+    },
+    "payment": {
+      "title": "Mode de paiement",
+      "subtitle": "Choisissez comment vous souhaitez payer.",
+      "payNow": "Payer maintenant",
+      "payLater": "Payer plus tard",
+      "payNowDesc": "Payez en ligne en toute sécurité.",
+      "payLaterDesc": "Payez sur place ou à l'arrivée.",
+      "chooseMethod": "Sélectionnez un mode de paiement",
+      "konnect": "Konnect",
+      "creditCard": "Carte bancaire",
+      "cash": "Espèces à l'arrivée",
+      "back": "Retour",
+      "confirm": "Confirmer la réservation",
+      "confirmBooking": "Confirmer la réservation",
+      "total": "Total",
+      "secureBooking": "Réservation sécurisée"
+    },
+    "summary": {
+      "adults": "adultes",
+      "children": "enfants",
+      "nights": "nuits",
+      "cleaningFee": "Frais de ménage",
+      "serviceFee": "Frais de service",
+      "taxes": "Taxes",
+      "total": "Total",
+      "totalNote": "Toutes taxes et frais inclus",
+      "perPerson": "par personne",
+      "perNight": "par nuit",
+      "freeCancel": "Annulation gratuite",
+      "nonRefundable": "Non remboursable"
+    },
+    "steps": {
+      "contact": "Contact",
+      "payment": "Paiement"
+    },
+    "success": {
+      "title": "Réservation confirmée !",
+      "bookingRef": "Référence de réservation",
+      "copied": "Copié !",
+      "whatsNext": "Et maintenant ?",
+      "step1": "Un e-mail de confirmation a été envoyé dans votre boîte de réception.",
+      "step2": "L'hôte vous contactera avec plus de détails.",
+      "step3": "Présentez votre QR code le jour de l'activité."
+    }
+  },
+  "WishlistPage": {
+    "title": "Ma liste de souhaits",
+    "subtitle": "Activités, séjours et restaurants que vous avez enregistrés.",
+    "activitiesTitle": "Activités",
+    "staysTitle": "Séjours",
+    "restaurantsTitle": "Restaurants",
+    "emptyTitle": "Votre liste de souhaits est vide",
+    "emptyHint": "Enregistrez les activités, séjours et restaurants qui vous plaisent en cliquant sur l'icône cœur.",
+    "browseActivities": "Parcourir les activités",
+    "browseStays": "Parcourir les séjours",
+    "shopsTitle": "Boutiques sauvegardées",
+    "productsTitle": "Produits sauvegardés",
+    "rentalsTitle": "Locations sauvegardées",
+    "transfersTitle": "Transport sauvegardé"
+  },
+  "ActivityPage": {
+    "about": "À propos de cette activité",
+    "showMore": "Voir plus",
+    "showLess": "Voir moins",
+    "hostedBy": "Proposé par",
+    "memberSince": "Membre depuis",
+    "relatedTitle": "Plus d'activités à {city}",
+    "nav": {
+      "overview": "Aperçu",
+      "includes": "Inclus",
+      "location": "Lieu",
+      "reviews": "Avis",
+      "goodToKnow": "Bon à savoir"
+    },
+    "perPerson": "par personne",
+    "share": "Partager",
+    "shareCopied": "Lien copié !",
+    "outOf": "sur 5",
+    "reviewsTitle": "Avis",
+    "allPhotos": "Voir toutes les photos",
+    "photos": "photos",
+    "breadcrumb": {
+      "activities": "Activités"
+    },
+    "quickFacts": {
+      "maxGroup": "Max {n} personnes",
+      "category": "Catégorie",
+      "duration": "Durée",
+      "groupSize": "Taille du groupe",
+      "languages": "Langues"
+    },
+    "highlights": {
+      "freeCancel": "Annulation gratuite",
+      "payLater": "Réservez maintenant, payez plus tard",
+      "smallGroup": "Petit groupe",
+      "guided": "Expérience guidée",
+      "topRated": "Très bien noté"
+    },
+    "passCallout": {
+      "title": "Inclus dans un Pass Guidni",
+      "subtitle": "Économisez jusqu'à 20 % en combinant des expériences.",
+      "cta": "Voir les passes"
+    },
+    "location": {
+      "title": "Point de rendez-vous",
+      "viewOnMaps": "Voir sur Google Maps"
+    },
+    "goodToKnow": {
+      "title": "Bon à savoir",
+      "cancellationTitle": "Annulation",
+      "cancellationFree": "Annulation gratuite jusqu'à 24 heures avant le début de l'activité.",
+      "cancellationStrict": "Cette réservation est non remboursable une fois confirmée.",
+      "paymentTitle": "Paiement",
+      "paymentLater": "Réservez votre place maintenant et payez sur place. Aucun frais à l'avance.",
+      "paymentNow": "Le paiement intégral est requis au moment de la réservation.",
+      "groupTitle": "Taille du groupe",
+      "maxGroup": "Maximum {n} participants par session."
+    },
+    "includes": "Ce qui est inclus",
+    "excludes": "Non inclus",
+    "allowed": "Autorisé",
+    "forbidden": "Non autorisé",
+    "cancelation": {
+      "title": "Annulation gratuite",
+      "description": "Annulez jusqu'à 24h à l'avance pour un remboursement complet."
+    },
+    "paynow": {
+      "title": "Réservez maintenant, payez sur place",
+      "description": "Vous pouvez réserver votre place sans payer à l'avance."
+    },
+    "guide": {
+      "title": "Langues disponibles"
+    },
+    "capacity": "Max {count} participants",
+    "reviews": "avis",
+    "noReviews": "Pas encore d'avis. Soyez le premier à partager votre expérience.",
+    "reviewForm": {
+      "buttonLabel": "Laisser un avis",
+      "dialogTitle": "Partagez votre expérience",
+      "ratingLabel": "Votre note",
+      "titleLabel": "Titre (facultatif)",
+      "titlePlaceholder": "Résumez votre expérience",
+      "commentLabel": "Commentaire (facultatif)",
+      "commentPlaceholder": "Dites-nous en plus sur votre expérience...",
+      "submit": "Soumettre l'avis",
+      "submitting": "Envoi en cours...",
+      "cancel": "Annuler",
+      "success": "Avis soumis avec succès !",
+      "partnerReply": "Réponse de l'organisateur"
+    },
+    "guidniReview": {
+      "title": "Testé par Guidni",
+      "by": "par",
+      "visited": "Visité",
+      "score": "Score Guidni",
+      "accuracy": "Exactitude",
+      "quality": "Expérience",
+      "value": "Rapport qualité/prix",
+      "presentation": "Présentation",
+      "host": "Hôte / Guide",
+      "fullReview": "L'Avis",
+      "loved": "Ce qu'on a adoré",
+      "worth": "À savoir",
+      "bestFor": "Idéal pour",
+      "partnerReply": "Réponse du partenaire",
+      "outOf": "/ 10"
+    },
+    "booking": {
+      "title": "Vérifier la disponibilité",
+      "checkAvailability": "Vérifier la disponibilité",
+      "checking": "Vérification...",
+      "selectTime": "Choisir un créneau",
+      "breakdown": "Détail du prix",
+      "adults": "Adultes",
+      "children": "Enfants",
+      "taxes": "Taxes",
+      "serviceFee": "Frais de service",
+      "serviceDesc": "Ces frais nous permettent de maintenir la plateforme et d'assurer un support 24h/24.",
+      "total": "Total",
+      "totalNote": "Toutes taxes et frais inclus",
+      "bookNow": "Réserver",
+      "noAvailability": "Aucun créneau disponible pour cette date. Essayez une autre date.",
+      "errorMessage": "Une erreur s'est produite. Veuillez réessayer.",
+      "date": "Date",
+      "pickDate": "Sélectionner une date",
+      "back": "Retour"
+    }
+  },
+  "BecomePartner": {
+    "hero": {
+      "badge": "Programme Partenaire",
+      "title": "Développez votre activité avec Guidni",
+      "subtitle": "Rejoignez des centaines de partenaires locaux qui se connectent chaque jour avec des milliers de voyageurs. Proposez vos activités, hébergements et expériences sur la plateforme de référence.",
+      "cta": "Commencer",
+      "login": "Vous avez déjà un compte ?"
+    },
+    "benefits": {
+      "title": "Pourquoi devenir partenaire ?",
+      "reach": {
+        "title": "Touchez plus de voyageurs",
+        "description": "Soyez découvert par des milliers de voyageurs qui planifient leur séjour dans votre destination."
+      },
+      "manage": {
+        "title": "Gérez tout en un seul endroit",
+        "description": "Gérez les réservations, disponibilités, tarifs et avis depuis un tableau de bord intuitif."
+      },
+      "earn": {
+        "title": "Augmentez vos revenus",
+        "description": "Aucun frais initial. Payez uniquement une petite commission sur les réservations confirmées."
+      },
+      "support": {
+        "title": "Support dédié",
+        "description": "Notre équipe partenaires est là pour vous aider à chaque étape."
+      }
+    },
+    "howItWorks": {
+      "title": "Comment ça marche ?",
+      "step1": {
+        "title": "Créez votre profil",
+        "description": "Parlez-nous de votre activité en quelques minutes."
+      },
+      "step2": {
+        "title": "Listez vos offres",
+        "description": "Ajoutez vos activités, hébergements ou expériences avec photos et tarifs."
+      },
+      "step3": {
+        "title": "Commencez à gagner",
+        "description": "Recevez des réservations et développez votre activité grâce aux analyses en temps réel."
+      }
+    },
+    "cta": {
+      "title": "Prêt à vous lancer ?",
+      "subtitle": "Rejoignez le réseau partenaires Guidni dès aujourd'hui.",
+      "button": "Postuler maintenant"
+    },
+    "testimonials": {
+      "title": "Ce que disent nos partenaires",
+      "items": [
+        {
+          "name": "Karim B.",
+          "business": "Djerba Adventures, Tunisie",
+          "quote": "Depuis que j'ai rejoint Guidni, mes réservations ont triplé. La plateforme est simple et l'équipe support est toujours disponible."
+        },
+        {
+          "name": "Sophie M.",
+          "business": "Dubai Desert Tours, Émirats",
+          "quote": "Guidni a offert à ma petite agence une visibilité que je n'aurais jamais pu obtenir seul. Le tableau de bord rend tout si facile."
+        },
+        {
+          "name": "Fatima R.",
+          "business": "Medina Stays, Tunisie",
+          "quote": "J'étais hésitante au début, mais l'intégration était très fluide. En une semaine j'avais ma première réservation depuis la France."
+        }
+      ]
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "items": [
+        {
+          "question": "L'adhésion est-elle gratuite ?",
+          "answer": "Il n'y a aucun frais initial pour rejoindre Guidni. Nous prélevons une petite commission uniquement sur les réservations confirmées."
+        },
+        {
+          "question": "Quels types d'entreprises peuvent s'inscrire ?",
+          "answer": "Nous accueillons les prestataires d'activités, les opérateurs touristiques, les hébergeurs et toute entreprise proposant des expériences de voyage."
+        },
+        {
+          "question": "Comment reçois-je mes paiements ?",
+          "answer": "Les paiements sont virés sur votre compte bancaire selon un calendrier régulier. Vous pouvez consulter tous vos revenus depuis le tableau de bord."
+        },
+        {
+          "question": "Puis-je gérer mes disponibilités moi-même ?",
+          "answer": "Absolument. Depuis votre tableau de bord, vous avez un contrôle total sur votre calendrier de disponibilité, vos tarifs et vos fenêtres de réservation."
+        },
+        {
+          "question": "Combien de temps faut-il pour être approuvé ?",
+          "answer": "Votre profil partenaire est activé immédiatement après la soumission de votre candidature. Vous pouvez commencer à référencer vos services de suite."
+        }
+      ]
+    },
+    "apply": {
+      "title": "Devenir partenaire",
+      "subtitle": "Renseignez les informations de votre entreprise. Votre profil sera activé immédiatement.",
+      "sections": {
+        "business": "Informations professionnelles",
+        "location": "Localisation",
+        "about": "À propos de votre activité",
+        "contact": "Contact & Réseaux sociaux"
+      },
+      "fields": {
+        "name": "Nom de l'entreprise",
+        "namePlaceholder": "ex. Djerba Adventures",
+        "category": "Catégorie",
+        "categoryActivities": "Activités & Excursions",
+        "categoryStays": "Hébergements",
+        "categoryBoth": "Les deux",
+        "type": "Type d'entreprise",
+        "typeIndividual": "Individuel / Indépendant",
+        "typeCompany": "Société enregistrée",
+        "companyRN": "Numéro d'immatriculation",
+        "companyRNPlaceholder": "ex. RNE-1234567",
+        "country": "Pays",
+        "countryPlaceholder": "ex. Tunisie",
+        "region": "Région / Ville",
+        "regionPlaceholder": "ex. Médenine",
+        "address": "Adresse complète (facultatif)",
+        "addressPlaceholder": "ex. 12 Rue de la Plage, Midoun",
+        "description": "Décrivez votre activité",
+        "descriptionPlaceholder": "Dites aux voyageurs ce qui rend votre activité unique, ce que vous proposez et pourquoi réserver avec vous...",
+        "phone": "Numéro de téléphone (facultatif)",
+        "phonePlaceholder": "+216 XX XXX XXX",
+        "website": "Site web (facultatif)",
+        "websitePlaceholder": "https://votresite.com",
+        "instagram": "Compte Instagram (facultatif)",
+        "instagramPlaceholder": "@votreentreprise",
+        "facebook": "Page Facebook (facultatif)",
+        "facebookPlaceholder": "facebook.com/votreentreprise",
+        "languages": "Langues parlées (facultatif)",
+        "languagesPlaceholder": "ex. en, fr, ar"
+      },
+      "submit": "Soumettre la demande",
+      "submitting": "Envoi en cours...",
+      "success": "Bienvenue ! Votre profil partenaire est prêt.",
+      "alreadyPartner": "Vous avez déjà un profil partenaire.",
+      "goToDashboard": "Accéder au tableau de bord",
+      "steps": {
+        "category": "Catégorie",
+        "details": "Détails",
+        "location": "Localisation",
+        "review": "Vérification"
+      },
+      "category": {
+        "title": "Quel type d'activité exercez-vous ?",
+        "subtitle": "Sélectionnez la catégorie qui correspond le mieux à votre offre.",
+        "activitiesLabel": "Activités & Excursions",
+        "activitiesDesc": "Visites guidées, aventures, expériences culturelles",
+        "staysLabel": "Hébergements",
+        "staysDesc": "Hôtels, appartements, villas, riads",
+        "bothLabel": "Les deux",
+        "bothDesc": "Activités et hébergement",
+        "restaurantLabel": "Restaurant & Café",
+        "restaurantDesc": "Restauration, cafés et expériences culinaires",
+        "rentalsLabel": "Locations de véhicules",
+        "rentalsDesc": "Voitures, vélos, scooters, bateaux et autres véhicules",
+        "transfersLabel": "Transferts & Chauffeur",
+        "transfersDesc": "Transferts aéroport, taxis, chauffeur privé et navettes",
+        "shopLabel": "Boutique",
+        "shopDesc": "Artisanat, produits faits main et créations locales",
+        "guideLabel": "Guide Local",
+        "guideDesc": "Partagez votre expertise locale — créez des plans de voyage et aidez les voyageurs à découvrir votre destination",
+        "registrationTitle": "Enregistrement de l'entreprise",
+        "registrationSubtitle": "Informez-nous de votre statut juridique.",
+        "comingSoon": "Bientôt disponible"
+      },
+      "details": {
+        "title": "Parlez-nous de votre activité",
+        "subtitle": "Ces informations apparaîtront sur votre profil partenaire public."
+      },
+      "location": {
+        "title": "Où êtes-vous basé ?",
+        "subtitle": "Aidez les voyageurs à vous trouver en précisant votre localisation."
+      },
+      "reviewStep": {
+        "title": "Vérifiez votre demande",
+        "subtitle": "Assurez-vous que tout est correct avant de soumettre.",
+        "name": "Nom de l'entreprise",
+        "category": "Catégorie",
+        "type": "Type d'entreprise",
+        "location": "Localisation",
+        "address": "Adresse",
+        "phone": "Téléphone",
+        "website": "Site web",
+        "description": "À propos"
+      },
+      "terms": {
+        "agreeTo": "J'accepte les",
+        "termsLink": "Conditions d'utilisation",
+        "and": "et la",
+        "privacyLink": "Politique de confidentialité",
+        "required": "Vous devez accepter les conditions pour continuer."
+      },
+      "buttons": {
+        "back": "Retour",
+        "next": "Suivant",
+        "confirm": "Soumettre la demande"
+      },
+      "benefitsList": {
+        "title": "Pourquoi rejoindre Guidni ?",
+        "items": [
+          "Gratuit — commission uniquement sur les réservations",
+          "Touchez des milliers de voyageurs internationaux",
+          "Gestion des réservations et disponibilités en temps réel",
+          "Équipe support partenaires dédiée"
+        ]
+      },
+      "support": {
+        "title": "Besoin d'aide ?",
+        "description": "Notre équipe partenaires est disponible pour répondre à vos questions avant et après votre candidature.",
+        "email": "contact@guidni.com",
+        "phone": "+216 56 411 511",
+        "address": "Djerba, Tunisie"
+      }
+    }
+  },
+  "PartnerDashboard": {
+    "title": "Tableau de bord partenaire"
+  },
+  "PartnerShops": {
+    "title": "Mes boutiques",
+    "subtitle": "Gérez vos boutiques et vos produits.",
+    "newShop": "Nouvelle boutique",
+    "noShops": "Aucune boutique",
+    "noShopsHint": "Créez votre première boutique pour commencer à vendre.",
+    "createShop": "Créer une boutique",
+    "tabs": {
+      "details": "Détails",
+      "products": "Produits",
+      "orders": "Commandes",
+      "images": "Photos",
+      "settings": "Paramètres"
+    },
+    "wizard": {
+      "category": "Catégorie",
+      "details": "Détails",
+      "location": "Localisation",
+      "delivery": "Livraison",
+      "review": "Vérifier"
+    }
+  },
+  "PassesPage": {
+    "title": "Passes Guidni",
+    "titlePrefix": "Passes à",
+    "titleFallback": "toutes les destinations",
+    "subtitle": "Regroupez vos activités préférées à un tarif spécial.",
+    "popular": "Populaire",
+    "fixedActivities": "activités incluses",
+    "choiceFrom": "choisissez",
+    "optionalActivities": "activités au choix",
+    "perPerson": "par personne",
+    "bookNow": "Réserver",
+    "more": "de plus",
+    "viewDetails": "Voir le pass",
+    "empty": "Aucun pass disponible pour cette destination."
+  },
+  "TransportPage": {
+    "titlePrefix": "Se déplacer à",
+    "titleFallback": "votre destination",
+    "subtitle": "Louez un véhicule, réservez un transfert ou engagez un chauffeur privé",
+    "serviceRentals": "Location",
+    "serviceTransfers": "Transferts",
+    "serviceChauffeur": "Chauffeur",
+    "comingSoon": "Bientôt",
+    "all": "Tout",
+    "cars": "Voitures",
+    "bikes": "Vélos",
+    "scooters": "Scooters",
+    "boats": "Bateaux",
+    "other": "Autre",
+    "resultsCount": "{count, plural, one {# résultat} other {# résultats}}",
+    "searchPlaceholder": "Rechercher…",
+    "clearSearch": "Effacer",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "empty": "Aucune location disponible",
+    "emptyHint": "Revenez bientôt ou essayez un autre filtre.",
+    "allTransfers": "Tous",
+    "airportTransfers": "Aéroport",
+    "cityTaxi": "Taxi",
+    "shuttle": "Navette",
+    "emptyTransfers": "Aucun transfert disponible",
+    "emptyTransfersHint": "Revenez bientôt ou essayez un autre filtre.",
+    "filtersLabel": "Filtres",
+    "clearFilters": "Tout effacer",
+    "vehicleType": "Type de véhicule",
+    "transferType": "Type de transfert",
+    "reviews": {
+      "title": "Avis",
+      "noReviews": "Pas encore d'avis. Soyez le premier après votre trajet !",
+      "writeReview": "Rédiger un avis",
+      "dialogTitle": "Évaluer ce service",
+      "ratingLabel": "Note",
+      "titleLabel": "Titre",
+      "titlePlaceholder": "Résumez votre expérience",
+      "commentLabel": "Commentaire",
+      "commentPlaceholder": "Partagez les détails de votre expérience avec ce service de transfert",
+      "submit": "Soumettre l'avis",
+      "submitting": "Envoi en cours...",
+      "cancel": "Annuler",
+      "success": "Avis soumis !",
+      "partnerReply": "Réponse du partenaire"
+    },
+    "guidniReview": {
+      "title": "Évalué par Guidni",
+      "by": "Évalué par",
+      "visited": "Visité",
+      "score": "Score Guidni",
+      "accuracy": "Exactitude",
+      "quality": "Qualité",
+      "value": "Rapport qualité-prix",
+      "presentation": "Présentation",
+      "host": "Hôte",
+      "fullReview": "Avis complet",
+      "loved": "Ce qu'on a adoré",
+      "worth": "À savoir",
+      "bestFor": "Idéal pour",
+      "partnerReply": "Réponse du partenaire",
+      "outOf": "/ 10"
+    },
+    "transfer": {
+      "breadcrumb": "Transferts",
+      "share": "Partager",
+      "shareCopied": "Lien copié !",
+      "allPhotos": "Voir toutes les photos",
+      "photos": "photos",
+      "about": "À propos de ce service",
+      "showMore": "Voir plus",
+      "showLess": "Voir moins",
+      "featuresTitle": "Inclus & caractéristiques",
+      "relatedTitle": "Plus de transferts",
+      "quickFacts": {
+        "type": "Type",
+        "capacity": "Capacité",
+        "vehicleType": "Véhicule",
+        "languages": "Langues"
+      },
+      "highlights": {
+        "ac": "Climatisation",
+        "meetGreet": "Meet & Greet",
+        "childSeat": "Siège enfant",
+        "topRated": "Très bien noté"
+      },
+      "hostStrip": {
+        "hostedBy": "Proposé par",
+        "memberSince": "Membre depuis"
+      },
+      "outOf": "/ 10",
+      "upToPassengers": "Jusqu'à {n} passagers",
+      "fixedRate": "Tarif fixe",
+      "pricePerTrip": "Prix par trajet",
+      "pricePerHour": "Prix par heure",
+      "pricePerPerson": "Prix par personne",
+      "typeAirport": "Transfert aéroport",
+      "typeTaxi": "Taxi urbain",
+      "typeChauffeur": "Chauffeur privé",
+      "typeShuttle": "Navette",
+      "featureAC": "Climatisation",
+      "featureMeetGreet": "Service Meet & Greet",
+      "featureChildSeat": "Siège enfant disponible",
+      "featureLanguages": "Langues : {v}",
+      "featureVehicleType": "Type de véhicule : {v}",
+      "nav": {
+        "overview": "Présentation",
+        "features": "Caractéristiques",
+        "reviews": "Avis"
+      },
+      "widget": {
+        "perTrip": "/trajet",
+        "perHour": "/h",
+        "perPerson": "/personne",
+        "date": "Date",
+        "time": "Heure",
+        "pickup": "Lieu de prise en charge",
+        "pickupPlaceholder": "ex. Aéroport de Djerba-Zarzis",
+        "dropoff": "Lieu de dépose",
+        "dropoffOptional": "Lieu de dépose (optionnel)",
+        "dropoffPlaceholder": "ex. Midoun, Djerba",
+        "flightNumber": "Numéro de vol (optionnel)",
+        "flightPlaceholder": "ex. TU123",
+        "hours": "Heures nécessaires",
+        "passengers": "Passagers",
+        "contactName": "Votre nom",
+        "namePlaceholder": "Nom complet",
+        "contactPhone": "Téléphone (optionnel)",
+        "phonePlaceholder": "+216 xx xxx xxx",
+        "notes": "Notes (optionnel)",
+        "notesPlaceholder": "Demandes spéciales, infos bagages...",
+        "total": "Total",
+        "book": "Réserver",
+        "booking": "Réservation…",
+        "noCharge": "Aucun paiement maintenant — le chauffeur confirmera d'abord.",
+        "doneTitle": "Réservation reçue !",
+        "doneMessage": "Le chauffeur confirmera votre réservation sous peu.",
+        "errDateTime": "Veuillez choisir une date et une heure",
+        "errPickup": "Veuillez indiquer un lieu de prise en charge",
+        "errName": "Veuillez entrer votre nom",
+        "errMinHour": "Minimum 1 heure requis"
+      }
+    },
+    "rental": {
+      "breadcrumb": "Location",
+      "share": "Partager",
+      "shareCopied": "Lien copié !",
+      "allPhotos": "Voir toutes les photos",
+      "photos": "photos",
+      "about": "À propos de ce véhicule",
+      "showMore": "Voir plus",
+      "showLess": "Voir moins",
+      "featuresTitle": "Caractéristiques",
+      "relatedTitle": "Plus de locations",
+      "quickFacts": {
+        "type": "Type",
+        "seats": "Places",
+        "vehicle": "Véhicule",
+        "transmission": "Transmission"
+      },
+      "highlights": {
+        "ac": "Climatisation",
+        "gps": "Navigation GPS",
+        "insurance": "Assurance incluse",
+        "topRated": "Très bien noté"
+      },
+      "hostStrip": {
+        "hostedBy": "Proposé par",
+        "memberSince": "Membre depuis"
+      },
+      "outOf": "/ 10",
+      "seat": "place",
+      "seats": "places",
+      "day": "jour",
+      "days": "jours",
+      "pricePerDay": "Prix par jour",
+      "pricePerHour": "Prix par heure",
+      "minRental": "Location minimum",
+      "typeCar": "Voiture",
+      "typeBike": "Vélo",
+      "typeScooter": "Scooter",
+      "typeBoat": "Bateau",
+      "typeOther": "Véhicule",
+      "transmission": "Transmission : {v}",
+      "fuelType": "Carburant : {v}",
+      "hasAC": "Climatisation",
+      "hasGPS": "Navigation GPS",
+      "hasInsurance": "Assurance incluse",
+      "requiresLicense": "Permis de conduire requis",
+      "nav": {
+        "overview": "Présentation",
+        "features": "Caractéristiques",
+        "reviews": "Avis"
+      },
+      "widget": {
+        "perDay": "/jour",
+        "pickupDate": "Date de prise en charge",
+        "returnDate": "Date de retour",
+        "notes": "Notes (optionnel)",
+        "notesPlaceholder": "Adresse de livraison, demandes spéciales...",
+        "reserve": "Réserver",
+        "reserving": "Réservation…",
+        "total": "Total",
+        "minDays": "Location minimum : {n} jours",
+        "noCharge": "Aucun paiement maintenant — le propriétaire confirmera d'abord.",
+        "doneTitle": "Réservation reçue !",
+        "doneMessage": "Le propriétaire confirmera votre réservation sous peu.",
+        "pickDateErr": "Veuillez choisir les dates de début et fin",
+        "minDaysErr": "Location minimum : {n} jours"
+      }
+    }
+  },
+  "PassDetail": {
+    "backToPasses": "Tous les Passes",
+    "popular": "Populaire",
+    "off": "de réduction",
+    "includedActivities": "Activités incluses",
+    "optionalActivities": "Activités au choix",
+    "chooseUpTo": "Choisissez jusqu'à {count} activité(s)",
+    "perPerson": "par personne",
+    "date": "Date de début",
+    "participants": "Participants",
+    "notes": "Notes (optionnel)",
+    "book": "Réserver ce Pass",
+    "booking": "Réservation…",
+    "chooseOptional": "Choisissez vos activités optionnelles",
+    "upTo": "Jusqu'à {count} choix",
+    "loginRequired": "Connectez-vous pour réserver un pass."
+  },
+  "PassBookingDetail": {
+    "backToBookings": "Mes Réservations",
+    "passId": "Pass",
+    "startDate": "Date de début",
+    "validUntil": "Valide jusqu'au",
+    "participants": "Participants",
+    "includedActivities": "Activités incluses",
+    "chosenActivities": "Vos activités choisies",
+    "priceBreakdown": "Détail du prix",
+    "serviceFee": "Frais de service",
+    "taxes": "Taxes",
+    "total": "Total"
+  },
+  "ShopsPage": {
+    "titlePrefix": "Boutiques locales à",
+    "titleFallback": "votre destination",
+    "subtitle": "Découvrez des produits artisanaux et locaux dans les boutiques sélectionnées à votre destination.",
+    "browseShops": "Boutiques",
+    "browseProducts": "Produits",
+    "allCategories": "Tout",
+    "shopsCount": "{count, plural, one {# boutique} other {# boutiques}}",
+    "productsCount": "{count, plural, one {# produit} other {# produits}}",
+    "searchShopsPlaceholder": "Rechercher des boutiques…",
+    "searchProductsPlaceholder": "Rechercher des produits…",
+    "clearSearch": "Effacer",
+    "handmade": "Fait main",
+    "handmadeOnly": "Fait main seulement",
+    "emptyShops": "Aucune boutique trouvée",
+    "emptyProducts": "Aucun produit trouvé",
+    "emptyHint": "Essayez une autre catégorie ou effacez votre recherche.",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "filtersLabel": "Filtres",
+    "clearFilters": "Tout effacer"
+  },
+  "ShopPage": {
+    "open": "Ouvert",
+    "closed": "Fermé",
+    "share": "Partager",
+    "shareCopied": "Lien copié !",
+    "showMore": "Voir plus",
+    "showLess": "Voir moins",
+    "breadcrumb": {
+      "shops": "Boutiques"
+    },
+    "anchorNav": {
+      "products": "Produits",
+      "about": "À propos",
+      "reviews": "Avis"
+    },
+    "hostStrip": {
+      "hostedBy": "Géré par",
+      "memberSince": "Membre depuis"
+    },
+    "productsTitle": "Produits",
+    "productSingular": "produit",
+    "productPlural": "produits",
+    "allProducts": "Tout",
+    "noProducts": "Aucun produit dans cette catégorie.",
+    "handmade": "Fait main",
+    "reviewsTitle": "Avis",
+    "noReviews": "Pas encore d'avis. Soyez le premier à partager votre expérience.",
+    "reviewsCount": "avis",
+    "outOf": "sur 5",
+    "similarShops": "Vous pourriez aussi aimer",
+    "delivery": {
+      "pickup": "Retrait en boutique",
+      "local": "Livraison locale",
+      "nationwide": "Livraison nationale",
+      "international": "Livraison internationale"
+    },
+    "infoCard": {
+      "about": "À propos de l'artisan",
+      "delivery": "Options de livraison",
+      "freeShipping": "Livraison gratuite dès {amount} TND",
+      "minOrder": "Commande minimum : {amount} TND",
+      "address": "Adresse",
+      "viewOnMaps": "Voir sur Google Maps",
+      "website": "Site web",
+      "instagram": "Instagram",
+      "facebook": "Facebook"
+    },
+    "guidniReview": {
+      "title": "Évalué par Guidni",
+      "by": "Évalué par",
+      "visited": "Visité",
+      "score": "Score Guidni",
+      "accuracy": "Exactitude",
+      "quality": "Qualité",
+      "value": "Rapport qualité-prix",
+      "presentation": "Présentation",
+      "host": "Hôte",
+      "fullReview": "Avis complet",
+      "loved": "Ce qu'on a adoré",
+      "worth": "À savoir",
+      "bestFor": "Idéal pour",
+      "partnerReply": "Réponse du partenaire",
+      "outOf": "/ 10"
+    }
+  },
+  "ProductPage": {
+    "breadcrumb": {
+      "shops": "Boutiques"
+    },
+    "anchorNav": {
+      "overview": "Aperçu",
+      "details": "Détails",
+      "reviews": "Avis"
+    },
+    "handmade": "Fait main",
+    "localOnly": "Local uniquement",
+    "inStock": "En stock",
+    "outOfStock": "Rupture de stock",
+    "onlyLeft": "Plus que {count} en stock",
+    "share": "Partager",
+    "shareCopied": "Lien copié !",
+    "showMore": "Voir plus",
+    "showLess": "Voir moins",
+    "allPhotos": "Voir toutes les photos",
+    "photos": "photos",
+    "visitShop": "Visiter la boutique",
+    "description": "Description",
+    "details": {
+      "material": "Matériau",
+      "origin": "Origine",
+      "weight": "Poids"
+    },
+    "deliveryTitle": "Options de livraison",
+    "delivery": {
+      "pickup": "Retrait",
+      "local": "Livraison locale",
+      "nationwide": "Livraison nationale",
+      "international": "Livraison internationale"
+    },
+    "quantity": "Quantité",
+    "addToCart": "Ajouter au panier",
+    "buyNow": "Acheter maintenant",
+    "added": "Ajouté au panier",
+    "safeCheckout": "Paiement sécurisé · Retours faciles",
+    "reviewsTitle": "Avis clients",
+    "noReviews": "Pas encore d'avis. Soyez le premier à partager votre expérience.",
+    "reviewsCount": "avis",
+    "outOf": "sur 5",
+    "moreFrom": "Plus de {shop}",
+    "viewAll": "Voir tout"
+  },
+  "CartPage": {
+    "title": "Passer la commande",
+    "subtitle": "Vérifiez votre commande et choisissez la livraison",
+    "drawerTitle": "Votre panier",
+    "empty": "Votre panier est vide",
+    "emptyHint": "Découvrir les boutiques locales",
+    "shopSubtotal": "Sous-total de la boutique",
+    "grandTotal": "Total",
+    "proceedToCheckout": "Passer à la caisse",
+    "orderSummary": "Récapitulatif de la commande",
+    "delivery": "Livraison",
+    "deliveryMethod": {
+      "PICKUP": "Retrait en boutique",
+      "LOCAL_DELIVERY": "Livraison locale",
+      "NATIONWIDE": "Livraison nationale",
+      "INTERNATIONAL": "Livraison internationale"
+    },
+    "deliveryAddress": "Adresse de livraison",
+    "deliveryCity": "Ville",
+    "deliveryCountry": "Pays",
+    "notes": "Notes de commande",
+    "notesPlaceholder": "Instructions particulières pour votre commande ?",
+    "subtotal": "Sous-total",
+    "deliveryCost": "Livraison",
+    "freeDelivery": "Gratuit",
+    "deliveryCalculated": "Calculé lors du traitement",
+    "placeOrder": "Passer la commande",
+    "paymentNote": "Le paiement est collecté par le partenaire au retrait ou à la livraison.",
+    "addressRequired": "L'adresse de livraison est requise pour ce mode de livraison.",
+    "success": "Commande passée avec succès !",
+    "error": "Échec de la commande. Veuillez réessayer."
+  },
+  "OrderPage": {
+    "title": "Mes commandes",
+    "subtitle": "Suivez et gérez vos commandes",
+    "empty": "Aucune commande",
+    "emptyHint": "Parcourez les boutiques locales et découvrez des produits uniques",
+    "browseShops": "Parcourir les boutiques",
+    "backToOrders": "Retour aux commandes",
+    "orderRef": "Commande",
+    "placedOn": "Passée le",
+    "from": "de",
+    "items": "articles",
+    "viewDetails": "Voir les détails →",
+    "subtotal": "Sous-total",
+    "deliveryCost": "Livraison",
+    "total": "Total",
+    "freePickup": "Gratuit (Retrait)",
+    "deliveryDetails": "Détails de livraison",
+    "shopContact": "Contact de la boutique",
+    "orderNotes": "Notes de commande",
+    "continueShopping": "Continuer mes achats",
+    "viewAllOrders": "Voir toutes les commandes",
+    "status": {
+      "PENDING": "En attente",
+      "CONFIRMED": "Confirmée",
+      "PROCESSING": "En cours",
+      "SHIPPED": "Expédiée",
+      "DELIVERED": "Livrée",
+      "CANCELLED": "Annulée",
+      "REFUNDED": "Remboursée"
+    }
+  },
+  "PlannerPage": {
+    "title": "Planifiez votre voyage",
+    "titlePrefix": "Voyage IA",
+    "subtitle": "Obtenez un itinéraire personnalisé jour par jour pour votre prochain voyage",
+    "step1Title": "Destination & Dates",
+    "step2Title": "Centres d'intérêt",
+    "step3Title": "Budget & Groupe",
+    "step4Title": "Logistique",
+    "step5Title": "Votre itinéraire",
+    "durationLabel": "Combien de jours ?",
+    "durationDays": "jours",
+    "travelStyleRelaxed": "Détendu",
+    "travelStyleBalanced": "Équilibré",
+    "travelStyleActive": "Actif",
+    "generateButton": "Générer le plan",
+    "generating": "Création de votre itinéraire…",
+    "regenerate": "Regénérer",
+    "saveButton": "Sauvegarder",
+    "saving": "Sauvegarde…",
+    "saved": "Sauvegardé",
+    "shareButton": "Partager",
+    "shareToast": "Lien copié",
+    "newPlanButton": "Nouveau plan",
+    "savedPlansTitle": "Vos plans sauvegardés",
+    "noSavedPlans": "Aucun plan sauvegardé",
+    "viewPlan": "Voir le plan",
+    "dayLabel": "Jour",
+    "morningLabel": "Matin",
+    "lunchLabel": "Déjeuner",
+    "afternoonLabel": "Après-midi",
+    "eveningLabel": "Soirée",
+    "notFoundTitle": "Plan introuvable",
+    "notFoundDesc": "Cet itinéraire n'existe pas ou n'est plus disponible.",
+    "deleteConfirmTitle": "Supprimer ce plan ?",
+    "deleteConfirmBody": "Cette action est irréversible.",
+    "deleteConfirm": "Supprimer",
+    "deleteCancel": "Annuler"
+  },
+  "AboutPage": {
+    "meta": {
+      "title": "A propos de Guidni — Une plateforme pour tout votre voyage",
+      "description": "Decouvrez Guidni, la plateforme de voyage qui reunit activites, sejours, restaurants, transport et guides en un seul endroit."
+    },
+    "hero": {
+      "title": "A propos de",
+      "subtitle": "Nous construisons la plateforme unique ou les voyageurs peuvent decouvrir, planifier et reserver tout pour leur prochain voyage — sans jongler entre cinq applications differentes."
+    },
+    "stats": {
+      "destinations": "Destinations",
+      "partners": "Partenaires verifies",
+      "experiences": "Experiences reservables",
+      "founded": "Fondee en"
+    },
+    "story": {
+      "title": "Notre histoire",
+      "p1": "Guidni est ne a Djerba. Nous regardions les voyageurs arriver en Tunisie avec seulement une reservation d hotel et une vague idee de ce qu il y avait a faire. Ils rataient les meilleurs restaurants, reservaient la mauvaise activite et repartaient sans avoir vecu ce qui rend Djerba si special.",
+      "p2": "Alors nous avons construit la plateforme dont nous aurions eu besoin. Un seul endroit pour decouvrir, comparer et reserver des activites, sejours, restaurants, transports et circuits guides — tout verifie, tout en une experience fluide.",
+      "p3": "Nous avons lance en 2025 et nous nous etendons a de nouvelles destinations. La mission n a pas change : chaque destination, une plateforme, zero compromis."
+    },
+    "values": {
+      "title": "Nos valeurs",
+      "trust": {
+        "title": "La confiance avant tout",
+        "body": "Chaque partenaire sur Guidni est verifie avant de pouvoir publier. Chaque reservation est confirmee instantanement. Nous ne transigeons pas sur les standards."
+      },
+      "local": {
+        "title": "Expertise locale",
+        "body": "Nous travaillons directement avec des operateurs locaux, pas des revendeurs. Quand vous reservez sur Guidni, l argent va aux gens qui ont cree quelque chose qui vaut la peine d etre vecu."
+      },
+      "quality": {
+        "title": "Exigence qualite",
+        "body": "Nous maintenons un standard de qualite Guidni. Les offres qui ne l atteignent pas sont retirees. Les voyageurs qui vivent une mauvaise experience ont toujours de nos nouvelles."
+      }
+    },
+    "social": {
+      "title": "Suivez l aventure"
+    },
+    "cta": {
+      "title": "Pret a explorer ?",
+      "body": "Decouvrez des experiences, reservez en quelques secondes et voyagez en toute confiance — seulement sur Guidni.",
+      "explore": "Explorer Djerba",
+      "partner": "Devenir partenaire"
+    }
+  },
+  "ContactPage": {
+    "meta": {
+      "title": "Contactez-nous — Guidni",
+      "description": "Contactez l equipe Guidni pour de l aide sur une reservation, une demande de partenariat, ou toute autre question."
+    },
+    "title": "Contactez-nous",
+    "subtitle": "Nous sommes une petite equipe et nous repondons personnellement. Envoyez-nous un message — nous repondons sous 24 heures.",
+    "info": {
+      "title": "Coordonnees",
+      "emailLabel": "Email",
+      "email": "contact@guidni.com",
+      "phoneLabel": "Telephone",
+      "phone": "+216 56 411 511",
+      "hoursLabel": "Horaires",
+      "hours": "Lun-Dim, 8h00-22h00"
+    },
+    "form": {
+      "title": "Envoyez-nous un message",
+      "name": "Votre nom",
+      "namePlaceholder": "Ahmed Ben Ali",
+      "email": "Adresse email",
+      "emailPlaceholder": "vous@exemple.com",
+      "subject": "Sujet",
+      "subjectGeneral": "Question generale",
+      "subjectBooking": "Aide reservation",
+      "subjectPartner": "Demande partenariat",
+      "subjectPress": "Presse et medias",
+      "subjectReport": "Signaler un probleme",
+      "message": "Message",
+      "messagePlaceholder": "Comment pouvons-nous vous aider...",
+      "submit": "Envoyer le message",
+      "submitting": "Envoi en cours...",
+      "success": "Message envoye — nous vous repondrons dans les 24 heures.",
+      "error": "Une erreur est survenue. Veuillez reessayer ou nous contacter par email directement."
+    }
+  },
+  "FAQPage": {
+    "meta": {
+      "title": "FAQ — Questions frequentes · Guidni",
+      "description": "Trouvez les reponses aux questions courantes sur les reservations Guidni, les paiements, les annulations et comment devenir partenaire."
+    },
+    "title": "Questions frequentes",
+    "subtitle": "Tout ce que vous devez savoir sur les voyages et reservations sur Guidni.",
+    "tabs": {
+      "travelers": "Pour les voyageurs",
+      "partners": "Pour les partenaires",
+      "platform": "A propos de Guidni"
+    },
+    "travelers": [
+      {
+        "q": "Comment fonctionne la reservation ?",
+        "a": "Choisissez votre experience, selectionnez une date et un horaire, remplissez vos coordonnees et confirmez. Vous recevrez une confirmation instantanee avec un QR code a presenter sur place — pas besoin de billet papier."
+      },
+      {
+        "q": "Puis-je annuler ma reservation ?",
+        "a": "Les conditions d annulation varient selon l offre. Chaque activite et sejour affiche sa politique d annulation exacte sur la page de reservation. La plupart des activites offrent une annulation gratuite jusqu a 24 heures avant."
+      },
+      {
+        "q": "Quels modes de paiement sont acceptes ?",
+        "a": "Nous acceptons actuellement le paiement en especes sur place. Le paiement en ligne par carte et via Konnect sera disponible prochainement. Tous les prix sont affiches en TND (Dinar tunisien)."
+      },
+      {
+        "q": "Ai-je besoin d un compte pour reserver ?",
+        "a": "Oui — un compte gratuit vous permet de suivre vos reservations, d acceder a vos QR codes, de sauvegarder votre liste de souhaits et de laisser des avis apres votre experience."
+      },
+      {
+        "q": "A quoi sert le QR code ?",
+        "a": "Chaque reservation genere un QR code unique. Vous le presentez au partenaire a l arrivee — il le scanne pour confirmer votre reservation instantanement. Sans papier, sans tracas."
+      }
+    ],
+    "partners": [
+      {
+        "q": "Comment je publie mon activite ou service ?",
+        "a": "Postulez via la page Devenir partenaire. Nous examinons toutes les candidatures dans les 3 jours ouvrables et vous contactons pour confirmer les details de votre offre."
+      },
+      {
+        "q": "Quels sont les frais de plateforme ?",
+        "a": "Guidni preleve un pourcentage par reservation effectuee. Le taux exact depend de votre categorie. Contactez-nous pour un detail complet avant de postuler."
+      },
+      {
+        "q": "Comment obtenir la verification ?",
+        "a": "Apres approbation de votre candidature, notre equipe examine votre profil. Les comptes avec des informations completes, de belles photos et des avis positifs recoivent le badge Verifie."
+      },
+      {
+        "q": "Comment et quand suis-je paye ?",
+        "a": "Les gains sont suivis dans votre tableau de bord partenaire. Vous demandez un virement et nous le traitons par virement bancaire. Les calendriers de paiement sont confirmes a l inscription."
+      }
+    ],
+    "platform": [
+      {
+        "q": "Qu est-ce que Guidni ?",
+        "a": "Guidni est une plateforme de voyage par destination. Vous pouvez decouvrir et reserver des activites, sejours, restaurants, transports, boutiques et itineraires guides — tout en un, tout verifie."
+      },
+      {
+        "q": "Quelles destinations sont disponibles ?",
+        "a": "Actuellement Djerba, Tunisie. Nous nous etendons a Hammamet, Tunis, Dubai et d autres destinations en 2025-2026."
+      },
+      {
+        "q": "Guidni est-il securise ?",
+        "a": "Oui. Chaque offre est examinee avant sa mise en ligne. Les reservations sont confirmees instantanement et soutenues par notre equipe de support. Nous garantissons chaque experience sur la plateforme."
+      },
+      {
+        "q": "Guidni est-il disponible en plusieurs langues ?",
+        "a": "Oui — Guidni est disponible en anglais, francais et arabe avec support RTL complet. D autres langues arrivent."
+      }
+    ],
+    "cta": {
+      "title": "Vous avez encore une question ?",
+      "body": "Notre equipe repond sous 24 heures — souvent bien moins.",
+      "button": "Nous contacter"
+    }
+  },
+  "TermsPage": {
+    "meta": {
+      "title": "Conditions d utilisation · Guidni",
+      "description": "Lisez les conditions d utilisation de Guidni — vos droits et obligations sur la plateforme."
+    },
+    "title": "Conditions d utilisation",
+    "subtitle": "En utilisant Guidni, vous acceptez ces conditions. Veuillez les lire attentivement.",
+    "lastUpdated": "Derniere mise a jour : mars 2025",
+    "sections": [
+      {
+        "title": "1. Acceptation des conditions",
+        "body": "En accedant ou en utilisant Guidni (guidni.com), vous acceptez d etre lie par ces conditions d utilisation et notre politique de confidentialite. Si vous n etes pas d accord, veuillez ne pas utiliser la plateforme. Ces conditions s appliquent a tous les utilisateurs."
+      },
+      {
+        "title": "2. Utilisation de la plateforme",
+        "body": "Vous ne pouvez utiliser Guidni qu a des fins licites. Vous vous engagez a ne pas vous livrer a des activites frauduleuses, soumettre de faux avis ou reservations, usurper l identite d une personne, ou violer toute loi applicable. Guidni se reserve le droit de suspendre tout compte en violation de ces conditions."
+      },
+      {
+        "title": "3. Reservations",
+        "body": "Lorsque vous effectuez une reservation sur Guidni, vous concluez un accord direct avec le partenaire fournissant le service. Guidni agit en tant que plateforme intermediaire. Les confirmations de reservation incluent un QR code unique. La politique d annulation affichee sur chaque offre regit l eligibilite au remboursement."
+      },
+      {
+        "title": "4. Paiements",
+        "body": "Les prix sont affiches en Dinar tunisien (TND) sauf indication contraire. Le paiement est actuellement collecte sur place a l arrivee. Le paiement en ligne sera introduit dans une prochaine mise a jour. Guidni percoit une commission sur les reservations effectuees."
+      },
+      {
+        "title": "5. Obligations des partenaires",
+        "body": "Les partenaires s engagent a fournir des informations exactes, a honorer les reservations confirmees et a maintenir des standards de qualite. Guidni se reserve le droit de retirer les offres qui ne repondent pas a nos standards."
+      },
+      {
+        "title": "6. Avis et contenus",
+        "body": "Les avis doivent etre bases sur des experiences genuines. Les avis faux ou abusifs peuvent etre supprimes. En soumettant du contenu a Guidni, vous nous accordez une licence non exclusive pour utiliser et afficher ce contenu sur la plateforme."
+      },
+      {
+        "title": "7. Limitation de responsabilite",
+        "body": "Guidni est une plateforme de reservation et de decouverte. Nous ne sommes pas responsables de la qualite ou de la securite des services fournis par les partenaires. Notre responsabilite pour toute reclamation est limitee au montant paye pour la reservation concernee."
+      },
+      {
+        "title": "8. Modifications des conditions",
+        "body": "Nous pouvons mettre a jour ces conditions de temps a autre. Nous informerons les utilisateurs des changements importants par email ou une notice sur la plateforme. La poursuite de l utilisation de Guidni apres les changements constitue une acceptation des conditions revisees."
+      }
+    ],
+    "questions": {
+      "title": "Des questions sur ces conditions ?",
+      "body": "Notre equipe est heureuse de clarifier quoi que ce soit.",
+      "button": "Nous contacter"
+    }
+  },
+  "PrivacyPage": {
+    "meta": {
+      "title": "Politique de confidentialite · Guidni",
+      "description": "Comment Guidni collecte, utilise et protege vos donnees personnelles."
+    },
+    "title": "Politique de confidentialite",
+    "subtitle": "Nous prenons votre vie privee au serieux. Voici exactement quelles donnees nous collectons et comment nous les utilisons.",
+    "lastUpdated": "Derniere mise a jour : mars 2025",
+    "sections": [
+      {
+        "title": "1. Donnees collectees",
+        "body": "Lors de la creation d un compte, nous collectons votre nom, adresse email et informations de profil. Lors d une reservation, nous collectons les details de la reservation. Nous pouvons egalement collecter des donnees d utilisation pour ameliorer la plateforme."
+      },
+      {
+        "title": "2. Utilisation de vos donnees",
+        "body": "Nous utilisons vos donnees pour traiter les reservations, envoyer des emails de confirmation, fournir un support client, personnaliser votre experience et envoyer des communications marketing si vous y avez consenti. Nous ne vendons pas vos donnees a des tiers."
+      },
+      {
+        "title": "3. Services tiers",
+        "body": "Nous utilisons Google OAuth pour l authentification, Cloudinary pour le stockage d images et Konnect pour le traitement des paiements (bientot disponible). Nous ne partageons que les donnees minimales necessaires au fonctionnement de ces services."
+      },
+      {
+        "title": "4. Stockage et securite",
+        "body": "Vos donnees sont stockees sur des serveurs securises. Nous utilisons un chiffrement standard pour les donnees en transit (HTTPS) et au repos. Nous conservons les donnees de reservation pendant au moins 5 ans pour des raisons legales et fiscales."
+      },
+      {
+        "title": "5. Vos droits",
+        "body": "Vous avez le droit d acceder a vos donnees personnelles, de demander leur correction, de demander la suppression de votre compte, et de vous desabonner des emails marketing a tout moment. Contactez-nous a contact@guidni.com."
+      },
+      {
+        "title": "6. Cookies",
+        "body": "Nous utilisons des cookies pour maintenir votre session, memoriser vos preferences et analyser l utilisation de la plateforme. Consultez notre Politique de cookies pour la liste complete."
+      }
+    ],
+    "contact": {
+      "title": "Questions sur vos donnees ?",
+      "body": "Envoyez-nous un email a contact@guidni.com et nous repondrons dans les 48 heures.",
+      "button": "Nous contacter"
+    }
+  },
+  "CookiesPage": {
+    "meta": {
+      "title": "Politique de cookies · Guidni",
+      "description": "Comment Guidni utilise les cookies et comment vous pouvez les controler."
+    },
+    "title": "Politique de cookies",
+    "subtitle": "Cette page explique quels cookies nous utilisons sur Guidni, pourquoi nous les utilisons et comment vous pouvez les controler.",
+    "lastUpdated": "Derniere mise a jour : mars 2025",
+    "sections": [
+      {
+        "title": "Qu est-ce qu un cookie ?",
+        "body": "Les cookies sont de petits fichiers texte places sur votre appareil lorsque vous visitez un site web. Ils permettent au site de memoriser vos preferences, de vous garder connecte et de collecter des donnees analytiques. Les cookies ne peuvent pas acceder a d autres fichiers sur votre appareil."
+      },
+      {
+        "title": "Cookies essentiels",
+        "body": "Ces cookies sont necessaires au fonctionnement de la plateforme. Ils incluent les cookies de session (pour rester connecte), les jetons de securite et les cookies de preference de langue et destination. Ils ne peuvent pas etre desactives sans affecter les fonctionnalites de base."
+      },
+      {
+        "title": "Cookies analytiques",
+        "body": "Nous utilisons des cookies analytiques pour comprendre comment les visiteurs utilisent Guidni. Ces donnees sont aggregees et anonymes. Vous pouvez vous desinscrire via les parametres de votre navigateur."
+      },
+      {
+        "title": "Cookies tiers",
+        "body": "Certains services tiers que nous integrons (comme Google OAuth) peuvent placer leurs propres cookies. Ceux-ci sont regis par leurs propres politiques de confidentialite. Guidni ne controle pas les cookies tiers."
+      },
+      {
+        "title": "Controler les cookies",
+        "body": "Vous pouvez controler et supprimer les cookies via les parametres de votre navigateur. Notez que la desactivation des cookies peut affecter votre capacite a rester connecte ou a utiliser certaines fonctionnalites."
+      }
+    ],
+    "contact": {
+      "title": "Questions sur nos cookies ?",
+      "body": "Envoyez-nous un email a contact@guidni.com.",
+      "button": "Nous contacter"
+    }
+  },
+  "AgentDashboard": {
+    "sidebar": {
+      "overview":      "Vue d'ensemble",
+      "invitations":   "Mes invitations",
+      "earnings":      "Gains",
+      "referrals":     "Parrainages",
+      "points":        "Points & Portefeuille",
+      "profile":       "Profil",
+      "newInvitation": "Envoyer une invitation",
+      "exitToSite":    "Retour au site"
+    },
+    "overview": {
+      "title":   "Bon retour",
+      "subtitle":"Voici un aperçu de votre activité.",
+      "stats": {
+        "totalInvitations":   "Invitations totales",
+        "conversionRate":     "Taux de conversion",
+        "confirmedEarnings":  "Gains confirmés",
+        "pointsBalance":      "Solde de points",
+        "partnerReferrals":   "Parrainages partenaires",
+        "pendingInvitations": "Invitations en attente",
+        "totalEarned":        "Total gagné (depuis le début)"
+      },
+      "recentInvitations": "Invitations récentes",
+      "noInvitations":     "Aucune invitation pour l'instant.",
+      "sendFirst":         "Envoyer votre première invitation",
+      "viewAll":           "Toutes les invitations"
+    },
+    "invitations": {
+      "title":     "Mes invitations",
+      "newButton": "Nouvelle invitation",
+      "copyLink":  "Copier le lien",
+      "cancel":    "Annuler l'invitation",
+      "empty":     "Aucune invitation pour l'instant",
+      "emptyHint": "Envoyez votre première invitation à un touriste et commencez à gagner des commissions.",
+      "status": {
+        "PENDING":   "En attente",
+        "OPENED":    "Ouverte",
+        "BOOKED":    "Réservée",
+        "EXPIRED":   "Expirée",
+        "CANCELLED": "Annulée"
+      }
+    },
+    "newInvitation": {
+      "title":    "Envoyer une invitation",
+      "subtitle": "Créez un lien de réservation personnalisé à partager avec votre touriste.",
+      "fields": {
+        "activity":     "Activité",
+        "touristEmail": "Email du touriste",
+        "touristPhone": "Téléphone / WhatsApp du touriste",
+        "contactHint":  "Fournissez au moins l'un des deux.",
+        "adults":       "Adultes",
+        "children":     "Enfants",
+        "date":         "Date souhaitée",
+        "timeSlot":     "Créneau horaire",
+        "note":         "Note personnelle",
+        "noteHint":     "Optionnel, visible par le touriste"
+      },
+      "submit":        "Créer l'invitation et obtenir le lien",
+      "submitting":    "Création de l'invitation…",
+      "success":       "Invitation créée !",
+      "successHint":   "Partagez ce lien avec votre touriste. Il expire dans 7 jours.",
+      "createAnother": "Créer une autre",
+      "viewAll":       "Voir toutes les invitations"
+    },
+    "earnings": {
+      "title":         "Gains",
+      "allTimeEarned": "Total gagné (depuis le début)",
+      "empty":         "Aucun gain pour l'instant",
+      "emptyHint":     "Les commissions apparaissent ici dès qu'un touriste réserve via l'un de vos liens.",
+      "columns": {
+        "booking":    "Réservation",
+        "bookingAmt": "Montant",
+        "commission": "Commission",
+        "status":     "Statut"
+      },
+      "status": {
+        "PENDING":   "En attente",
+        "CONFIRMED": "Confirmé",
+        "PAID":      "Payé",
+        "CANCELLED": "Annulé"
+      }
+    },
+    "points": {
+      "title":          "Points & Portefeuille",
+      "subtitle":       "1 point = 0,50 TND · Rachat minimum : 50 points",
+      "balance":        "Solde actuel",
+      "recentActivity": "Activité récente",
+      "empty":          "Aucun point gagné pour l'instant.",
+      "howToEarn":      "Comment gagner des points",
+      "redeem":         "Échanger vos points",
+      "redeemHint":     "Dès 50 points (25 TND), contactez-nous à agents@guidni.com pour demander un virement.",
+      "pointTypes": {
+        "BOOKING_COMMISSION":    "Commission de réservation",
+        "REFERRAL_SIGNUP":       "Inscription partenaire",
+        "REFERRAL_VERIFIED":     "Partenaire vérifié",
+        "REFERRAL_FIRST_LISTING":"Première annonce partenaire",
+        "REFERRAL_FIRST_BOOKING":"Première réservation partenaire",
+        "TIER_BONUS":            "Bonus de niveau",
+        "REDEMPTION":            "Rachat"
+      }
+    },
+    "referrals": {
+      "title":     "Parrainages partenaires",
+      "subtitle":  "Parrainez des partenaires et gagnez jusqu'à 105 points par parrainage.",
+      "yourLink":  "Votre lien de parrainage",
+      "linkHint":  "Partagez ce lien avec des propriétaires d'hôtels, guides ou restaurateurs.",
+      "milestones": {
+        "signup":       "Inscription partenaire",
+        "verified":     "Partenaire vérifié",
+        "firstListing": "Première annonce",
+        "firstBooking": "Première réservation"
+      },
+      "yourReferrals": "Vos parrainages",
+      "empty":         "Aucun parrainage pour l'instant",
+      "emptyHint":     "Partagez votre lien de parrainage avec des partenaires potentiels.",
+      "status": {
+        "PENDING":  "En cours d'examen",
+        "VERIFIED": "Vérifié",
+        "REJECTED": "Refusé"
+      }
+    },
+    "profile": {
+      "title":    "Mon profil",
+      "subtitle": "Mettez à jour vos informations d'agent.",
+      "fields": {
+        "displayName": "Nom complet",
+        "pseudonym":   "Pseudonyme public",
+        "phone":       "Téléphone / WhatsApp",
+        "country":     "Pays",
+        "city":        "Ville",
+        "bio":         "À propos de vous"
+      },
+      "save":    "Enregistrer",
+      "saving":  "Enregistrement…",
+      "success": "Profil mis à jour"
+    },
+    "admin": {
+      "title":      "Agents locaux",
+      "search":     "Rechercher par nom, email ou ville…",
+      "verify":     "Vérifier l'agent",
+      "unverify":   "Retirer la vérification",
+      "activate":   "Réactiver l'agent",
+      "deactivate": "Désactiver l'agent",
+      "status": {
+        "verified":    "Vérifié",
+        "pending":     "En attente",
+        "deactivated": "Désactivé"
+      },
+      "tiers": {
+        "STARTER": "Débutant",
+        "PRO":     "Pro",
+        "ELITE":   "Élite"
+      }
+    }
+  }
+}

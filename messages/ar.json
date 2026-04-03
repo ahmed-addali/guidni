@@ -1,0 +1,2487 @@
+{
+  "Navbar": {
+    "login": "تسجيل الدخول",
+    "language": "اللغة",
+    "currency": "العملة",
+    "mobileMenuTitle": "استكشف",
+    "mobileMenuLabel": "فتح القائمة"
+  },
+  "LanguageCurrency": {
+    "title": "اللغة والعملة",
+    "subtitle": "تفضيلات اللغة والعملة",
+    "languageLabel": "اللغة",
+    "languageDescription": "اختر لغة الواجهة المفضلة لديك.",
+    "currencyLabel": "العملة",
+    "currencyDescription": "ستُعرض الأسعار بالعملة التي تختارها.",
+    "saveButton": "حفظ التفضيلات",
+    "savingButton": "جارٍ الحفظ…",
+    "successMessage": "تم حفظ التفضيلات"
+  },
+  "DestinationPicker": {
+    "triggerAriaLabel": "اختر وجهة",
+    "title": "اختر وجهة",
+    "subtitle": "حدد المكان الذي تستكشفه",
+    "searchPlaceholder": "ابحث عن مدينة أو دولة…",
+    "allCountries": "الكل",
+    "emptyTitle": "لا توجد وجهات",
+    "emptySubtitle": "جرب اسم مدينة أو دولة مختلفة",
+    "clearFilters": "مسح الفلاتر"
+  },
+  "UserMenu": {
+    "accountSection": "الحساب",
+    "dashboardsSection": "لوحات التحكم",
+    "myBookings": "حجوزاتي",
+    "myReviews": "تقييماتي",
+    "myOrders": "طلباتي",
+    "wishlist": "قائمة الرغبات",
+    "profile": "الملف الشخصي",
+    "adminDashboard": "لوحة الإدارة",
+    "partnerDashboard": "لوحة الشريك",
+    "agentDashboard": "لوحة الوكيل",
+    "signOut": "تسجيل الخروج",
+    "roleAdmin": "مشرف",
+    "rolePartner": "شريك",
+    "roleAgent": "وكيل"
+  },
+  "LoginPage": {
+    "title": "مرحباً بك في Guidni",
+    "subtitle": "سجّل دخولك لحجز الأنشطة والإقامة والمطاعم والمزيد في وجهاتك المفضلة.",
+    "continueGoogle": "المتابعة مع Google",
+    "signingIn": "جارٍ تسجيل الدخول…",
+    "or": "أو",
+    "continueEmail": "المتابعة بالبريد الإلكتروني",
+    "soon": "قريباً",
+    "trustSecure": "دخول آمن",
+    "trustInstant": "وصول فوري",
+    "trustLanguages": "٣ لغات",
+    "legalPrefix": "بالمتابعة، أنت توافق على",
+    "terms": "شروط الخدمة",
+    "privacy": "سياسة الخصوصية"
+  },
+  "Footer": {
+    "tagline": "كل ما يحتاجه المسافر، في مكان واحد.",
+    "explore": "استكشف",
+    "experiences": "التجارب",
+    "company": "الشركة",
+    "support": "الدعم",
+    "djerba": "جربة",
+    "dubai": "دبي",
+    "destinations": "جميع الوجهات",
+    "attractions": "المعالم السياحية",
+    "activities": "الأنشطة",
+    "stays": "الإقامة",
+    "restaurants": "المطاعم",
+    "passes": "بطاقة المستكشف",
+    "transport": "النقل",
+    "shops": "المتاجر",
+    "planner": "مخطط الرحلة بالذكاء الاصطناعي",
+    "about": "من نحن",
+    "becomePartner": "كن شريكاً",
+    "becomeAgent": "كن وكيلاً",
+    "agentLeaderboard": "لوحة المتصدرين",
+    "blog": "المدونة",
+    "careers": "وظائف",
+    "partners": "الشركاء",
+    "badges": "الشارات الموثقة",
+    "contact": "اتصل بنا",
+    "faq": "الأسئلة الشائعة",
+    "howItWorks": "كيف يعمل",
+    "terms": "الشروط",
+    "privacy": "الخصوصية",
+    "cookies": "ملفات تعريف الارتباط",
+    "rightsReserved": "جميع الحقوق محفوظة.",
+    "dir": "rtl"
+  },
+  "HomePage": {
+    "hero": {
+      "headline": "مغامرتك القادمة تبدأ على",
+      "brand": "Guidni",
+      "subtitle": "احجز الأنشطة والإقامات والمطاعم. اكتشف المرشدين المحليين ودع الذكاء الاصطناعي يخطط رحلتك المثالية — كل شيء لرحلتك في مكان واحد.",
+      "ctaPlanner": "خطط رحلتي",
+      "ctaExplore": "استكشف الوجهات"
+    },
+    "trust": {
+      "item1Label": "قوائم موثّقة",
+      "item1Desc": "كل شريك يخضع للتحقق",
+      "item2Label": "تجارب مختارة بعناية",
+      "item2Desc": "جودة مختارة يدوياً",
+      "item3Label": "حجز مرن",
+      "item3Desc": "إلغاء مجاني في معظم الحالات",
+      "item4Label": "خبرة محلية",
+      "item4Desc": "مرشدون يعيشون هنا"
+    },
+    "spotlight": {
+      "activities": "الأنشطة",
+      "stays": "الإقامات",
+      "restaurants": "المطاعم",
+      "seeGuide": "دليل الوجهة"
+    },
+    "planner": {
+      "badge": "مخطط الرحلات بالذكاء الاصطناعي",
+      "headline": "رحلتك المثالية،",
+      "headlineAccent": "مخططة في ثوانٍ",
+      "subtitle": "أخبرنا أين ستذهب، وكم ستبقى، وما الذي تحب — يبني نظامنا الذكي برنامجاً يومياً مخصصاً لك.",
+      "step1": "اختر وجهتك",
+      "step2": "حدد تواريخك ومدة رحلتك",
+      "step3": "أخبرنا باهتماماتك",
+      "step4": "احصل على برنامجك الشخصي",
+      "cta": "خطط رحلتي",
+      "previewHeader": "جربة · 4 ليالٍ",
+      "previewSubheader": "شخصان · ثقافة وطعام",
+      "previewBadge": "مولَّد بالذكاء الاصطناعي",
+      "previewMoreDays": "+ يومان آخران في خطتك…",
+      "previewCta": "أنشئ خطتك",
+      "day1": "اليوم الأول",
+      "day2": "اليوم الثاني"
+    },
+    "agent": {
+      "eyebrow": "برنامج الوكيل المحلي",
+      "headline": "تعرف وجهتك؟",
+      "headlineAccent": "احصل على أجر مقابل ذلك.",
+      "subtitle": "شارك روابط حجز مخصصة مع السياح واكسب عمولات على كل حجز.",
+      "perk1": "اكسب عمولة 5–10٪ على كل حجز تولّده",
+      "perk2": "ترقَّ في المستويات: مبتدئ → محترف → نخبة مع مكافآت",
+      "perk3": "اعمل من أي مكان — بلا مكتب، بلا ساعات محددة",
+      "stat1Value": "25 د.ت",
+      "stat1Label": "الحد الأدنى للدفع",
+      "stat2Value": "105 نقطة",
+      "stat2Label": "أقصى نقاط لكل إحالة",
+      "stat3Value": "3 مستويات",
+      "stat3Label": "مبتدئ · محترف · نخبة",
+      "stat4Value": "مجاني",
+      "stat4Label": "مجاني دائماً",
+      "cta": "كن وكيلاً",
+      "leaderboard": "عرض المتصدرين"
+    },
+    "destinations": {
+      "title": "الوجهات الشائعة"
+    },
+    "activities": {
+      "title": "الأنشطة الشائعة",
+      "subtitle": "تجارب مختارة بعناية في جربة",
+      "viewAll": "عرض جميع الأنشطة"
+    },
+    "packages": {
+      "title": "بطاقات السفر",
+      "subtitle": "اجمع مغامراتك ووفّر أكثر",
+      "viewAll": "عرض جميع البطاقات",
+      "popular": "الأكثر شيوعاً",
+      "perPerson": "لكل شخص",
+      "included": "أنشطة مشمولة",
+      "optional": "أنشطة اختيارية",
+      "bookNow": "احجز الآن"
+    },
+    "stays": {
+      "title": "أماكن للإقامة",
+      "subtitle": "فيلات وشقق وإقامات فريدة",
+      "viewAll": "عرض جميع الإقامات"
+    },
+    "restaurants": {
+      "title": "المطاعم والمقاهي",
+      "subtitle": "أفضل أماكن الأكل والشرب",
+      "viewAll": "عرض جميع المطاعم"
+    },
+    "exploring": {
+      "readyToExplore": "هل أنت مستعد لاستكشاف جربة؟",
+      "intro": "جزيرة متوسطية بتاريخ يمتد 3000 عام وشواطئ رائعة وثقافة نابضة بالحياة.",
+      "historyTitle": "تاريخ عريق",
+      "historyDesc": "موطن إحدى أقدم المجتمعات اليهودية في العالم والإرث الفينيقي القديم.",
+      "weatherTitle": "مناخ مثالي",
+      "weatherDesc": "أكثر من 300 يوم مشمس في السنة. الأفضل من أبريل إلى أكتوبر.",
+      "cuisineTitle": "المطبخ المحلي",
+      "cuisineDesc": "المأكولات البحرية الطازجة والأطباق التونسية التقليدية ونخيل التمر الشهير.",
+      "stayTitle": "إقامات فريدة",
+      "stayDesc": "من الفيلات المطلة على البحر إلى الدور التقليدية في المدينة العتيقة.",
+      "budgetTitle": "قيمة رائعة",
+      "budgetDesc": "من أكثر الوجهات المتوسطية بأسعار معقولة دون المساس بالجودة.",
+      "attractionsTitle": "معالم رائعة",
+      "attractionsDesc": "متحف غلالة، كنيس الغريبة، تراث جربة والشواطئ النقية.",
+      "ctaParagraph": "ابدأ تخطيط رحلتك المثالية إلى جربة اليوم.",
+      "exploreBtn": "استكشف جربة",
+      "generateBtn": "توليد خط سير"
+    },
+    "info": {
+      "title": "لماذا تختار Guidni؟",
+      "subtitle": "نجعل تخطيط رحلتك سهلاً حتى تتمكن من التركيز على التجربة.",
+      "features": {
+        "trusted": {
+          "title": "شركاء موثوقون",
+          "description": "كل نشاط تجاري على Guidni يتم التحقق منه. نختار شركاءنا بعناية."
+        },
+        "curated": {
+          "title": "تجارب مختارة",
+          "description": "أنشطة وإقامات مختارة يدوياً من قبل فريقنا المحلي للجودة والأصالة."
+        },
+        "payments": {
+          "title": "مدفوعات آمنة",
+          "description": "ادفع بأمان بالبطاقة أو PayPal أو Konnect للمسافرين التونسيين."
+        },
+        "price": {
+          "title": "ضمان أفضل سعر",
+          "description": "نعمل مباشرة مع الشركات المحلية لضمان أفضل الأسعار دائماً."
+        },
+        "rescheduling": {
+          "title": "إلغاء سهل",
+          "description": "سياسات إلغاء مرنة. الحياة تحدث — نحن نفهم ذلك."
+        },
+        "experts": {
+          "title": "خبراء محليون",
+          "description": "فريقنا يعيش في جربة. نصائح حقيقية وتوصيات حقيقية."
+        }
+      },
+      "partners": {
+        "eyebrow": "للأعمال التجارية",
+        "title": "انمُ مع Guidni",
+        "description": "انضم إلى الشركات المحلية التي تصل بالفعل إلى المسافرين عبر Guidni. أدر قوائمك وحجوزاتك وأرباحك من لوحة تحكم واحدة.",
+        "learnButton": "اعرف أكثر",
+        "joinButton": "ابدأ الآن",
+        "benefit1": "أدرج أنشطة وإقامات ومطاعم والمزيد",
+        "benefit2": "استقبل الحجوزات وأدرها بسهولة",
+        "benefit3": "لوحة تحليلات للأرباح والتقييمات",
+        "benefit4": "اوصل إلى المسافرين في وجهات متعددة",
+        "statActivities": "أنشطة مدرجة",
+        "statStays": "إقامات متاحة",
+        "statRestaurants": "مطاعم مميزة",
+        "statDestinations": "وجهات"
+      }
+    },
+    "shops": {
+      "shopsTitle": "المحلات المحلية",
+      "shopsSubtitle": "منتجات يدوية وحرفية من محلات متحقق منها",
+      "viewAllShops": "عرض كل المحلات",
+      "productsTitle": "منتجات حرفية مختارة",
+      "productsSubtitle": "منتجات فريدة مصنوعة يدوياً من حرفيين محليين",
+      "viewAllProducts": "تصفح كل المنتجات",
+      "handmade": "صنع يدوي"
+    },
+    "transfers": {
+      "title": "التنقل بسهولة",
+      "subtitle": "خدمات النقل من المطار والتاكسي والسائق الخاص",
+      "viewAll": "عرض كل خدمات النقل"
+    },
+    "attractions": {
+      "title": "أبرز المعالم السياحية",
+      "subtitle": "الأماكن والمعالم التي لا يمكن تفويتها في وجهتك",
+      "viewAll": "استكشاف كل المعالم"
+    },
+    "guides": {
+      "title": "المرشدون المحليون",
+      "subtitle": "خطط رحلات من وضع أشخاص يعيشون هنا فعلاً",
+      "viewAll": "تصفح جميع المرشدين"
+    }
+  },
+  "PlannerLanding": {
+    "badge": "تخطيط الرحلة",
+    "heroPrefix": "خطّط رحلتك إلى",
+    "heroSuffix": "",
+    "defaultCity": "وجهتك",
+    "heroSubtitle": "احصل على برنامج يومي مفصّل في ثوانٍ بالذكاء الاصطناعي، أو اختر خطة أعدّها خبير محلي يعرف الوجهة.",
+    "aiTitle": "مخطط الذكاء الاصطناعي",
+    "aiPopular": "الأكثر شيوعاً",
+    "aiSubtitle": "أجب على بعض الأسئلة واحصل على برنامج رحلة شامل ومخصص في ثوانٍ.",
+    "aiFeature1": "جاهز في أقل من 30 ثانية",
+    "aiFeature2": "يتناسب مع ميزانيتك وحجم مجموعتك",
+    "aiFeature3": "يغطي وجهتك من الألف إلى الياء",
+    "aiFeature4": "بدّل أي نشاط لا يناسبك",
+    "aiCta": "ابدأ التخطيط بالذكاء الاصطناعي",
+    "guidesTitle": "المرشدون المحليون",
+    "guidesSubtitle": "تصفح خططاً صمّمها سكان محليون يعرفون كل زاوية مخفية وأفضل مطعم في المدينة.",
+    "guidesFeature1": "معرفة حقيقية من أهل المنطقة",
+    "guidesFeature2": "خبراء محليون موثقون",
+    "guidesFeature3": "اسأل مرشدك مباشرة",
+    "guidesFeature4": "مُقيَّمون من مسافرين آخرين",
+    "guidesCta": "تصفح المرشدين المحليين",
+    "trustNote": "مجاني · لا حاجة لحساب للتصفح · احجز فوراً عندما تكون مستعداً"
+  },
+  "AIPlannerPage": {
+    "backLink": "العودة إلى المخطط",
+    "title": "خطّط رحلتك إلى",
+    "defaultCity": "وجهتك",
+    "subtitle": "أجب على بعض الأسئلة — سيكون برنامجك جاهزاً في ثوانٍ."
+  },
+  "GuidesListing": {
+    "pageLabel": "المرشدون المحليون",
+    "headingPrefix": "تعرّف على خبراء",
+    "headingFallbackCity": "وجهتك",
+    "subheading": "خطط صنعها أشخاص يعيشون هنا — ليس الذكاء الاصطناعي، وليس الخوارزميات. معرفة محلية حقيقية.",
+    "guideCount": "{count, plural, zero {لا يوجد مرشد} one {مرشد واحد} two {مرشدان} few {{count} مرشدين} many {{count} مرشداً} other {{count} مرشد}}",
+    "noGuidesSpec": "لا يوجد مرشدون بهذا التخصص",
+    "noGuidesSpecHint": "جرّب فلتراً آخر أو تصفّح جميع المرشدين.",
+    "noGuides": "لا يوجد مرشدون بعد لهذه الوجهة",
+    "noGuidesHint": "تحقق لاحقاً — شبكة المرشدين لدينا في توسّع مستمر.",
+    "backLink": "العودة إلى المخطط",
+    "filterAll": "الكل",
+    "sortBy": "ترتيب حسب",
+    "sortFeatured": "المميّزون",
+    "sortMostPlans": "أكثر الخطط",
+    "sortTopRated": "الأعلى تقييماً",
+    "sortNewest": "الأحدث",
+    "specAdventures": "مغامرات",
+    "specWaterSports": "رياضات مائية",
+    "specCulture": "ثقافة",
+    "specFoodDrink": "طعام وشراب",
+    "specNature": "طبيعة",
+    "specShopping": "تسوّق",
+    "specWellness": "صحة وعافية",
+    "specFamily": "عائلة",
+    "specSightseeing": "سياحة",
+    "specWorkshops": "ورش عمل"
+  },
+  "GuideProfile": {
+    "backLink": "جميع المرشدين",
+    "verified": "موثّق",
+    "reviewCount": "({count, plural, zero {لا تقييمات} one {تقييم واحد} two {تقييمان} few {{count} تقييمات} many {{count} تقييماً} other {{count} تقييم}})",
+    "planCountLabel": "{count, plural, zero {لا خطط} one {خطة واحدة} two {خطتان} few {{count} خطط} many {{count} خطة} other {{count} خطة}}",
+    "aboutHeading": "عن {firstName}",
+    "specializationsHeading": "التخصصات",
+    "guideInfoHeading": "معلومات المرشد",
+    "languagesLabel": "اللغات",
+    "experienceLabel": "الخبرة",
+    "experienceYears": "{years, plural, one {سنة واحدة} two {سنتان} few {{years} سنوات} other {{years} سنة}}",
+    "basedInLabel": "مقيم في",
+    "plansHeading": "خطط {firstName}",
+    "plansCount": "({count})",
+    "noPlans": "لا توجد خطط منشورة بعد.",
+    "planTypeFree": "مجاني",
+    "planTypePaid": "مدفوع",
+    "planDuration": "{count, plural, one {يوم واحد} two {يومان} few {{count} أيام} other {{count} يوماً}}",
+    "tripsPlanned": "{count} رحلة مخططة",
+    "planViews": "{count} مشاهدة",
+    "noReviews": "لا توجد تقييمات بعد — كن أول من يشارك تجربته مع هذا المرشد.",
+    "reviewButtonLabel": "اكتب تقييماً",
+    "reviewDialogTitle": "تقييم {name}",
+    "reviewRatingLabel": "التقييم",
+    "reviewTitleLabel": "العنوان",
+    "reviewTitlePlaceholder": "لخّص تجربتك",
+    "reviewCommentLabel": "تقييمك",
+    "reviewCommentPlaceholder": "كيف كانت تجربتك مع خطط هذا المرشد؟",
+    "reviewSubmit": "إرسال التقييم",
+    "reviewSubmitting": "جارٍ الإرسال…",
+    "reviewCancel": "إلغاء",
+    "reviewSuccess": "تم إرسال التقييم — شكراً لك!",
+    "notFoundTitle": "المرشد غير موجود",
+    "notFoundDesc": "هذا الملف الشخصي للمرشد غير موجود أو تم تعطيله.",
+    "notFoundCta": "تصفّح جميع المرشدين"
+  },
+  "GuideCard": {
+    "planCount": "{count, plural, zero {لا خطط} one {خطة واحدة} two {خطتان} few {{count} خطط} other {{count} خطة}}"
+  },
+  "PlannerWizard": {
+    "stepDestination": "الوجهة",
+    "stepDestinationDesc": "إلى أين ستذهب وكم المدة؟",
+    "stepInterests": "الاهتمامات",
+    "stepInterestsDesc": "ما الذي تريد تجربته؟",
+    "stepBudget": "الميزانية والمجموعة",
+    "stepBudgetDesc": "أخبرنا عن ميزانيتك ومن يسافر معك.",
+    "stepLogistics": "اللوجستيات",
+    "stepLogisticsDesc": "التنقلات والمواصلات لرحلتك.",
+    "stepItinerary": "برنامجك",
+    "stepItineraryDesc": "برنامجك اليومي المخصص.",
+    "stepOf": "الخطوة {step} من {total}",
+    "back": "رجوع",
+    "next": "التالي",
+    "generatePlan": "إنشاء خطتي",
+    "savePlan": "حفظ الخطة",
+    "share": "مشاركة",
+    "generatingTitle": "جارٍ إنشاء برنامجك…",
+    "generatingSubtitle": "نحن نعدّ الخطة المثالية لرحلتك.",
+    "errorGenerate": "فشل إنشاء البرنامج. يرجى المحاولة مجدداً.",
+    "errorSave": "فشل حفظ الخطة.",
+    "savedSuccess": "تم حفظ الخطة!",
+    "linkCopied": "تم نسخ الرابط!"
+  },
+  "PlannerStepDestination": {
+    "whereGoing": "إلى أين ستذهب؟",
+    "whenArriving": "متى تصل؟",
+    "optional": "(اختياري)",
+    "dateHelp": "يساعدنا في التحقق من مواعيد المطاعم وتخطيط يوم وصولك بشكل صحيح.",
+    "howManyDays": "كم عدد الأيام؟",
+    "travelStyle": "ما أسلوب سفرك؟",
+    "styleRelaxed": "مريح",
+    "styleRelaxedDesc": "وتيرة هادئة، وقت حر كافٍ",
+    "styleBalanced": "متوازن",
+    "styleBalancedDesc": "مزيج من الأنشطة والراحة",
+    "styleActive": "نشط",
+    "styleActiveDesc": "جدول مليء، استفد من كل لحظة"
+  },
+  "PlannerStepInterests": {
+    "title": "ما الذي يثير اهتمامك أكثر؟",
+    "subtitle": "اختر كل ما يناسبك — سنبني خطتك حوله.",
+    "selectedCount": "{count} مختار",
+    "hint": "اختر اهتماماً واحداً على الأقل للحصول على توصيات مخصصة.",
+    "adventures": "مغامرات",
+    "waterSports": "رياضات مائية",
+    "culture": "ثقافة",
+    "foodDrink": "طعام وشراب",
+    "natureWildlife": "طبيعة وحياة برية",
+    "attractions": "معالم سياحية",
+    "sightseeing": "جولات استكشافية",
+    "workshops": "ورش عمل",
+    "wellness": "صحة وسبا",
+    "shopping": "تسوق",
+    "familyFriendly": "مناسب للعائلات",
+    "events": "فعاليات وموسيقى",
+    "dayTrips": "رحلات يومية"
+  },
+  "PlannerStepBudget": {
+    "budgetTitle": "ما ميزانيتك؟",
+    "budgetLabel": "اقتصادي",
+    "budgetRange": "~50–150 دينار/يوم",
+    "midrangeLabel": "متوسط",
+    "midrangeRange": "~150–400 دينار/يوم",
+    "luxuryLabel": "فاخر",
+    "luxuryRange": "+400 دينار/يوم",
+    "groupTitle": "من يسافر؟",
+    "solo": "منفرد",
+    "couple": "زوجان",
+    "family": "عائلة",
+    "friends": "أصدقاء",
+    "accommodationTitle": "أين ستقيم؟",
+    "hotel": "فندق",
+    "hotelDesc": "خدمة كاملة",
+    "riad": "رياض",
+    "riadDesc": "طابع محلي",
+    "apartment": "شقة",
+    "apartmentDesc": "راحة المنزل",
+    "hostel": "نزل",
+    "hostelDesc": "ميزانية محدودة"
+  },
+  "PlannerStepLogistics": {
+    "title": "الوصول والتنقل",
+    "subtitle": "سنضمّن أفضل الخيارات من شركائنا الموثقين.",
+    "airportPickupLabel": "استقبال من المطار عند الوصول",
+    "airportPickupDesc": "سنضمّن أفضل شريك نقل لاستقبالك عند الوصول.",
+    "returnTransferLabel": "نقل العودة إلى المطار",
+    "returnTransferDesc": "نقل في يوم مغادرتك حتى لا تفوتك رحلتك.",
+    "rentalLabel": "استئجار مركبة للرحلة",
+    "rentalDesc": "سيارة أو دراجة أو سكوتر للاستكشاف بحريتك.",
+    "rentalTypeTitle": "ما نوع المركبة؟",
+    "car": "سيارة",
+    "bike": "دراجة",
+    "scooter": "سكوتر",
+    "skipNote": "يمكنك تخطي هذه الخيارات — اللوجستيات تُضاف فوق خطة الأنشطة."
+  },
+  "CategoriesNav": {
+    "home": "Guidni",
+    "activities": "الأنشطة",
+    "stays": "الإقامات",
+    "restaurants": "المطاعم",
+    "passes": "الباقات",
+    "transport": "التنقل",
+    "shops": "المتاجر",
+    "destinations": "الوجهات",
+    "planner": "المخطط"
+  },
+  "Destinations": {
+    "title": "الوجهات",
+    "heroTitle": "استكشف",
+    "heroAccent": "العالم",
+    "subtitle": "استكشف العالم مع Guidni",
+    "heroSubtitle": "اكتشف وجهات رائعة وأنشطة مختارة بعناية وإقامات لا تُنسى — كل ذلك في مكان واحد.",
+    "allDestinations": "جميع الوجهات",
+    "exploreIn": "استكشف في",
+    "activities": "الأنشطة",
+    "stays": "الإقامات",
+    "filterAll": "جميع الدول",
+    "countrySelectPlaceholder": "الدولة",
+    "count": "{count} وجهة",
+    "countPlural": "{count} وجهات",
+    "resultsCount": "{count, plural, zero {لا وجهات} one {وجهة واحدة} two {وجهتان} few {{count} وجهات} many {{count} وجهة} other {{count} وجهة}}",
+    "searchPlaceholder": "ابحث عن الوجهات…",
+    "clearSearch": "مسح",
+    "noResults": "لم يتم العثور على وجهات",
+    "noResultsHint": "جرب دولة مختلفة أو امسح بحثك.",
+    "featuredLabel": "مميز",
+    "featuredTitle": "الوجهات المميزة",
+    "featuredSubtitle": "أكثر وجهاتنا شعبية في الوقت الحالي",
+    "activitiesCount": "{count} نشاط",
+    "staysCount": "{count} إقامة",
+    "restaurantsCount": "{count} مطعم"
+  },
+  "AttractionPage": {
+    "about": "حول هذا المعلم",
+    "practicalInfo": "معلومات عملية",
+    "hours": "ساعات العمل",
+    "admission": "رسوم الدخول",
+    "free": "دخول مجاني",
+    "location": "الموقع",
+    "viewMap": "عرض على الخريطة",
+    "ticketTitle": "احجز زيارتك",
+    "bookTour": "احجز جولة",
+    "relatedActivities": "الأنشطة التي تتضمن هذا المعلم",
+    "relatedAttractions": "معالم قريبة أخرى",
+    "backToDestination": "العودة إلى {city}",
+    "breadcrumbDestinations": "الوجهات",
+    "breadcrumbAttractions": "المعالم السياحية",
+    "categoryBadge": {
+      "culture": "ثقافة",
+      "religion": "دين",
+      "beach": "شاطئ",
+      "nature": "طبيعة",
+      "history": "تاريخ",
+      "entertainment": "ترفيه"
+    }
+  },
+  "DestinationGuide": {
+    "overview": "نظرة عامة",
+    "weather": "الطقس",
+    "food": "المطبخ المحلي",
+    "transport": "التنقل",
+    "budget": "الميزانية",
+    "safety": "الأمان",
+    "packing": "ماذا تحمل",
+    "quickFacts": "معلومات سريعة",
+    "highlights": "أبرز المعالم",
+    "culture": "الثقافة والعادات",
+    "bestTime": "أفضل وقت للزيارة",
+    "climate": "المناخ",
+    "gettingThere": "كيف تصل",
+    "movingAround": "التنقل في الوجهة",
+    "budgetLevels": "الميزانية اليومية",
+    "priceExamples": "أمثلة على الأسعار",
+    "moneyTips": "نصائح مالية",
+    "safetyTips": "نصائح الأمان",
+    "emergency": "أرقام الطوارئ",
+    "essentials": "الأساسيات",
+    "summer": "الصيف",
+    "winter": "الشتاء",
+    "currency": "العملة",
+    "activities": "الأنشطة",
+    "stays": "الإقامة",
+    "restaurants": "المطاعم",
+    "attractions": "أبرز المعالم السياحية",
+    "readyToExplore": "مستعد لاستكشاف {city}؟",
+    "exploreSubtitle": "احجز الأنشطة وابحث عن الإقامة واكتشف أفضل المطاعم."
+  },
+  "ActivitiesPage": {
+    "titlePrefix": "ماذا تفعل في",
+    "titleDefault": "الأنشطة",
+    "titleFallback": "جميع الوجهات",
+    "subtitle": "انغمس في المغامرات — استكشف، استرخِ، واستمتع. تجربتك تنتظرك.",
+    "allActivities": "جميع الأنشطة",
+    "resultsCount": "{count, plural, zero {لا توجد أنشطة} one {نشاط واحد} two {نشاطان} few {{count} أنشطة} many {{count} نشاطاً} other {{count} نشاط}}",
+    "searchPlaceholder": "ابحث عن الأنشطة…",
+    "noActivities": "لم يتم العثور على أنشطة",
+    "noActivitiesHint": "جرّب فئة مختلفة أو امسح بحثك.",
+    "clearSearch": "مسح البحث",
+    "page": "صفحة",
+    "of": "من",
+    "previous": "السابق",
+    "next": "التالي",
+    "perPage": "لكل صفحة",
+    "filtersLabel": "الفلاتر",
+    "clearFilters": "مسح الكل"
+  },
+  "RestaurantsPage": {
+    "titlePrefix": "أين تأكل في",
+    "titleDefault": "أين تأكل",
+    "titleFallback": "جميع الوجهات",
+    "subtitle": "من الأماكن الخفية إلى الطاولات الشهيرة — تناول الطعام كأنك تعيش هنا.",
+    "resultsCount": "{count, plural, zero {لا توجد أماكن} one {مكان واحد} two {مكانان} few {{count} أماكن} many {{count} مكاناً} other {{count} مكان}}",
+    "searchPlaceholder": "ابحث عن المطاعم…",
+    "clearSearch": "مسح البحث",
+    "noResults": "لم يتم العثور على مطاعم",
+    "noResultsHint": "جرّب أجواءً مختلفة أو مطبخاً آخر أو امسح بحثك.",
+    "previous": "السابق",
+    "next": "التالي",
+    "showFilters": "الفلاتر",
+    "hideFilters": "إخفاء الفلاتر",
+    "activeFilters": "{count, plural, zero {لا فلاتر} one {فلتر واحد} two {فلتران} few {{count} فلاتر} many {{count} فلتراً} other {{count} فلتر}}",
+    "filtersLabel": "الفلاتر",
+    "filter": {
+      "cuisinePlaceholder": "المطبخ",
+      "typePlaceholder": "نوع المنشأة",
+      "mealPlaceholder": "الوجبة",
+      "foodTypePlaceholder": "نوع الطعام",
+      "dietPlaceholder": "النظام الغذائي",
+      "attributesPlaceholder": "الأجواء والمميزات",
+      "typeRestaurants": "مطاعم",
+      "typeCafes": "مقاهي",
+      "reservation": "حجز",
+      "clearAll": "مسح جميع الفلاتر",
+      "mealBreakfast": "الفطور",
+      "mealBrunch": "البرانش",
+      "mealLunch": "الغداء",
+      "mealDinner": "العشاء",
+      "mealSnacks": "وجبات خفيفة",
+      "search": "بحث...",
+      "noResults": "لا توجد نتائج.",
+      "selectAll": "تحديد الكل",
+      "clear": "مسح",
+      "close": "إغلاق"
+    },
+    "cuisines": {
+      "tunisian": "تونسي",
+      "moroccan": "مغربي",
+      "north_african": "شمال أفريقي",
+      "middle_eastern": "شرق أوسطي",
+      "lebanese": "لبناني",
+      "syrian": "سوري",
+      "turkish": "تركي",
+      "mediterranean": "متوسطي",
+      "greek": "يوناني",
+      "italian": "إيطالي",
+      "french": "فرنسي",
+      "spanish": "إسباني",
+      "american": "أمريكي",
+      "mexican": "مكسيكي",
+      "asian": "آسيوي",
+      "japanese": "ياباني",
+      "chinese": "صيني",
+      "indian": "هندي",
+      "thai": "تايلاندي",
+      "international": "دولي"
+    },
+    "foodTypes": {
+      "seafood": "مأكولات بحرية",
+      "grill": "مشويات وباربيكيو",
+      "pizza": "بيتزا",
+      "burgers": "برغر",
+      "street_food": "أكل الشارع",
+      "fast_food": "وجبات سريعة",
+      "bakery": "مخبوزات وحلويات",
+      "cafe": "كافيه وقهوة"
+    },
+    "dietTypes": {
+      "halal": "حلال",
+      "vegetarian": "نباتي",
+      "vegan": "نباتي صرف"
+    },
+    "attributes": {
+      "romantic": "أجواء رومانسية",
+      "cosy": "دافئ وحميمي",
+      "quiet": "هادئ ومريح",
+      "live_music": "موسيقى حية",
+      "sea_view": "إطلالة على البحر",
+      "panoramic_view": "إطلالة بانورامية",
+      "rooftop": "تراس على السطح",
+      "terrace": "تراس خارجي",
+      "family_friendly": "مناسب للعائلات",
+      "children_menu": "قائمة أطفال",
+      "baby_space": "مساحة للأطفال الرضع",
+      "board_games": "ألعاب ورق وطاولة",
+      "sports_screen": "بث مباريات رياضية",
+      "wifi": "واي فاي مجاني",
+      "air_conditioned": "تكييف هواء",
+      "parking": "موقف سيارات",
+      "pet_friendly": "الحيوانات الأليفة مرحب بها",
+      "private_dining": "غرفة طعام خاصة"
+    },
+    "intents": {
+      "all": "الكل",
+      "breakfast": "الفطور",
+      "brunch": "البرانش",
+      "work": "العمل والدراسة",
+      "date": "موعد غرامي",
+      "hangout": "مع الأصدقاء",
+      "night": "سهرة",
+      "cheap": "اقتصادي",
+      "cosy": "هادئ ومريح",
+      "scenic": "إطلالة جميلة",
+      "local": "محلي",
+      "family": "عائلي"
+    }
+  },
+  "RestaurantPage": {
+    "reviews": "تقييم",
+    "reviewsTitle": "التقييمات",
+    "noReviews": "لا توجد تقييمات بعد. كن أول من يشارك تجربته.",
+    "outOf": "من 5",
+    "share": "مشاركة",
+    "shareCopied": "تم نسخ الرابط!",
+    "allPhotos": "عرض كل الصور",
+    "photos": "صور",
+    "showMore": "عرض المزيد",
+    "showLess": "عرض أقل",
+    "breadcrumb": "المطاعم",
+    "about": "حول",
+    "relatedTitle": "المزيد من المطاعم في {city}",
+    "type": {
+      "RESTAURANT": "مطعم",
+      "CAFEE_SHOP": "مقهى",
+      "BOTH": "مطعم ومقهى"
+    },
+    "nav": {
+      "overview": "نظرة عامة",
+      "menu": "القائمة",
+      "location": "الموقع",
+      "reviews": "التقييمات"
+    },
+    "menu": {
+      "title": "القائمة",
+      "noMenu": "لا تتوفر قائمة في الوقت الحالي.",
+      "groupBy": "تجميع حسب الفئة",
+      "showAll": "عرض جميع العناصر",
+      "other": "أخرى",
+      "items": "عنصر",
+      "viewFull": "عرض القائمة الكاملة"
+    },
+    "location": {
+      "title": "الموقع",
+      "viewOnMaps": "عرض على خرائط Google",
+      "website": "الموقع الإلكتروني",
+      "instagram": "إنستغرام",
+      "facebook": "فيسبوك"
+    },
+    "hours": {
+      "title": "ساعات العمل",
+      "closed": "مغلق",
+      "open24h": "مفتوح 24 ساعة"
+    },
+    "widget": {
+      "title": "احجز طاولة",
+      "date": "التاريخ",
+      "time": "الوقت",
+      "guests": "الضيوف",
+      "maxGuests": "الحد الأقصى {n} ضيف لكل حجز",
+      "notes": "طلبات خاصة (اختياري)",
+      "notesPlaceholder": "حساسية، كرسي أطفال، عيد ميلاد...",
+      "submit": "طلب حجز",
+      "submitting": "جارٍ الإرسال...",
+      "cancelNote": "إلغاء مجاني حتى 24 ساعة قبل زيارتك",
+      "successTitle": "تم إرسال طلب الحجز!",
+      "successMessage": "سنؤكد طاولتك في {name} قريباً."
+    },
+    "visitCard": {
+      "title": "زورونا",
+      "walkin": "الزيارة بدون حجز مرحب بها"
+    },
+    "mobileBar": {
+      "bookTable": "احجز طاولة",
+      "viewMenu": "عرض القائمة"
+    },
+    "menuPage": {
+      "backToRestaurant": "العودة إلى المطعم",
+      "table": "طاولة {n}",
+      "fullMenu": "القائمة الكاملة",
+      "poweredBy": "مدعوم من Guidni"
+    },
+    "qrTab": {
+      "title": "رموز QR",
+      "description": "أنشئ رموز QR للطاولات. يمكن للضيوف مسحها لعرض القائمة مباشرة على هواتفهم.",
+      "tableLabel": "رقم الطاولة",
+      "general": "عام (بدون طاولة)",
+      "previewLabel": "معاينة رمز QR",
+      "linkLabel": "يؤدي إلى",
+      "download": "تحميل PNG",
+      "tableMode": "طاولة",
+      "generalMode": "عام"
+    },
+    "reviewForm": {
+      "buttonLabel": "اكتب تقييماً",
+      "dialogTitle": "شارك تجربتك",
+      "ratingLabel": "تقييمك",
+      "titleLabel": "العنوان (اختياري)",
+      "titlePlaceholder": "لخّص زيارتك",
+      "commentLabel": "التعليق (اختياري)",
+      "commentPlaceholder": "أخبرنا عن الطعام والخدمة والأجواء...",
+      "submit": "إرسال التقييم",
+      "submitting": "جارٍ الإرسال...",
+      "cancel": "إلغاء",
+      "success": "تم إرسال التقييم بنجاح!",
+      "partnerReply": "رد المطعم"
+    },
+    "guidniReview": {
+      "title": "تم التقييم من قبل Guidni",
+      "by": "تقييم من",
+      "visited": "تم الزيارة",
+      "score": "نقاط Guidni",
+      "accuracy": "الدقة",
+      "quality": "الجودة",
+      "value": "القيمة مقابل السعر",
+      "presentation": "العرض",
+      "host": "المضيف",
+      "fullReview": "التقييم الكامل",
+      "loved": "ما أعجبنا",
+      "worth": "يستحق المعرفة",
+      "bestFor": "الأنسب لـ",
+      "partnerReply": "رد الشريك",
+      "outOf": "/ 10"
+    }
+  },
+  "StaysPage": {
+    "titlePrefix": "أين تقيم في",
+    "titleDefault": "أين تقيم",
+    "titleFallback": "جميع الوجهات",
+    "subtitle": "من المنتجعات الفاخرة إلى بيوت الضيافة المريحة — اعثر على إقامتك المثالية.",
+    "allStays": "جميع الإقامات",
+    "resultsCount": "{count, plural, zero {لا توجد إقامات} one {إقامة واحدة} two {إقامتان} few {{count} إقامات} many {{count} إقامة} other {{count} إقامة}}",
+    "searchPlaceholder": "ابحث عن الإقامات…",
+    "clearSearch": "مسح البحث",
+    "noStays": "لم يتم العثور على إقامات",
+    "noStaysHint": "جرّب فئة مختلفة أو امسح بحثك.",
+    "previous": "السابق",
+    "next": "التالي",
+    "filtersLabel": "الفلاتر",
+    "clearFilters": "مسح الكل"
+  },
+  "StayPage": {
+    "about": "عن هذا المكان",
+    "perNight": "في الليلة",
+    "cleaningFee": "رسوم التنظيف",
+    "serviceFee": "رسوم الخدمة",
+    "taxes": "الضرائب (TVA 9%)",
+    "discount": "خصم",
+    "total": "المجموع",
+    "allPhotos": "عرض جميع الصور",
+    "photos": "صور",
+    "minNights": "الحد الأدنى للإقامة {n} ليالٍ",
+    "outOf": "من 5",
+    "share": "مشاركة",
+    "shareCopied": "تم نسخ الرابط!",
+    "bookNow": "احجز الآن",
+    "bookingNote": "لن يتم تحصيل أي مبلغ الآن",
+    "reviews": "تقييم",
+    "reviewsTitle": "التقييمات",
+    "noReviews": "لا توجد تقييمات بعد. كن أول من يشارك تجربته.",
+    "breadcrumb": {
+      "stays": "الإقامات"
+    },
+    "host": {
+      "hostedBy": "{type} كامل بإدارة {name}",
+      "speaks": "يتحدث",
+      "defaultName": "المضيف"
+    },
+    "showMore": "عرض المزيد",
+    "showLess": "عرض أقل",
+    "memberSince": "عضو منذ",
+    "relatedTitle": "إقامات أخرى في {city}",
+    "night": "ليلة",
+    "nights": "ليالٍ",
+    "nav": {
+      "overview": "نظرة عامة",
+      "amenities": "المرافق",
+      "location": "الموقع",
+      "reviews": "التقييمات"
+    },
+    "highlights": {
+      "freeCancel": "إلغاء مجاني",
+      "pool": "مسبح خاص",
+      "wifi": "واي فاي مجاني",
+      "parking": "موقف مجاني",
+      "kitchen": "مطبخ كامل",
+      "garden": "حديقة",
+      "balcony": "شرفة",
+      "topRated": "المفضل لدى الضيوف"
+    },
+    "location": {
+      "title": "أين ستكون",
+      "viewOnMaps": "عرض على خرائط Google"
+    },
+    "thingsToKnow": {
+      "title": "معلومات مهمة",
+      "houseRules": "قواعد المنزل",
+      "safety": "السلامة وإمكانية الوصول",
+      "cancellation": "سياسة الإلغاء",
+      "safetyItem1": "كاشف أول أكسيد الكربون",
+      "safetyItem2": "كاشف الدخان",
+      "safetyItem3": "إسعافات أولية"
+    },
+    "reviewForm": {
+      "buttonLabel": "اكتب تقييماً",
+      "dialogTitle": "شارك تجربتك",
+      "ratingLabel": "تقييمك",
+      "titleLabel": "العنوان (اختياري)",
+      "titlePlaceholder": "لخّص تجربتك",
+      "commentLabel": "التعليق (اختياري)",
+      "commentPlaceholder": "أخبرنا المزيد عن تجربتك...",
+      "submit": "إرسال التقييم",
+      "submitting": "جارٍ الإرسال...",
+      "cancel": "إلغاء",
+      "success": "تم إرسال تقييمك بنجاح!",
+      "partnerReply": "رد صاحب المكان"
+    },
+    "details": {
+      "title": "المساحة",
+      "guests": "ضيف",
+      "bedrooms": "غرفة نوم",
+      "beds": "سرير",
+      "bathrooms": "حمام",
+      "cancellation": "سياسة الإلغاء",
+      "cancelation": {
+        "flexible": "مرنة — إلغاء قبل 24 ساعة من تسجيل الوصول مع استرداد كامل.",
+        "moderate": "معتدلة — إلغاء قبل 5 أيام من تسجيل الوصول مع استرداد كامل.",
+        "strict": "صارمة — إلغاء قبل 14 يومًا من تسجيل الوصول مع استرداد كامل.",
+        "non_refundable": "غير قابل للاسترداد — لا يمكن إلغاء هذا الحجز."
+      }
+    },
+    "amenities": {
+      "title": "وسائل الراحة",
+      "wifi": "واي فاي",
+      "kitchen": "مطبخ",
+      "ac": "تكييف هواء",
+      "heating": "تدفئة",
+      "pool": "حمام سباحة",
+      "garden": "حديقة",
+      "balcony": "شرفة",
+      "parking": "موقف سيارات مجاني",
+      "security": "كاميرات أمنية",
+      "concierge": "خدمة الكونسيرج",
+      "wheelchair": "مناسب لذوي الاحتياجات الخاصة",
+      "elevator": "مصعد",
+      "groupEssentials": "الأساسيات",
+      "groupOutdoors": "الخارج والإضافات",
+      "groupSafety": "السلامة وإمكانية الوصول",
+      "showAll": "عرض جميع المرافق ({n})",
+      "showLess": "عرض أقل"
+    },
+    "houseRules": {
+      "title": "قواعد المنزل",
+      "checkIn": "تسجيل الوصول",
+      "checkOut": "تسجيل المغادرة",
+      "after": "بعد الساعة",
+      "before": "قبل الساعة",
+      "pets": "الحيوانات الأليفة",
+      "smoking": "التدخين",
+      "allowed": "مسموح",
+      "notAllowed": "غير مسموح",
+      "cancelPolicies": {
+        "flexible": "مرنة — استرداد كامل حتى 24 ساعة قبل الوصول.",
+        "moderate": "معتدلة — استرداد كامل حتى 5 أيام قبل الوصول.",
+        "strict": "صارمة — استرداد كامل حتى 14 يومًا قبل الوصول.",
+        "non_refundable": "غير قابل للاسترداد."
+      }
+    },
+    "booking": {
+      "checkIn": "تسجيل الوصول",
+      "checkOut": "تسجيل المغادرة",
+      "adults": "بالغون",
+      "children": "أطفال",
+      "maxGuests": "تجاوز الحد الأقصى لعدد الضيوف"
+    },
+    "guidniReview": {
+      "title": "تم التقييم من قبل Guidni",
+      "by": "تقييم من",
+      "visited": "تم الزيارة",
+      "score": "نقاط Guidni",
+      "accuracy": "الدقة",
+      "quality": "الجودة",
+      "value": "القيمة مقابل السعر",
+      "presentation": "العرض",
+      "host": "المضيف",
+      "fullReview": "التقييم الكامل",
+      "loved": "ما أعجبنا",
+      "worth": "يستحق المعرفة",
+      "bestFor": "الأنسب لـ",
+      "partnerReply": "رد الشريك",
+      "outOf": "/ 10"
+    }
+  },
+  "BookingsPage": {
+    "title": "حجوزاتي",
+    "subtitle": "عرض وإدارة جميع حجوزاتك.",
+    "activities": "الأنشطة",
+    "stays": "الإقامات",
+    "passes": "الباقات",
+    "rentals": "الإيجارات",
+    "transfers": "التنقلات",
+    "noActivities": "لم تحجز أي أنشطة بعد.",
+    "noStays": "لم تحجز أي إقامات بعد.",
+    "noPasses": "لم تحجز أي باقات بعد.",
+    "noRentals": "لم تحجز أي إيجارات بعد.",
+    "noTransfers": "لم تحجز أي تنقلات بعد.",
+    "browseActivities": "تصفح الأنشطة",
+    "browseStays": "تصفح الإقامات",
+    "browsePasses": "تصفح الباقات",
+    "browseRentals": "تصفح الإيجارات",
+    "browseTransfers": "تصفح التنقلات",
+    "viewDetails": "عرض التفاصيل",
+    "bookingRef": "مرجع",
+    "adults": "بالغون",
+    "children": "أطفال",
+    "nights": "ليالٍ",
+    "days": "أيام",
+    "passengers": "ركاب",
+    "participants": "مشاركون",
+    "validUntil": "صالحة حتى"
+  },
+  "BookingDetail": {
+    "backToBookings": "العودة إلى الحجوزات",
+    "activityTitle": "تفاصيل حجز النشاط",
+    "stayTitle": "تفاصيل حجز الإقامة",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "participants": "المشاركون",
+    "checkIn": "تسجيل الوصول",
+    "checkOut": "تسجيل المغادرة",
+    "nights": "ليالٍ",
+    "guests": "الضيوف",
+    "adults": "بالغون",
+    "children": "أطفال",
+    "priceBreakdown": "تفصيل السعر",
+    "taxes": "الضرائب",
+    "serviceFee": "رسوم الخدمة",
+    "cleaningFee": "رسوم التنظيف",
+    "total": "الإجمالي",
+    "payment": "الدفع",
+    "method": "طريقة الدفع",
+    "paymentOption": "خيار الدفع",
+    "payNow": "تم الدفع إلكترونياً",
+    "payLater": "الدفع عند الوصول",
+    "contact": "بيانات التواصل",
+    "bookingRef": "مرجع الحجز",
+    "cancel": "إلغاء الحجز",
+    "confirmCancel": "نعم، إلغاء",
+    "keepBooking": "الاحتفاظ بالحجز"
+  },
+  "ProfilePage": {
+    "title": "ملفي الشخصي",
+    "memberSince": "عضو منذ",
+    "editTitle": "تعديل معلوماتك",
+    "editSubtitle": "قم بتحديث بياناتك الشخصية.",
+    "name": "الاسم الكامل",
+    "phone": "رقم الهاتف",
+    "bio": "نبذة عني",
+    "city": "المدينة",
+    "country": "البلد",
+    "address": "العنوان",
+    "save": "حفظ التغييرات",
+    "saving": "جارٍ الحفظ...",
+    "saved": "تم تحديث الملف الشخصي بنجاح.",
+    "error": "فشل التحديث. يرجى المحاولة مرة أخرى."
+  },
+  "Checkout": {
+    "title": "إتمام الحجز",
+    "backTo": "العودة إلى",
+    "orderSummary": "ملخص الطلب",
+    "goBack": "إعادة المحاولة",
+    "bookAnother": "حجز آخر",
+    "viewBookings": "عرض حجوزاتي",
+    "error": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "contact": {
+      "title": "بياناتك الشخصية",
+      "subtitle": "سنستخدم هذه المعلومات لإرسال تأكيد حجزك.",
+      "infoNote": "بياناتك تُستخدم فقط لتأكيد الحجز والتواصل مع المضيف.",
+      "name": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "namePlaceholder": "اسمك الكامل",
+      "emailPlaceholder": "بريدك@email.com",
+      "phonePlaceholder": "+216 XX XXX XXX",
+      "next": "متابعة"
+    },
+    "payment": {
+      "title": "طريقة الدفع",
+      "subtitle": "اختر طريقة الدفع المناسبة.",
+      "payNow": "الدفع الآن",
+      "payLater": "الدفع لاحقاً",
+      "payNowDesc": "ادفع بأمان عبر الإنترنت.",
+      "payLaterDesc": "ادفع في الموقع أو عند الوصول.",
+      "chooseMethod": "اختر طريقة الدفع",
+      "konnect": "كونكت",
+      "creditCard": "بطاقة ائتمانية",
+      "cash": "نقداً عند الوصول",
+      "back": "رجوع",
+      "confirm": "تأكيد الحجز",
+      "confirmBooking": "تأكيد الحجز",
+      "total": "الإجمالي",
+      "secureBooking": "حجز آمن"
+    },
+    "summary": {
+      "adults": "بالغون",
+      "children": "أطفال",
+      "nights": "ليالٍ",
+      "cleaningFee": "رسوم التنظيف",
+      "serviceFee": "رسوم الخدمة",
+      "taxes": "الضرائب",
+      "total": "الإجمالي",
+      "totalNote": "شامل جميع الضرائب والرسوم",
+      "perPerson": "للشخص",
+      "perNight": "في الليلة",
+      "freeCancel": "إلغاء مجاني",
+      "nonRefundable": "غير قابل للاسترداد"
+    },
+    "steps": {
+      "contact": "بيانات التواصل",
+      "payment": "الدفع"
+    },
+    "success": {
+      "title": "تم تأكيد الحجز!",
+      "bookingRef": "رقم الحجز",
+      "copied": "تم النسخ!",
+      "whatsNext": "ماذا سيحدث بعد ذلك",
+      "step1": "تم إرسال رسالة تأكيد إلى بريدك الإلكتروني.",
+      "step2": "سيتواصل معك المضيف بالتفاصيل اللازمة.",
+      "step3": "أظهر رمز QR الخاص بك في يوم النشاط."
+    }
+  },
+  "WishlistPage": {
+    "title": "قائمة الأمنيات",
+    "subtitle": "الأنشطة والإقامات والمطاعم التي حفظتها.",
+    "activitiesTitle": "الأنشطة",
+    "staysTitle": "الإقامات",
+    "restaurantsTitle": "المطاعم",
+    "emptyTitle": "قائمة الأمنيات فارغة",
+    "emptyHint": "احفظ الأنشطة والإقامات والمطاعم التي تعجبك بالنقر على أيقونة القلب.",
+    "browseActivities": "تصفح الأنشطة",
+    "browseStays": "تصفح الإقامات",
+    "shopsTitle": "المحلات المحفوظة",
+    "productsTitle": "المنتجات المحفوظة",
+    "rentalsTitle": "الإيجارات المحفوظة",
+    "transfersTitle": "وسائل النقل المحفوظة"
+  },
+  "ActivityPage": {
+    "about": "عن هذا النشاط",
+    "showMore": "عرض المزيد",
+    "showLess": "عرض أقل",
+    "hostedBy": "يقدّمه",
+    "memberSince": "عضو منذ",
+    "relatedTitle": "المزيد من الأنشطة في {city}",
+    "nav": {
+      "overview": "نظرة عامة",
+      "includes": "يشمل",
+      "location": "الموقع",
+      "reviews": "التقييمات",
+      "goodToKnow": "معلومات مهمة"
+    },
+    "perPerson": "للشخص",
+    "share": "مشاركة",
+    "shareCopied": "تم نسخ الرابط!",
+    "outOf": "من 5",
+    "reviewsTitle": "التقييمات",
+    "allPhotos": "عرض جميع الصور",
+    "photos": "صور",
+    "breadcrumb": {
+      "activities": "الأنشطة"
+    },
+    "quickFacts": {
+      "maxGroup": "الحد الأقصى {n} شخص",
+      "category": "الفئة",
+      "duration": "المدة",
+      "groupSize": "حجم المجموعة",
+      "languages": "اللغات"
+    },
+    "highlights": {
+      "freeCancel": "إلغاء مجاني",
+      "payLater": "احجز الآن، ادفع لاحقاً",
+      "smallGroup": "مجموعة صغيرة",
+      "guided": "تجربة مرشدة",
+      "topRated": "الأعلى تقييماً"
+    },
+    "passCallout": {
+      "title": "مشمول في باقة Guidni",
+      "subtitle": "وفّر حتى 20% عند تجميع التجارب.",
+      "cta": "عرض الباقات"
+    },
+    "location": {
+      "title": "نقطة الالتقاء",
+      "viewOnMaps": "عرض على خرائط Google"
+    },
+    "goodToKnow": {
+      "title": "معلومات مفيدة",
+      "cancellationTitle": "الإلغاء",
+      "cancellationFree": "إلغاء مجاني حتى 24 ساعة قبل بدء النشاط.",
+      "cancellationStrict": "هذا الحجز غير قابل للاسترداد بعد التأكيد.",
+      "paymentTitle": "الدفع",
+      "paymentLater": "احجز مكانك الآن وادفع في الموقع. لا رسوم مسبقة.",
+      "paymentNow": "يُشترط الدفع الكامل عند إتمام الحجز.",
+      "groupTitle": "حجم المجموعة",
+      "maxGroup": "الحد الأقصى {n} مشارك في كل جلسة."
+    },
+    "includes": "ما هو مشمول",
+    "excludes": "غير مشمول",
+    "allowed": "مسموح به",
+    "forbidden": "غير مسموح به",
+    "cancelation": {
+      "title": "إلغاء مجاني",
+      "description": "يمكنك الإلغاء قبل 24 ساعة للحصول على استرداد كامل."
+    },
+    "paynow": {
+      "title": "احجز الآن، ادفع في الموقع",
+      "description": "يمكنك حجز مكانك دون الدفع مسبقاً."
+    },
+    "guide": {
+      "title": "اللغات المتاحة"
+    },
+    "capacity": "الحد الأقصى {count} مشارك",
+    "reviews": "تقييم",
+    "noReviews": "لا توجد تقييمات بعد. كن أول من يشارك تجربته.",
+    "reviewForm": {
+      "buttonLabel": "اكتب تقييماً",
+      "dialogTitle": "شارك تجربتك",
+      "ratingLabel": "تقييمك",
+      "titleLabel": "العنوان (اختياري)",
+      "titlePlaceholder": "لخّص تجربتك",
+      "commentLabel": "التعليق (اختياري)",
+      "commentPlaceholder": "أخبرنا المزيد عن تجربتك...",
+      "submit": "إرسال التقييم",
+      "submitting": "جارٍ الإرسال...",
+      "cancel": "إلغاء",
+      "success": "تم إرسال تقييمك بنجاح!",
+      "partnerReply": "رد المنظّم"
+    },
+    "guidniReview": {
+      "title": "تمت مراجعته من قِبَل Guidni",
+      "by": "بواسطة",
+      "visited": "تمت الزيارة",
+      "score": "تقييم Guidni",
+      "accuracy": "الدقة",
+      "quality": "جودة التجربة",
+      "value": "القيمة مقابل السعر",
+      "presentation": "العرض والنظافة",
+      "host": "المضيف / المرشد",
+      "fullReview": "المراجعة",
+      "loved": "ما أعجبنا",
+      "worth": "ما يجب معرفته",
+      "bestFor": "الأنسب لـ",
+      "partnerReply": "رد الشريك",
+      "outOf": "/ 10"
+    },
+    "booking": {
+      "title": "تحقق من التوفر",
+      "checkAvailability": "تحقق من التوفر",
+      "checking": "جارٍ التحقق...",
+      "selectTime": "اختر موعداً",
+      "breakdown": "تفصيل السعر",
+      "adults": "بالغون",
+      "children": "أطفال",
+      "taxes": "الضرائب",
+      "serviceFee": "رسوم الخدمة",
+      "serviceDesc": "تساعدنا هذه الرسوم في الحفاظ على المنصة وتقديم الدعم على مدار الساعة.",
+      "total": "الإجمالي",
+      "totalNote": "شامل جميع الضرائب والرسوم",
+      "bookNow": "احجز الآن",
+      "noAvailability": "لا توجد أوقات متاحة لهذا التاريخ. حاول تاريخاً آخر.",
+      "errorMessage": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+      "date": "التاريخ",
+      "pickDate": "اختر تاريخاً",
+      "back": "رجوع"
+    }
+  },
+  "BecomePartner": {
+    "hero": {
+      "badge": "برنامج الشركاء",
+      "title": "طوّر أعمالك مع Guidni",
+      "subtitle": "انضم إلى مئات الشركاء المحليين الذين يتواصلون يومياً مع آلاف المسافرين. أضف أنشطتك وإقاماتك وتجاربك على المنصة الموثوقة للمستكشفين.",
+      "cta": "ابدأ الآن",
+      "login": "هل لديك حساب بالفعل؟"
+    },
+    "benefits": {
+      "title": "لماذا تصبح شريكاً معنا؟",
+      "reach": {
+        "title": "وسّع نطاق وصولك",
+        "description": "اجعل أعمالك مرئية لآلاف المسافرين الذين يخططون لزيارة وجهتك."
+      },
+      "manage": {
+        "title": "إدارة كل شيء في مكان واحد",
+        "description": "أدر الحجوزات والتوفر والأسعار والتقييمات من لوحة تحكم سهلة الاستخدام."
+      },
+      "earn": {
+        "title": "نمّ إيراداتك",
+        "description": "لا رسوم مسبقة. تدفع فقط عمولة صغيرة على الحجوزات المؤكدة."
+      },
+      "support": {
+        "title": "دعم متخصص",
+        "description": "فريق الشركاء لدينا هنا لمساعدتك في كل خطوة."
+      }
+    },
+    "howItWorks": {
+      "title": "كيف يعمل؟",
+      "step1": {
+        "title": "أنشئ ملفك التعريفي",
+        "description": "أخبرنا عن نشاطك التجاري في دقائق معدودة."
+      },
+      "step2": {
+        "title": "أضف عروضك",
+        "description": "أضف أنشطتك وإقاماتك وتجاربك مع الصور والأسعار."
+      },
+      "step3": {
+        "title": "ابدأ تحقيق الأرباح",
+        "description": "استقبل الحجوزات وطوّر أعمالك بفضل التحليلات الفورية."
+      }
+    },
+    "cta": {
+      "title": "هل أنت مستعد للبدء؟",
+      "subtitle": "انضم إلى شبكة شركاء Guidni اليوم.",
+      "button": "قدّم طلبك الآن"
+    },
+    "testimonials": {
+      "title": "ماذا يقول شركاؤنا",
+      "items": [
+        {
+          "name": "كريم ب.",
+          "business": "مغامرات جربة، تونس",
+          "quote": "منذ انضمامي إلى Guidni، تضاعفت حجوزاتي ثلاث مرات. المنصة سهلة الاستخدام وفريق الدعم دائماً متوفر."
+        },
+        {
+          "name": "صوفي م.",
+          "business": "جولات صحراء دبي، الإمارات",
+          "quote": "أعطت Guidni وكالتي الصغيرة الظهور الذي لم أستطع تحقيقه بمفردي. لوحة التحكم تجعل كل شيء سهلاً."
+        },
+        {
+          "name": "فاطمة ر.",
+          "business": "إقامات المدينة، تونس",
+          "quote": "كنت مترددة في البداية، لكن عملية الانضمام كانت سلسة جداً. في أسبوع واحد حصلت على أول حجز من فرنسا."
+        }
+      ]
+    },
+    "faq": {
+      "title": "الأسئلة الشائعة",
+      "items": [
+        {
+          "question": "هل الانضمام مجاني؟",
+          "answer": "لا توجد تكاليف مسبقة للانضمام إلى Guidni. نأخذ عمولة صغيرة فقط على الحجوزات المؤكدة، لذا لا تدفع إلا عندما تكسب."
+        },
+        {
+          "question": "ما أنواع الأعمال التي يمكنها الانضمام؟",
+          "answer": "نرحب بمقدمي الأنشطة ومشغلي الجولات وأصحاب الإقامات وأي عمل يقدم تجارب سفر لا تُنسى."
+        },
+        {
+          "question": "كيف أستلم مدفوعاتي؟",
+          "answer": "يتم تحويل المدفوعات إلى حسابك البنكي وفق جدول منتظم. يمكنك عرض جميع الأرباح والمدفوعات من لوحة التحكم."
+        },
+        {
+          "question": "هل يمكنني إدارة توفريتي بنفسي؟",
+          "answer": "بالتأكيد. من لوحة التحكم لديك تحكم كامل في تقويم التوفر والأسعار ونوافذ الحجز في أي وقت."
+        },
+        {
+          "question": "كم يستغرق الموافقة على الطلب؟",
+          "answer": "يتم تفعيل ملفك الشريك فوراً بعد تقديم طلبك. يمكنك البدء في إدراج خدماتك مباشرة."
+        }
+      ]
+    },
+    "apply": {
+      "title": "التقديم للانضمام كشريك",
+      "subtitle": "أدخل تفاصيل نشاطك التجاري. سيتم تفعيل ملفك التعريفي فوراً.",
+      "sections": {
+        "business": "المعلومات التجارية",
+        "location": "الموقع",
+        "about": "عن نشاطك التجاري",
+        "contact": "التواصل والشبكات الاجتماعية"
+      },
+      "fields": {
+        "name": "اسم النشاط التجاري",
+        "namePlaceholder": "مثال: مغامرات جربة",
+        "category": "الفئة",
+        "categoryActivities": "الأنشطة والجولات",
+        "categoryStays": "الإقامات",
+        "categoryBoth": "كلاهما",
+        "type": "نوع النشاط التجاري",
+        "typeIndividual": "فرد / مستقل",
+        "typeCompany": "شركة مسجلة",
+        "companyRN": "رقم التسجيل التجاري",
+        "companyRNPlaceholder": "مثال: RNE-1234567",
+        "country": "الدولة",
+        "countryPlaceholder": "مثال: تونس",
+        "region": "المنطقة / المدينة",
+        "regionPlaceholder": "مثال: مدنين",
+        "address": "العنوان الكامل (اختياري)",
+        "addressPlaceholder": "مثال: 12 شارع الشاطئ، ميدون",
+        "description": "صف نشاطك التجاري",
+        "descriptionPlaceholder": "أخبر المسافرين بما يجعل نشاطك مميزاً وما الذي تقدمه ولماذا يجب عليهم الحجز معك...",
+        "phone": "رقم الهاتف (اختياري)",
+        "phonePlaceholder": "+216 XX XXX XXX",
+        "website": "الموقع الإلكتروني (اختياري)",
+        "websitePlaceholder": "https://موقعك.com",
+        "instagram": "حساب إنستغرام (اختياري)",
+        "instagramPlaceholder": "@نشاطك",
+        "facebook": "صفحة فيسبوك (اختياري)",
+        "facebookPlaceholder": "facebook.com/نشاطك",
+        "languages": "اللغات المتحدثة (اختياري)",
+        "languagesPlaceholder": "مثال: en, fr, ar"
+      },
+      "submit": "إرسال الطلب",
+      "submitting": "جارٍ الإرسال...",
+      "success": "أهلاً بك! ملفك التعريفي كشريك جاهز.",
+      "alreadyPartner": "لديك بالفعل ملف تعريفي كشريك.",
+      "goToDashboard": "الذهاب إلى لوحة التحكم",
+      "steps": {
+        "category": "الفئة",
+        "details": "التفاصيل",
+        "location": "الموقع",
+        "review": "المراجعة"
+      },
+      "category": {
+        "title": "ما نوع نشاطك التجاري؟",
+        "subtitle": "اختر الفئة التي تصف عروضك بشكل أفضل.",
+        "activitiesLabel": "الأنشطة والجولات",
+        "activitiesDesc": "جولات مرشدة ومغامرات وتجارب ثقافية",
+        "staysLabel": "الإقامات",
+        "staysDesc": "فنادق وشقق وفيلات ورياض",
+        "bothLabel": "كلاهما",
+        "bothDesc": "أنشطة وإقامات",
+        "restaurantLabel": "مطعم وكافيه",
+        "restaurantDesc": "تجارب المطاعم والمقاهي والمأكولات والمشروبات",
+        "rentalsLabel": "تأجير المركبات",
+        "rentalsDesc": "سيارات، دراجات، سكوترات، قوارب وسائر المركبات",
+        "transfersLabel": "نقل وسائق خاص",
+        "transfersDesc": "نقل المطار، سيارات الأجرة، السائق الخاص والحافلات المكوكية",
+        "shopLabel": "متجر",
+        "shopDesc": "الحرف اليدوية والمنتجات المحلية والأعمال الفنية",
+        "guideLabel": "دليل محلي",
+        "guideDesc": "شارك خبرتك المحلية — أنشئ خطط رحلات وساعد المسافرين على اكتشاف وجهتك",
+        "registrationTitle": "تسجيل النشاط التجاري",
+        "registrationSubtitle": "أخبرنا عن وضعك القانوني.",
+        "comingSoon": "قريباً"
+      },
+      "details": {
+        "title": "أخبرنا عن نشاطك التجاري",
+        "subtitle": "ستظهر هذه المعلومات في ملفك الشريك العام."
+      },
+      "location": {
+        "title": "أين تتواجد؟",
+        "subtitle": "ساعد المسافرين في العثور عليك بتحديد موقعك."
+      },
+      "reviewStep": {
+        "title": "راجع طلبك",
+        "subtitle": "تأكد من صحة جميع البيانات قبل الإرسال.",
+        "name": "اسم النشاط",
+        "category": "الفئة",
+        "type": "نوع النشاط",
+        "location": "الموقع",
+        "address": "العنوان",
+        "phone": "الهاتف",
+        "website": "الموقع الإلكتروني",
+        "description": "عن النشاط"
+      },
+      "terms": {
+        "agreeTo": "أوافق على",
+        "termsLink": "شروط الخدمة",
+        "and": "و",
+        "privacyLink": "سياسة الخصوصية",
+        "required": "يجب قبول الشروط للمتابعة."
+      },
+      "buttons": {
+        "back": "رجوع",
+        "next": "التالي",
+        "confirm": "إرسال الطلب"
+      },
+      "benefitsList": {
+        "title": "لماذا تنضم إلى Guidni؟",
+        "items": [
+          "مجاني — عمولة فقط على الحجوزات",
+          "وصول لآلاف المسافرين الدوليين",
+          "إدارة الحجوزات والتوفر في الوقت الفعلي",
+          "فريق دعم شركاء متخصص"
+        ]
+      },
+      "support": {
+        "title": "هل تحتاج مساعدة؟",
+        "description": "فريقنا متاح للإجابة على أسئلتك قبل وبعد التقديم.",
+        "email": "contact@guidni.com",
+        "phone": "+216 56 411 511",
+        "address": "جربة، تونس"
+      }
+    }
+  },
+  "PartnerDashboard": {
+    "title": "لوحة تحكم الشريك"
+  },
+  "PartnerShops": {
+    "title": "متاجري",
+    "subtitle": "إدارة متاجرك ومنتجاتك.",
+    "newShop": "متجر جديد",
+    "noShops": "لا توجد متاجر بعد",
+    "noShopsHint": "أنشئ متجرك الأول لتبدأ البيع للمسافرين.",
+    "createShop": "إنشاء متجر",
+    "tabs": {
+      "details": "التفاصيل",
+      "products": "المنتجات",
+      "orders": "الطلبات",
+      "images": "الصور",
+      "settings": "الإعدادات"
+    },
+    "wizard": {
+      "category": "الفئة",
+      "details": "التفاصيل",
+      "location": "الموقع",
+      "delivery": "التوصيل",
+      "review": "مراجعة"
+    }
+  },
+  "PassesPage": {
+    "title": "باقات Guidni",
+    "titlePrefix": "الباقات في",
+    "titleFallback": "جميع الوجهات",
+    "subtitle": "اجمع أنشطتك المفضلة بسعر خاص.",
+    "popular": "الأكثر شيوعاً",
+    "fixedActivities": "أنشطة مشمولة",
+    "choiceFrom": "اختر",
+    "optionalActivities": "أنشطة اختيارية",
+    "perPerson": "لكل شخص",
+    "bookNow": "احجز الآن",
+    "more": "أخرى",
+    "viewDetails": "عرض الباقة",
+    "empty": "لا توجد باقات متاحة لهذه الوجهة بعد."
+  },
+  "TransportPage": {
+    "titlePrefix": "التنقل في",
+    "titleFallback": "وجهتك",
+    "subtitle": "استأجر مركبة، احجز نقلاً أو استعن بسائق خاص",
+    "serviceRentals": "الإيجار",
+    "serviceTransfers": "النقل",
+    "serviceChauffeur": "السائق الخاص",
+    "comingSoon": "قريباً",
+    "all": "الكل",
+    "cars": "سيارات",
+    "bikes": "دراجات",
+    "scooters": "سكوترات",
+    "boats": "قوارب",
+    "other": "أخرى",
+    "resultsCount": "{count, plural, zero {لا نتائج} one {نتيجة واحدة} two {نتيجتان} few {{count} نتائج} many {{count} نتيجة} other {{count} نتيجة}}",
+    "searchPlaceholder": "بحث…",
+    "clearSearch": "مسح",
+    "previous": "السابق",
+    "next": "التالي",
+    "empty": "لا تتوفر مركبات للإيجار",
+    "emptyHint": "تحقق لاحقاً أو جرب فلتراً مختلفاً.",
+    "allTransfers": "الكل",
+    "airportTransfers": "المطار",
+    "cityTaxi": "تاكسي",
+    "shuttle": "حافلة مكوكية",
+    "emptyTransfers": "لا تتوفر خدمات نقل",
+    "emptyTransfersHint": "تحقق لاحقاً أو جرب فلتراً مختلفاً.",
+    "filtersLabel": "الفلاتر",
+    "clearFilters": "مسح الكل",
+    "vehicleType": "نوع المركبة",
+    "transferType": "نوع النقل",
+    "reviews": {
+      "title": "التقييمات",
+      "noReviews": "لا توجد تقييمات بعد. كن أول من يقيّم بعد رحلتك!",
+      "writeReview": "كتابة تقييم",
+      "dialogTitle": "تقييم هذه الخدمة",
+      "ratingLabel": "التقييم",
+      "titleLabel": "العنوان",
+      "titlePlaceholder": "لخّص تجربتك",
+      "commentLabel": "التعليق",
+      "commentPlaceholder": "شارك تفاصيل تجربتك مع خدمة النقل هذه",
+      "submit": "إرسال التقييم",
+      "submitting": "جارٍ الإرسال...",
+      "cancel": "إلغاء",
+      "success": "تم إرسال التقييم!",
+      "partnerReply": "رد الشريك"
+    },
+    "guidniReview": {
+      "title": "تم التقييم من قبل Guidni",
+      "by": "تقييم من",
+      "visited": "تم الزيارة",
+      "score": "نقاط Guidni",
+      "accuracy": "الدقة",
+      "quality": "الجودة",
+      "value": "القيمة مقابل السعر",
+      "presentation": "العرض",
+      "host": "المضيف",
+      "fullReview": "التقييم الكامل",
+      "loved": "ما أعجبنا",
+      "worth": "يستحق المعرفة",
+      "bestFor": "الأنسب لـ",
+      "partnerReply": "رد الشريك",
+      "outOf": "/ 10"
+    },
+    "transfer": {
+      "breadcrumb": "النقل",
+      "share": "مشاركة",
+      "shareCopied": "تم نسخ الرابط!",
+      "allPhotos": "عرض جميع الصور",
+      "photos": "صور",
+      "about": "حول هذه الخدمة",
+      "showMore": "عرض المزيد",
+      "showLess": "عرض أقل",
+      "featuresTitle": "المميزات والخصائص",
+      "relatedTitle": "خدمات نقل أخرى",
+      "quickFacts": {
+        "type": "النوع",
+        "capacity": "السعة",
+        "vehicleType": "المركبة",
+        "languages": "اللغات"
+      },
+      "highlights": {
+        "ac": "تكييف هواء",
+        "meetGreet": "خدمة الاستقبال",
+        "childSeat": "مقعد أطفال",
+        "topRated": "تقييم ممتاز"
+      },
+      "hostStrip": {
+        "hostedBy": "مقدم من",
+        "memberSince": "عضو منذ"
+      },
+      "outOf": "/ 10",
+      "upToPassengers": "حتى {n} مسافرين",
+      "fixedRate": "سعر ثابت",
+      "pricePerTrip": "السعر لكل رحلة",
+      "pricePerHour": "السعر في الساعة",
+      "pricePerPerson": "السعر للشخص",
+      "typeAirport": "نقل المطار",
+      "typeTaxi": "تاكسي المدينة",
+      "typeChauffeur": "سائق خاص",
+      "typeShuttle": "حافلة مكوك",
+      "featureAC": "تكييف هواء",
+      "featureMeetGreet": "خدمة الاستقبال والترحيب",
+      "featureChildSeat": "مقعد أطفال متاح",
+      "featureLanguages": "اللغات: {v}",
+      "featureVehicleType": "نوع المركبة: {v}",
+      "nav": {
+        "overview": "نظرة عامة",
+        "features": "المميزات",
+        "reviews": "التقييمات"
+      },
+      "widget": {
+        "perTrip": "/رحلة",
+        "perHour": "/ساعة",
+        "perPerson": "/شخص",
+        "date": "التاريخ",
+        "time": "الوقت",
+        "pickup": "موقع الاستلام",
+        "pickupPlaceholder": "مثل: مطار جربة-جرجيس",
+        "dropoff": "موقع التوصيل",
+        "dropoffOptional": "موقع التوصيل (اختياري)",
+        "dropoffPlaceholder": "مثل: ميدون، جربة",
+        "flightNumber": "رقم الرحلة (اختياري)",
+        "flightPlaceholder": "مثل: TU123",
+        "hours": "عدد الساعات",
+        "passengers": "المسافرون",
+        "contactName": "اسمك",
+        "namePlaceholder": "الاسم الكامل",
+        "contactPhone": "الهاتف (اختياري)",
+        "phonePlaceholder": "+216 xx xxx xxx",
+        "notes": "ملاحظات (اختياري)",
+        "notesPlaceholder": "طلبات خاصة، معلومات الأمتعة...",
+        "total": "المجموع",
+        "book": "احجز الآن",
+        "booking": "جاري الحجز…",
+        "noCharge": "لن يتم الخصم الآن — سيؤكد السائق أولاً.",
+        "doneTitle": "تم استلام الحجز!",
+        "doneMessage": "سيؤكد السائق حجزك قريباً.",
+        "errDateTime": "يرجى اختيار تاريخ ووقت",
+        "errPickup": "يرجى إدخال موقع الاستلام",
+        "errName": "يرجى إدخال اسمك",
+        "errMinHour": "مطلوب ساعة واحدة على الأقل"
+      }
+    },
+    "rental": {
+      "breadcrumb": "تأجير",
+      "share": "مشاركة",
+      "shareCopied": "تم نسخ الرابط!",
+      "allPhotos": "عرض جميع الصور",
+      "photos": "صور",
+      "about": "حول هذه المركبة",
+      "showMore": "عرض المزيد",
+      "showLess": "عرض أقل",
+      "featuresTitle": "المميزات والمعلومات",
+      "relatedTitle": "تأجيرات أخرى",
+      "quickFacts": {
+        "type": "النوع",
+        "seats": "المقاعد",
+        "vehicle": "المركبة",
+        "transmission": "ناقل الحركة"
+      },
+      "highlights": {
+        "ac": "تكييف هواء",
+        "gps": "نظام GPS",
+        "insurance": "تأمين شامل",
+        "topRated": "تقييم ممتاز"
+      },
+      "hostStrip": {
+        "hostedBy": "مقدم من",
+        "memberSince": "عضو منذ"
+      },
+      "outOf": "/ 10",
+      "seat": "مقعد",
+      "seats": "مقاعد",
+      "day": "يوم",
+      "days": "أيام",
+      "pricePerDay": "السعر اليومي",
+      "pricePerHour": "السعر في الساعة",
+      "minRental": "الحد الأدنى للإيجار",
+      "typeCar": "سيارة",
+      "typeBike": "دراجة",
+      "typeScooter": "سكوتر",
+      "typeBoat": "قارب",
+      "typeOther": "مركبة",
+      "transmission": "ناقل الحركة: {v}",
+      "fuelType": "الوقود: {v}",
+      "hasAC": "تكييف هواء",
+      "hasGPS": "نظام GPS",
+      "hasInsurance": "تأمين شامل",
+      "requiresLicense": "يلزم رخصة قيادة",
+      "nav": {
+        "overview": "نظرة عامة",
+        "features": "المميزات",
+        "reviews": "التقييمات"
+      },
+      "widget": {
+        "perDay": "/يوم",
+        "pickupDate": "تاريخ الاستلام",
+        "returnDate": "تاريخ الإرجاع",
+        "notes": "ملاحظات (اختياري)",
+        "notesPlaceholder": "عنوان التسليم، طلبات خاصة...",
+        "reserve": "احجز الآن",
+        "reserving": "جاري الحجز…",
+        "total": "المجموع",
+        "minDays": "الحد الأدنى للإيجار {n} أيام",
+        "noCharge": "لن يتم الخصم الآن — سيؤكد المالك أولاً.",
+        "doneTitle": "تم استلام الحجز!",
+        "doneMessage": "سيؤكد مالك السيارة حجزك قريباً.",
+        "pickDateErr": "يرجى اختيار تواريخ البداية والنهاية",
+        "minDaysErr": "الحد الأدنى للإيجار {n} أيام"
+      }
+    }
+  },
+  "PassDetail": {
+    "backToPasses": "جميع الباقات",
+    "popular": "الأكثر شيوعاً",
+    "off": "خصم",
+    "includedActivities": "الأنشطة المشمولة",
+    "optionalActivities": "الأنشطة الاختيارية",
+    "chooseUpTo": "اختر حتى {count} أنشطة",
+    "perPerson": "لكل شخص",
+    "date": "تاريخ البداية",
+    "participants": "عدد المشاركين",
+    "notes": "ملاحظات (اختياري)",
+    "book": "احجز هذه الباقة",
+    "booking": "جارٍ الحجز…",
+    "chooseOptional": "اختر أنشطتك الاختيارية",
+    "upTo": "حتى {count} اختيارات",
+    "loginRequired": "يرجى تسجيل الدخول للحجز."
+  },
+  "PassBookingDetail": {
+    "backToBookings": "حجوزاتي",
+    "passId": "الباقة",
+    "startDate": "تاريخ البداية",
+    "validUntil": "صالحة حتى",
+    "participants": "عدد المشاركين",
+    "includedActivities": "الأنشطة المشمولة",
+    "chosenActivities": "أنشطتك المختارة",
+    "priceBreakdown": "تفاصيل السعر",
+    "serviceFee": "رسوم الخدمة",
+    "taxes": "الضرائب",
+    "total": "الإجمالي"
+  },
+  "ShopsPage": {
+    "titlePrefix": "المحلات المحلية في",
+    "titleFallback": "وجهتك",
+    "subtitle": "اكتشف المنتجات اليدوية والحرفية والمحلية من المحلات المتحقق منها في وجهتك.",
+    "browseShops": "تصفح المحلات",
+    "browseProducts": "تصفح المنتجات",
+    "allCategories": "الكل",
+    "shopsCount": "{count, plural, zero {لا محلات} one {محل واحد} two {محلان} few {{count} محلات} many {{count} محلاً} other {{count} محل}}",
+    "productsCount": "{count, plural, zero {لا منتجات} one {منتج واحد} two {منتجان} few {{count} منتجات} many {{count} منتجاً} other {{count} منتج}}",
+    "searchShopsPlaceholder": "ابحث عن المحلات…",
+    "searchProductsPlaceholder": "ابحث عن المنتجات…",
+    "clearSearch": "مسح",
+    "handmade": "صنع يدوي",
+    "handmadeOnly": "يدوي فقط",
+    "emptyShops": "لا توجد محلات",
+    "emptyProducts": "لا توجد منتجات",
+    "emptyHint": "جرب فئة مختلفة أو امسح بحثك.",
+    "previous": "السابق",
+    "next": "التالي",
+    "filtersLabel": "الفلاتر",
+    "clearFilters": "مسح الكل"
+  },
+  "ShopPage": {
+    "open": "مفتوح",
+    "closed": "مغلق",
+    "share": "مشاركة",
+    "shareCopied": "تم نسخ الرابط!",
+    "showMore": "عرض المزيد",
+    "showLess": "عرض أقل",
+    "breadcrumb": {
+      "shops": "المحلات"
+    },
+    "anchorNav": {
+      "products": "المنتجات",
+      "about": "حول",
+      "reviews": "التقييمات"
+    },
+    "hostStrip": {
+      "hostedBy": "يديره",
+      "memberSince": "عضو منذ"
+    },
+    "productsTitle": "المنتجات",
+    "productSingular": "منتج",
+    "productPlural": "منتجات",
+    "allProducts": "الكل",
+    "noProducts": "لا توجد منتجات في هذه الفئة بعد.",
+    "handmade": "صنع يدوي",
+    "reviewsTitle": "التقييمات",
+    "noReviews": "لا توجد تقييمات بعد. كن أول من يشارك تجربته.",
+    "reviewsCount": "تقييم",
+    "outOf": "من 5",
+    "similarShops": "قد يعجبك أيضاً",
+    "delivery": {
+      "pickup": "استلام من المحل",
+      "local": "توصيل محلي",
+      "nationwide": "توصيل وطني",
+      "international": "توصيل دولي"
+    },
+    "infoCard": {
+      "about": "عن الحرفي",
+      "delivery": "خيارات التوصيل",
+      "freeShipping": "شحن مجاني للطلبات فوق {amount} دينار",
+      "minOrder": "الحد الأدنى للطلب: {amount} دينار",
+      "address": "العنوان",
+      "viewOnMaps": "عرض على خرائط جوجل",
+      "website": "الموقع الإلكتروني",
+      "instagram": "إنستغرام",
+      "facebook": "فيسبوك"
+    },
+    "guidniReview": {
+      "title": "تم التقييم من قبل Guidni",
+      "by": "تقييم من",
+      "visited": "تم الزيارة",
+      "score": "نقاط Guidni",
+      "accuracy": "الدقة",
+      "quality": "الجودة",
+      "value": "القيمة مقابل السعر",
+      "presentation": "العرض",
+      "host": "المضيف",
+      "fullReview": "التقييم الكامل",
+      "loved": "ما أعجبنا",
+      "worth": "يستحق المعرفة",
+      "bestFor": "الأنسب لـ",
+      "partnerReply": "رد الشريك",
+      "outOf": "/ 10"
+    }
+  },
+  "ProductPage": {
+    "breadcrumb": {
+      "shops": "المحلات"
+    },
+    "anchorNav": {
+      "overview": "نظرة عامة",
+      "details": "التفاصيل",
+      "reviews": "التقييمات"
+    },
+    "handmade": "صنع يدوي",
+    "localOnly": "محلي فقط",
+    "inStock": "متوفر في المخزون",
+    "outOfStock": "نفد من المخزون",
+    "onlyLeft": "{count} قطع متبقية فقط",
+    "share": "مشاركة",
+    "shareCopied": "تم نسخ الرابط!",
+    "showMore": "عرض المزيد",
+    "showLess": "عرض أقل",
+    "allPhotos": "عرض جميع الصور",
+    "photos": "صور",
+    "visitShop": "زيارة المحل",
+    "description": "الوصف",
+    "details": {
+      "material": "المادة",
+      "origin": "المنشأ",
+      "weight": "الوزن"
+    },
+    "deliveryTitle": "خيارات التوصيل",
+    "delivery": {
+      "pickup": "استلام",
+      "local": "توصيل محلي",
+      "nationwide": "توصيل وطني",
+      "international": "توصيل دولي"
+    },
+    "quantity": "الكمية",
+    "addToCart": "أضف إلى السلة",
+    "buyNow": "اشتر الآن",
+    "added": "تمت الإضافة إلى السلة",
+    "safeCheckout": "دفع آمن · إرجاع سهل",
+    "reviewsTitle": "آراء العملاء",
+    "noReviews": "لا توجد تقييمات بعد. كن أول من يشارك تجربته.",
+    "reviewsCount": "تقييم",
+    "outOf": "من 5",
+    "moreFrom": "المزيد من {shop}",
+    "viewAll": "عرض الكل"
+  },
+  "CartPage": {
+    "title": "إتمام الطلب",
+    "subtitle": "راجع طلبك واختر طريقة التوصيل",
+    "drawerTitle": "سلة التسوق",
+    "empty": "سلة التسوق فارغة",
+    "emptyHint": "اكتشف المتاجر المحلية",
+    "shopSubtotal": "المجموع الجزئي للمتجر",
+    "grandTotal": "الإجمالي",
+    "proceedToCheckout": "المتابعة للدفع",
+    "orderSummary": "ملخص الطلب",
+    "delivery": "التوصيل",
+    "deliveryMethod": {
+      "PICKUP": "استلام من المتجر",
+      "LOCAL_DELIVERY": "توصيل محلي",
+      "NATIONWIDE": "توصيل وطني",
+      "INTERNATIONAL": "توصيل دولي"
+    },
+    "deliveryAddress": "عنوان التوصيل",
+    "deliveryCity": "المدينة",
+    "deliveryCountry": "الدولة",
+    "notes": "ملاحظات الطلب",
+    "notesPlaceholder": "أي تعليمات خاصة لطلبك؟",
+    "subtotal": "المجموع الجزئي",
+    "deliveryCost": "التوصيل",
+    "freeDelivery": "مجاني",
+    "deliveryCalculated": "يُحسب عند المعالجة",
+    "placeOrder": "تأكيد الطلب",
+    "paymentNote": "يتم الدفع للشريك عند الاستلام أو التوصيل.",
+    "addressRequired": "عنوان التوصيل مطلوب لهذه الطريقة.",
+    "success": "تم تقديم الطلب بنجاح!",
+    "error": "فشل في تقديم الطلب. يرجى المحاولة مرة أخرى."
+  },
+  "OrderPage": {
+    "title": "طلباتي",
+    "subtitle": "تتبع وإدارة طلبات المتجر",
+    "empty": "لا توجد طلبات بعد",
+    "emptyHint": "تصفح المتاجر المحلية واكتشف منتجات فريدة",
+    "browseShops": "تصفح المتاجر",
+    "backToOrders": "العودة إلى الطلبات",
+    "orderRef": "طلب",
+    "placedOn": "بتاريخ",
+    "from": "من",
+    "items": "منتج",
+    "viewDetails": "عرض التفاصيل →",
+    "subtotal": "المجموع الجزئي",
+    "deliveryCost": "التوصيل",
+    "total": "الإجمالي",
+    "freePickup": "مجاني (استلام)",
+    "deliveryDetails": "تفاصيل التوصيل",
+    "shopContact": "معلومات التواصل",
+    "orderNotes": "ملاحظات الطلب",
+    "continueShopping": "مواصلة التسوق",
+    "viewAllOrders": "عرض جميع الطلبات",
+    "status": {
+      "PENDING": "قيد الانتظار",
+      "CONFIRMED": "مؤكد",
+      "PROCESSING": "قيد المعالجة",
+      "SHIPPED": "تم الشحن",
+      "DELIVERED": "تم التوصيل",
+      "CANCELLED": "ملغى",
+      "REFUNDED": "مسترد"
+    }
+  },
+  "PlannerPage": {
+    "title": "خطط لرحلتك",
+    "titlePrefix": "مخطط الرحلات",
+    "subtitle": "احصل على برنامج يومي مخصص لرحلتك القادمة",
+    "step1Title": "الوجهة والتواريخ",
+    "step2Title": "الاهتمامات",
+    "step3Title": "الميزانية والمجموعة",
+    "step4Title": "اللوجستيات",
+    "step5Title": "برنامجك",
+    "durationLabel": "كم عدد الأيام؟",
+    "durationDays": "أيام",
+    "travelStyleRelaxed": "مريح",
+    "travelStyleBalanced": "متوازن",
+    "travelStyleActive": "نشيط",
+    "generateButton": "إنشاء البرنامج",
+    "generating": "جاري بناء برنامجك…",
+    "regenerate": "إعادة الإنشاء",
+    "saveButton": "حفظ البرنامج",
+    "saving": "جاري الحفظ…",
+    "saved": "تم الحفظ",
+    "shareButton": "مشاركة",
+    "shareToast": "تم نسخ الرابط",
+    "newPlanButton": "برنامج جديد",
+    "savedPlansTitle": "برامجك المحفوظة",
+    "noSavedPlans": "لا توجد برامج محفوظة",
+    "viewPlan": "عرض البرنامج",
+    "dayLabel": "اليوم",
+    "morningLabel": "الصباح",
+    "lunchLabel": "الغداء",
+    "afternoonLabel": "بعد الظهر",
+    "eveningLabel": "المساء",
+    "notFoundTitle": "البرنامج غير موجود",
+    "notFoundDesc": "هذا البرنامج غير موجود أو لم يعد متاحاً.",
+    "deleteConfirmTitle": "حذف هذا البرنامج؟",
+    "deleteConfirmBody": "لا يمكن التراجع عن هذا الإجراء.",
+    "deleteConfirm": "حذف",
+    "deleteCancel": "إلغاء"
+  },
+  "AboutPage": {
+    "meta": {
+      "title": "عن Guidni — منصة واحدة لرحلتك كاملة",
+      "description": "تعرف على Guidni، منصة السفر الوجهاتية التي تجمع الأنشطة والإقامات والمطاعم والنقل والمرشدين في مكان واحد."
+    },
+    "hero": {
+      "title": "عن",
+      "subtitle": "نحن نبني المنصة الواحدة التي يمكن للمسافرين من خلالها اكتشاف وتخطيط وحجز كل شيء لرحلتهم القادمة — دون التنقل بين خمس تطبيقات مختلفة."
+    },
+    "stats": {
+      "destinations": "وجهات",
+      "partners": "شركاء موثقون",
+      "experiences": "تجربة قابلة للحجز",
+      "founded": "تأسست"
+    },
+    "story": {
+      "title": "قصتنا",
+      "p1": "وُلدت Guidni في جربة. كنا نرى المسافرين يصلون إلى تونس بحجز فندق فحسب وفكرة مبهمة عما يمكن فعله. كانوا يفوّتون أفضل المطاعم ويحجزون الأنشطة الخاطئة ويغادرون دون أن يعيشوا ما يجعل جربة مميزة.",
+      "p2": "لذا بنينا المنصة التي تمنينا وجودها. مكان واحد لاكتشاف ومقارنة وحجز الأنشطة والإقامات والمطاعم والنقل والجولات الإرشادية — كل شيء موثق ومتحقق منه، كل شيء في تجربة سلسة واحدة.",
+      "p3": "أطلقنا في 2025 ونتوسع إلى وجهات جديدة. المهمة لم تتغير: كل وجهة، منصة واحدة، بلا تنازلات."
+    },
+    "values": {
+      "title": "ما نؤمن به",
+      "trust": {
+        "title": "الثقة أولاً",
+        "body": "كل شريك على Guidni يمر بمراجعة قبل أن يتمكن من النشر. كل حجز يأتي بتأكيد فوري. لا نتساهل في المعايير."
+      },
+      "local": {
+        "title": "الخبرة المحلية",
+        "body": "نعمل مباشرة مع المشغلين المحليين، لا الموزعين. عندما تحجز على Guidni، تذهب الأموال إلى الأشخاص الذين بنوا شيئاً يستحق التجربة."
+      },
+      "quality": {
+        "title": "معيار الجودة",
+        "body": "نحافظ على معيار جودة Guidni. العروض التي تقل عنه تُزال. المسافرون الذين يمرون بتجربة سيئة يتلقون دائماً ردوداً منا."
+      }
+    },
+    "social": {
+      "title": "تابع الرحلة"
+    },
+    "cta": {
+      "title": "مستعد للاستكشاف؟",
+      "body": "اكتشف التجارب، احجز في ثوانٍ، وسافر بثقة — فقط على Guidni.",
+      "explore": "استكشف جربة",
+      "partner": "كن شريكاً"
+    }
+  },
+  "ContactPage": {
+    "meta": {
+      "title": "تواصل معنا — Guidni",
+      "description": "تواصل مع فريق Guidni للمساعدة في الحجز، استفسارات الشراكة، الصحافة، أو أي أسئلة أخرى."
+    },
+    "title": "تواصل معنا",
+    "subtitle": "نحن فريق صغير ونرد شخصياً. أرسل لنا رسالة — نرد خلال 24 ساعة.",
+    "info": {
+      "title": "بيانات التواصل",
+      "emailLabel": "البريد الإلكتروني",
+      "email": "contact@guidni.com",
+      "phoneLabel": "الهاتف",
+      "phone": "+216 56 411 511",
+      "hoursLabel": "ساعات العمل",
+      "hours": "الاثنين-الأحد، 8:00-22:00"
+    },
+    "form": {
+      "title": "أرسل لنا رسالة",
+      "name": "اسمك",
+      "namePlaceholder": "أحمد بن علي",
+      "email": "عنوان البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "subject": "الموضوع",
+      "subjectGeneral": "سؤال عام",
+      "subjectBooking": "مساعدة في الحجز",
+      "subjectPartner": "استفسار شراكة",
+      "subjectPress": "صحافة وإعلام",
+      "subjectReport": "الإبلاغ عن مشكلة",
+      "message": "الرسالة",
+      "messagePlaceholder": "أخبرنا كيف يمكننا مساعدتك...",
+      "submit": "إرسال الرسالة",
+      "submitting": "جارٍ الإرسال...",
+      "success": "تم إرسال رسالتك — سنرد عليك خلال 24 ساعة.",
+      "error": "حدث خطأ ما. يرجى المحاولة مرة أخرى أو مراسلتنا مباشرة عبر البريد الإلكتروني."
+    }
+  },
+  "FAQPage": {
+    "meta": {
+      "title": "الأسئلة الشائعة · Guidni",
+      "description": "اعثر على إجابات للأسئلة الشائعة حول الحجز على Guidni والمدفوعات والإلغاء وكيفية الانضمام كشريك."
+    },
+    "title": "الأسئلة الشائعة",
+    "subtitle": "كل ما تحتاج معرفته عن السفر والحجز على Guidni.",
+    "tabs": {
+      "travelers": "للمسافرين",
+      "partners": "للشركاء",
+      "platform": "عن Guidni"
+    },
+    "travelers": [
+      {
+        "q": "كيف يعمل الحجز؟",
+        "a": "اختر تجربتك، حدد تاريخاً ووقتاً، أدخل بياناتك وأكّد. ستحصل على تأكيد فوري مع رمز QR تعرضه عند الوصول — لا حاجة لتذاكر ورقية."
+      },
+      {
+        "q": "هل يمكنني إلغاء حجزي؟",
+        "a": "تتفاوت سياسات الإلغاء حسب العرض. تعرض كل نشاط وإقامة سياسة الإلغاء الدقيقة على صفحة الحجز. معظم الأنشطة تتيح إلغاءً مجانياً حتى 24 ساعة قبل موعد البدء."
+      },
+      {
+        "q": "ما طرق الدفع المقبولة؟",
+        "a": "ندعم حالياً الدفع نقداً عند الوصول. الدفع عبر بطاقة ائتمانية وKonnect سيتوفر قريباً. جميع الأسعار معروضة بالدينار التونسي (TND)."
+      },
+      {
+        "q": "هل أحتاج حساباً للحجز؟",
+        "a": "نعم — يتيح لك حساب مجاني تتبع حجوزاتك والوصول إلى رموز QR وحفظ قائمة أمنياتك وترك مراجعات بعد تجربتك."
+      },
+      {
+        "q": "ما الغرض من رمز QR؟",
+        "a": "كل حجز يولّد رمز QR فريداً. تعرضه للشريك عند الوصول — يقوم بمسحه لتأكيد حجزك فوراً. بلا ورق، بلا متاعب."
+      }
+    ],
+    "partners": [
+      {
+        "q": "كيف أنشر نشاطي أو خدمتي؟",
+        "a": "تقدم عبر صفحة انضم كشريك. نراجع جميع الطلبات خلال 3 أيام عمل ونتواصل لتأكيد تفاصيل عرضك."
+      },
+      {
+        "q": "ما هي رسوم المنصة؟",
+        "a": "تفرض Guidni نسبة مئوية على كل حجز مكتمل. تعتمد النسبة الدقيقة على فئتك. تواصل معنا للحصول على التفاصيل الكاملة قبل التقديم."
+      },
+      {
+        "q": "كيف أحصل على التحقق؟",
+        "a": "بعد قبول طلبك، يراجع فريقنا ملفك الشخصي. الحسابات التي تحتوي على معلومات كاملة وصور احترافية وتقييمات إيجابية تحصل على شارة الموثوقية."
+      },
+      {
+        "q": "كيف ومتى أتلقى الدفع؟",
+        "a": "تُتتبع الأرباح في لوحة تحكم الشريك. تطلب صرفاً ونعالجه عبر تحويل بنكي. يتم تأكيد مواعيد الدفع عند التسجيل."
+      }
+    ],
+    "platform": [
+      {
+        "q": "ما هو Guidni؟",
+        "a": "Guidni هي منصة سفر وجهاتية. يمكنك اكتشاف وحجز الأنشطة والإقامات والمطاعم والنقل والمتاجر والمسارات الإرشادية — كل شيء في مكان واحد، كل شيء موثق."
+      },
+      {
+        "q": "ما الوجهات المتاحة؟",
+        "a": "حالياً جربة، تونس. نتوسع إلى الحمامات وتونس ودبي ووجهات أخرى في 2025-2026."
+      },
+      {
+        "q": "هل Guidni آمن للاستخدام؟",
+        "a": "نعم. تُراجع كل عرض قبل نشره. تُؤكد الحجوزات فوراً ويدعمها فريق دعم العملاء لدينا. نضمن كل تجربة على المنصة."
+      },
+      {
+        "q": "هل Guidni متاح بعدة لغات؟",
+        "a": "نعم — Guidni متاح بالإنجليزية والفرنسية والعربية مع دعم كامل للكتابة من اليمين إلى اليسار. المزيد من اللغات قادمة."
+      }
+    ],
+    "cta": {
+      "title": "لا تزال لديك أسئلة؟",
+      "body": "يرد فريقنا خلال 24 ساعة — وعادةً أسرع من ذلك.",
+      "button": "تواصل معنا"
+    }
+  },
+  "TermsPage": {
+    "meta": {
+      "title": "شروط الاستخدام · Guidni",
+      "description": "اقرأ شروط استخدام Guidni — حقوقك والتزاماتك عند استخدام المنصة."
+    },
+    "title": "شروط الاستخدام",
+    "subtitle": "باستخدام Guidni، فأنت توافق على هذه الشروط. يرجى قراءتها بعناية.",
+    "lastUpdated": "آخر تحديث: مارس 2025",
+    "sections": [
+      {
+        "title": "1. قبول الشروط",
+        "body": "بالوصول إلى Guidni (guidni.com) أو استخدامه، فأنت توافق على الالتزام بشروط الاستخدام هذه وسياسة الخصوصية. إذا كنت لا توافق، يرجى عدم استخدام المنصة. تنطبق هذه الشروط على جميع المستخدمين."
+      },
+      {
+        "title": "2. استخدام المنصة",
+        "body": "يجوز لك استخدام Guidni للأغراض المشروعة فحسب. توافق على عدم الانخراط في أي نشاط احتيالي أو تقديم مراجعات أو حجوزات زائفة أو انتهاك أي قانون معمول به. تحتفظ Guidni بالحق في تعليق أي حساب ينتهك هذه الشروط."
+      },
+      {
+        "title": "3. الحجوزات",
+        "body": "عند إجراء حجز على Guidni، تبرم اتفاقية مباشرة مع الشريك مقدم الخدمة. تعمل Guidni كمنصة وسيطة. تتضمن تأكيدات الحجز رمز QR فريداً. تحكم سياسة الإلغاء المعروضة على كل عرض الأهلية للاسترداد."
+      },
+      {
+        "title": "4. المدفوعات",
+        "body": "تُعرض الأسعار بالدينار التونسي (TND) ما لم يُشر إلى خلاف ذلك. يُجمع الدفع حالياً في الموقع عند الوصول. سيُقدَّم الدفع عبر الإنترنت في تحديث مستقبلي. تفرض Guidni عمولة على الحجوزات المكتملة."
+      },
+      {
+        "title": "5. التزامات الشركاء",
+        "body": "يلتزم الشركاء بتقديم معلومات دقيقة والوفاء بالحجوزات المؤكدة والحفاظ على معايير الجودة. تحتفظ Guidni بالحق في إزالة العروض التي لا تلبي معاييرنا."
+      },
+      {
+        "title": "6. المراجعات والمحتوى",
+        "body": "يجب أن تستند المراجعات إلى تجارب حقيقية. قد تُزال المراجعات الزائفة أو المسيئة. بتقديم محتوى إلى Guidni، تمنحنا ترخيصاً غير حصري لاستخدام هذا المحتوى وعرضه على المنصة."
+      },
+      {
+        "title": "7. تحديد المسؤولية",
+        "body": "Guidni هي منصة حجز واكتشاف. لسنا مسؤولين عن جودة أو سلامة الخدمات المقدمة من الشركاء. مسؤوليتنا عن أي مطالبة محدودة بالمبلغ المدفوع مقابل الحجز المعني."
+      },
+      {
+        "title": "8. تغييرات الشروط",
+        "body": "قد نحدّث هذه الشروط من وقت لآخر. سنخطر المستخدمين بالتغييرات الهامة عبر البريد الإلكتروني أو إشعار على المنصة. استمرار استخدام Guidni بعد التغييرات يعني قبول الشروط المعدّلة."
+      }
+    ],
+    "questions": {
+      "title": "هل لديك أسئلة حول هذه الشروط؟",
+      "body": "فريقنا يسعده توضيح أي شيء.",
+      "button": "تواصل معنا"
+    }
+  },
+  "PrivacyPage": {
+    "meta": {
+      "title": "سياسة الخصوصية · Guidni",
+      "description": "كيف تجمع Guidni بياناتك الشخصية وتستخدمها وتحميها."
+    },
+    "title": "سياسة الخصوصية",
+    "subtitle": "نأخذ خصوصيتك بجدية. إليك تحديداً البيانات التي نجمعها وكيف نستخدمها.",
+    "lastUpdated": "آخر تحديث: مارس 2025",
+    "sections": [
+      {
+        "title": "1. البيانات التي نجمعها",
+        "body": "عند إنشاء حساب، نجمع اسمك وعنوان بريدك الإلكتروني ومعلومات ملفك الشخصي. عند الحجز، نجمع تفاصيله. قد نجمع أيضاً بيانات الاستخدام لتحسين المنصة."
+      },
+      {
+        "title": "2. كيف نستخدم بياناتك",
+        "body": "نستخدم بياناتك لمعالجة الحجوزات وإرسال رسائل التأكيد وتقديم دعم العملاء وتخصيص تجربتك. لا نبيع بياناتك لأطراف ثالثة."
+      },
+      {
+        "title": "3. خدمات الأطراف الثالثة",
+        "body": "نستخدم Google OAuth للمصادقة وCloudinary لتخزين الصور وKonnect لمعالجة المدفوعات (قريباً). نشارك فقط الحد الأدنى من البيانات اللازمة لعمل هذه الخدمات."
+      },
+      {
+        "title": "4. تخزين البيانات وأمنها",
+        "body": "بياناتك مخزنة على خوادم آمنة. نستخدم تشفيراً معيارياً للبيانات أثناء النقل (HTTPS) وعند الراحة. نحتفظ ببيانات الحجز لمدة 5 سنوات على الأقل للامتثال القانوني."
+      },
+      {
+        "title": "5. حقوقك",
+        "body": "يحق لك الوصول إلى بياناتك الشخصية وطلب تصحيحها وطلب حذف حسابك والإلغاء من رسائل التسويق في أي وقت. تواصل معنا على contact@guidni.com."
+      },
+      {
+        "title": "6. ملفات تعريف الارتباط",
+        "body": "نستخدم ملفات تعريف الارتباط للحفاظ على جلستك وتذكر تفضيلاتك وتحليل استخدام المنصة. راجع سياسة ملفات تعريف الارتباط للحصول على القائمة الكاملة."
+      }
+    ],
+    "contact": {
+      "title": "أسئلة حول بياناتك؟",
+      "body": "راسلنا على contact@guidni.com وسنرد خلال 48 ساعة.",
+      "button": "تواصل معنا"
+    }
+  },
+  "CookiesPage": {
+    "meta": {
+      "title": "سياسة ملفات تعريف الارتباط · Guidni",
+      "description": "كيف تستخدم Guidni ملفات تعريف الارتباط وكيف يمكنك التحكم فيها."
+    },
+    "title": "سياسة ملفات تعريف الارتباط",
+    "subtitle": "توضح هذه الصفحة ملفات تعريف الارتباط التي نستخدمها على Guidni ولماذا وكيف يمكنك التحكم فيها.",
+    "lastUpdated": "آخر تحديث: مارس 2025",
+    "sections": [
+      {
+        "title": "ما هي ملفات تعريف الارتباط؟",
+        "body": "ملفات تعريف الارتباط هي ملفات نصية صغيرة تُوضع على جهازك عند زيارة موقع ويب. تتيح للموقع تذكر تفضيلاتك والحفاظ على تسجيل دخولك وجمع بيانات تحليلية. لا يمكنها الوصول إلى ملفات أخرى على جهازك."
+      },
+      {
+        "title": "ملفات تعريف الارتباط الأساسية",
+        "body": "هذه الملفات ضرورية لعمل المنصة. تشمل ملفات الجلسة (للبقاء مسجلاً) ورموز الأمان وملفات تفضيلات اللغة والوجهة. لا يمكن تعطيلها دون التأثير على الوظائف الأساسية."
+      },
+      {
+        "title": "ملفات تعريف الارتباط التحليلية",
+        "body": "نستخدم ملفات تعريف الارتباط التحليلية لفهم كيفية استخدام الزوار لـ Guidni. هذه البيانات مجمّعة ومجهولة الهوية. يمكنك إلغاء الاشتراك عبر إعدادات متصفحك."
+      },
+      {
+        "title": "ملفات تعريف الارتباط لأطراف ثالثة",
+        "body": "قد تضع بعض خدمات الأطراف الثالثة التي ندمجها (كـ Google OAuth) ملفات تعريف ارتباطها الخاصة. تخضع هذه لسياسات الخصوصية الخاصة بها. لا تتحكم Guidni في ملفات تعريف الارتباط الخارجية."
+      },
+      {
+        "title": "كيفية التحكم في ملفات تعريف الارتباط",
+        "body": "يمكنك التحكم في ملفات تعريف الارتباط وحذفها من خلال إعدادات متصفحك. قد يؤثر تعطيل ملفات تعريف الارتباط على قدرتك على البقاء مسجلاً أو استخدام بعض الميزات."
+      }
+    ],
+    "contact": {
+      "title": "أسئلة حول ملفات تعريف الارتباط؟",
+      "body": "راسلنا على contact@guidni.com.",
+      "button": "تواصل معنا"
+    }
+  },
+  "AgentDashboard": {
+    "sidebar": {
+      "overview":      "نظرة عامة",
+      "invitations":   "دعواتي",
+      "earnings":      "الأرباح",
+      "referrals":     "الإحالات",
+      "points":        "النقاط والمحفظة",
+      "profile":       "الملف الشخصي",
+      "newInvitation": "إرسال دعوة",
+      "exitToSite":    "العودة إلى الموقع"
+    },
+    "overview": {
+      "title":   "مرحباً بعودتك",
+      "subtitle":"إليك نظرة عامة على نشاطك.",
+      "stats": {
+        "totalInvitations":   "إجمالي الدعوات",
+        "conversionRate":     "معدل التحويل",
+        "confirmedEarnings":  "الأرباح المؤكدة",
+        "pointsBalance":      "رصيد النقاط",
+        "partnerReferrals":   "إحالات الشركاء",
+        "pendingInvitations": "الدعوات المعلقة",
+        "totalEarned":        "إجمالي الأرباح (منذ البداية)"
+      },
+      "recentInvitations": "الدعوات الأخيرة",
+      "noInvitations":     "لا توجد دعوات بعد.",
+      "sendFirst":         "أرسل دعوتك الأولى",
+      "viewAll":           "جميع الدعوات"
+    },
+    "invitations": {
+      "title":     "دعواتي",
+      "newButton": "دعوة جديدة",
+      "copyLink":  "نسخ رابط الحجز",
+      "cancel":    "إلغاء الدعوة",
+      "empty":     "لا توجد دعوات بعد",
+      "emptyHint": "أرسل دعوتك الأولى لسائح وابدأ في كسب العمولات.",
+      "status": {
+        "PENDING":   "معلقة",
+        "OPENED":    "مفتوحة",
+        "BOOKED":    "محجوزة",
+        "EXPIRED":   "منتهية",
+        "CANCELLED": "ملغاة"
+      }
+    },
+    "newInvitation": {
+      "title":    "إرسال دعوة",
+      "subtitle": "أنشئ رابط حجز مخصص لمشاركته مع السائح.",
+      "fields": {
+        "activity":     "النشاط",
+        "touristEmail": "بريد السائح الإلكتروني",
+        "touristPhone": "هاتف السائح / واتساب",
+        "contactHint":  "أدخل واحداً على الأقل.",
+        "adults":       "البالغون",
+        "children":     "الأطفال",
+        "date":         "التاريخ المفضل",
+        "timeSlot":     "الوقت المفضل",
+        "note":         "ملاحظة شخصية",
+        "noteHint":     "اختياري، يظهر للسائح"
+      },
+      "submit":        "إنشاء الدعوة والحصول على الرابط",
+      "submitting":    "جاري الإنشاء…",
+      "success":       "تم إنشاء الدعوة!",
+      "successHint":   "شارك هذا الرابط مع السائح. تنتهي صلاحيته خلال 7 أيام.",
+      "createAnother": "إنشاء دعوة أخرى",
+      "viewAll":       "عرض جميع الدعوات"
+    },
+    "earnings": {
+      "title":         "الأرباح",
+      "allTimeEarned": "إجمالي الأرباح (منذ البداية)",
+      "empty":         "لا توجد أرباح بعد",
+      "emptyHint":     "تظهر العمولات هنا عندما يحجز سائح عبر أحد روابط دعوتك.",
+      "columns": {
+        "booking":    "الحجز",
+        "bookingAmt": "مبلغ الحجز",
+        "commission": "العمولة",
+        "status":     "الحالة"
+      },
+      "status": {
+        "PENDING":   "معلقة",
+        "CONFIRMED": "مؤكدة",
+        "PAID":      "مدفوعة",
+        "CANCELLED": "ملغاة"
+      }
+    },
+    "points": {
+      "title":          "النقاط والمحفظة",
+      "subtitle":       "1 نقطة = 0.50 دينار تونسي · الحد الأدنى للاسترداد: 50 نقطة",
+      "balance":        "الرصيد الحالي",
+      "recentActivity": "النشاط الأخير",
+      "empty":          "لم تكسب أي نقاط بعد.",
+      "howToEarn":      "كيفية كسب النقاط",
+      "redeem":         "استرداد نقاطك",
+      "redeemHint":     "عند الوصول إلى 50 نقطة (25 دينار)، تواصل معنا على agents@guidni.com لطلب التحويل.",
+      "pointTypes": {
+        "BOOKING_COMMISSION":    "عمولة حجز",
+        "REFERRAL_SIGNUP":       "تسجيل شريك",
+        "REFERRAL_VERIFIED":     "شريك موثق",
+        "REFERRAL_FIRST_LISTING":"أول قائمة للشريك",
+        "REFERRAL_FIRST_BOOKING":"أول حجز للشريك",
+        "TIER_BONUS":            "مكافأة المستوى",
+        "REDEMPTION":            "استرداد"
+      }
+    },
+    "referrals": {
+      "title":     "إحالات الشركاء",
+      "subtitle":  "أحِل شركاء إلى Guidni واكسب حتى 105 نقطة لكل إحالة.",
+      "yourLink":  "رابط الإحالة الخاص بك",
+      "linkHint":  "شارك هذا الرابط مع أصحاب الفنادق والمرشدين وأصحاب المطاعم.",
+      "milestones": {
+        "signup":       "تسجيل الشريك",
+        "verified":     "توثيق الشريك",
+        "firstListing": "أول قائمة",
+        "firstBooking": "أول حجز"
+      },
+      "yourReferrals": "إحالاتك",
+      "empty":         "لا توجد إحالات بعد",
+      "emptyHint":     "شارك رابط الإحالة مع الشركاء المحتملين.",
+      "status": {
+        "PENDING":  "قيد المراجعة",
+        "VERIFIED": "موثق",
+        "REJECTED": "مرفوض"
+      }
+    },
+    "profile": {
+      "title":    "ملفي الشخصي",
+      "subtitle": "حدّث معلومات ملف وكيلك.",
+      "fields": {
+        "displayName": "الاسم الكامل",
+        "pseudonym":   "الاسم المستعار العلني",
+        "phone":       "الهاتف / واتساب",
+        "country":     "البلد",
+        "city":        "المدينة",
+        "bio":         "نبذة عنك"
+      },
+      "save":    "حفظ التغييرات",
+      "saving":  "جاري الحفظ…",
+      "success": "تم تحديث الملف"
+    },
+    "admin": {
+      "title":      "الوكلاء المحليون",
+      "search":     "البحث بالاسم أو البريد أو المدينة…",
+      "verify":     "توثيق الوكيل",
+      "unverify":   "إلغاء التوثيق",
+      "activate":   "إعادة تفعيل الوكيل",
+      "deactivate": "إلغاء تفعيل الوكيل",
+      "status": {
+        "verified":    "موثق",
+        "pending":     "معلق",
+        "deactivated": "معطّل"
+      },
+      "tiers": {
+        "STARTER": "مبتدئ",
+        "PRO":     "محترف",
+        "ELITE":   "نخبة"
+      }
+    }
+  },
+  "PlanView": {
+    "backLink": "العودة إلى المخطط",
+    "localGuide": "مرشد محلي",
+    "defaultTitle": "رحلة {days} أيام إلى {city}",
+    "titlePlaceholder": "أعطِ رحلتك اسماً…",
+    "editTitle": "تعديل العنوان",
+    "dayCount": "{count, plural, one {يوم واحد} two {يومان} few {{count} أيام} other {{count} يوماً}}",
+    "reviewCount": "({count, plural, one {تقييم واحد} two {تقييمان} few {{count} تقييمات} other {{count} تقييم}})",
+    "unknownCity": "غير معروف",
+    "groupSolo": "مسافر منفرد",
+    "groupCouple": "زوجان",
+    "groupFamily": "عائلة",
+    "groupFriends": "أصدقاء",
+    "budgetBudget": "اقتصادي",
+    "budgetMidrange": "متوسط",
+    "budgetLuxury": "فاخر",
+    "public": "عام",
+    "private": "خاص",
+    "makePublic": "اجعله عاماً",
+    "makePrivate": "اجعله خاصاً",
+    "copyLink": "نسخ الرابط",
+    "deletePlan": "حذف الخطة",
+    "confirmDelete": "هل تريد حذف هذه الخطة؟ لا يمكن التراجع عن ذلك.",
+    "madePublic": "الخطة أصبحت عامة",
+    "madePrivate": "الخطة أصبحت خاصة",
+    "linkCopied": "تم نسخ الرابط",
+    "errorUpdate": "فشل التحديث",
+    "errorSaveTitle": "فشل حفظ العنوان",
+    "errorDelete": "فشل حذف الخطة",
+    "reviewsTitle": "التقييمات",
+    "noReviews": "لا توجد تقييمات بعد — كن أول من يشارك تجربته مع هذه الخطة.",
+    "reviewButtonLabel": "اكتب تقييماً",
+    "reviewDialogTitle": "تقييم هذه الخطة",
+    "reviewRatingLabel": "التقييم",
+    "reviewTitleLabel": "العنوان",
+    "reviewTitlePlaceholder": "لخّص تجربتك",
+    "reviewCommentLabel": "تقييمك",
+    "reviewCommentPlaceholder": "هل اتبعت هذه الخطة؟ كيف كانت تجربتك؟",
+    "reviewSubmit": "إرسال التقييم",
+    "reviewSubmitting": "جارٍ الإرسال…",
+    "reviewCancel": "إلغاء",
+    "reviewSuccess": "تم إرسال التقييم — شكراً لك!"
+  },
+  "PlanItinerary": {
+    "slotMorning": "الصباح",
+    "slotLunch": "الغداء",
+    "slotAfternoon": "بعد الظهر",
+    "slotEvening": "المساء",
+    "itemCount": "{count, plural, one {عنصر واحد} two {عنصران} few {{count} عناصر} other {{count} عنصر}}",
+    "regenerateDay": "إعادة توليد هذا اليوم",
+    "dropHere": "أفلت هنا",
+    "typeActivity": "نشاط",
+    "typeAttraction": "معلم سياحي",
+    "typeRestaurant": "مطعم",
+    "typeTransfer": "نقل",
+    "typeRental": "إيجار",
+    "typeStay": "إقامة",
+    "free": "مجاني",
+    "swapItem": "استبدال هذا العنصر",
+    "book": "احجز",
+    "estimatedTotal": "الإجمالي التقديري",
+    "overBudget": "تجاوز الميزانية",
+    "perPerson": "/ للشخص",
+    "budgetEmpty": "ستظهر التكاليف عند بناء الرحلة"
+  }
+}
