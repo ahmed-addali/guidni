@@ -12,8 +12,10 @@ import { StepLogistics } from "./steps/StepLogistics";
 import { StepItinerary } from "./steps/StepItinerary";
 import { buildItinerary } from "@/lib/planner/engine";
 import { injectLogistics, injectShoppingBlocks } from "@/lib/planner/logistics";
+import { z } from "zod";
 import { savePlan } from "@/lib/actions/planner";
 import type { PlanDay, PlannerData, UserPreferences } from "@/lib/planner/types";
+import { log } from "console";
 
 type DestinationOption = {
   id: string;
@@ -95,19 +97,141 @@ export function PlannerWizard({
 
   const generate = useCallback(async () => {
     setIsGenerating(true);
-    setTimeout(() => {
+
+    const agentFullPlanSchema = z.object({
+      days: z.array(
+        z.object({
+          day_number: z.number(),
+          date: z.string().optional(),
+          theme: z.string().optional(),
+          slots: z
+            .array(
+              z.object({
+                time: z.string(),
+                end_time: z.string(),
+                type: z.string(),
+                activity_id: z.string().optional(),
+                title: z.string(),
+                description: z.string().optional(),
+                category: z.string().optional(),
+                price: z.number().optional(),
+                duration: z.number().optional(),
+                reason: z.string().optional(),
+                image: z.string().optional(),
+                bookable: z.boolean().optional(),
+              })
+            )
+            .optional(),
+        })
+      ),
+    });
+
+    const mapAgentTypeToSlotType = (type: string, startTime?: string): "morning" | "lunch" | "afternoon" | "evening" => {
+      try {
+        if (type === "meal") return "lunch";
+        if (type === "stay_suggestion") return "evening";
+        // derive from start time if available
+        if (startTime) {
+          const h = parseInt(startTime.split(":")[0], 10);
+          if (h >= 5 && h < 12) return "morning";
+          if (h >= 12 && h < 14) return "lunch";
+          if (h >= 14 && h < 19) return "afternoon";
+          return "evening";
+        }
+      } catch {}
+      return "afternoon";
+    };
+
+    const agentTypeToPlanItemType = (type: string) => {
+      switch (type) {
+        case "activity": return "ACTIVITY";
+        case "meal": return "RESTAURANT";
+        case "stay_suggestion": return "STAY";
+        case "rest": return "ATTRACTION";
+        default: return "ATTRACTION";
+      }
+    };
+
+    const slugify = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
+        .slice(0, 50);
+
+    try {
+      // Call internal proxy which supplies authenticated user_id and forwards to planner-agent
+      const resp = await fetch("/api/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ preferences }),
+      });
+
+      const payload = await resp.json();
+      if (!resp.ok || !payload?.success) throw new Error(payload?.error || "Agent error");
+
+      const parsed = agentFullPlanSchema.safeParse(payload.data);
+      if (!parsed.success) {
+        console.warn("Agent response didn't match expected schema:", parsed.error);
+        throw new Error("Agent schema mismatch");
+      }
+
+      const mapped: PlanDay[] = parsed.data.days.map((d) => ({
+        dayNumber: d.day_number,
+        date: d.date ?? undefined,
+        theme: d.theme ?? "",
+        notes: "",
+        logistics: undefined,
+        slots: (d.slots || []).map((s, i) => ({
+          id: s.activity_id ?? `agent-${d.day_number}-${i}`,
+          slotType: mapAgentTypeToSlotType(s.type, s.time),
+          time: { start: s.time, end: s.end_time },
+          item: {
+            id: s.activity_id ?? `agent-${d.day_number}-${i}`,
+            type: agentTypeToPlanItemType(s.type) as any,
+            slug: slugify(s.title),
+            name: s.title,
+            arabicName: undefined,
+            imageUrl: s.image ?? undefined,
+            location: undefined,
+            price: s.price ?? 0,
+            priceLabel: s.price ? "per person" : "free",
+            durationMinutes: s.duration ?? undefined,
+            intensity: "low",
+            tags: s.category ? [s.category] : [],
+            idealTime: undefined,
+            familyFriendly: false,
+            bookingUrl: undefined,
+            meals: undefined,
+            attributes: undefined,
+            hours: undefined,
+            transferType: undefined,
+            capacity: undefined,
+            isAC: undefined,
+            isMeetGreet: undefined,
+            isChildSeat: undefined,
+            nbReviews: undefined,
+            rating: undefined,
+          },
+        })),
+      }));
+
+      setDays(mapped);
+    } catch (e) {
+      console.error("Agent generation failed, falling back to local builder:", e);
       try {
         let built = buildItinerary(plannerData, preferences);
         built = injectLogistics(built, plannerData, preferences);
         built = injectShoppingBlocks(built, plannerData.shops, preferences);
+        console.log("planner built (local fallback)", built);
         setDays(built);
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        console.error(err);
         toast.error(t("errorGenerate"));
-      } finally {
-        setIsGenerating(false);
       }
-    }, 50);
+    } finally {
+      setIsGenerating(false);
+    }
   }, [plannerData, preferences, t]);
 
   const goNext = useCallback(() => {

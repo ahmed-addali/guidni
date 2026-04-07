@@ -1,0 +1,1546 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ─────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  USER
+  PARTNER
+  AGENT
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentOption {
+  NOW
+  LATER
+}
+
+enum PaymentMethod {
+  INCLUDED_IN_PASS
+  KONNECT
+  PAYPAL
+  STRIPE
+  CASH
+  CREDIT_CARD
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum CurrencyCode {
+  TND
+  EUR
+  USD
+}
+
+enum RelationType {
+  RESTAURANT
+  ACTIVITY
+  STAY
+  RENTAL
+  TRANSFER
+  BUSINESS_PROFILE
+  SHOP
+  PRODUCT
+  GUIDE
+  PLAN
+}
+
+enum PlanType {
+  USER_SAVED
+  GUIDE_FREE
+  GUIDE_PAID
+}
+
+enum TransferType {
+  AIRPORT_TRANSFER
+  TAXI
+  CHAUFFEUR
+  SHUTTLE
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum DeliveryMethod {
+  PICKUP
+  LOCAL_DELIVERY
+  NATIONWIDE
+  INTERNATIONAL
+}
+
+enum RentalType {
+  CAR
+  BIKE
+  SCOOTER
+  BOAT
+  OTHER
+}
+
+enum RestaurantType {
+  RESTAURANT
+  CAFEE_SHOP
+  BOTH
+}
+
+enum BadgeKey {
+  VERIFIED
+  GUEST_FAVORITE
+  REVIEWED_BY_GUIDNI
+  OWNER_OPERATED
+}
+
+enum GuidniReviewStatus {
+  PENDING
+  SCHEDULED
+  UNDER_REVIEW
+  PUBLISHED
+  WITHDRAWN
+}
+
+enum PassActivityType {
+  FIXED
+  OPTIONAL
+}
+
+// ─────────────────────────────────────────
+// BETTER AUTH — core auth tables
+// ─────────────────────────────────────────
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+
+  // Custom fields
+  role          UserRole  @default(USER)
+  phone         String?
+  bio           String?
+  address       String?
+  country       String?
+  city          String?
+  postalCode    String?
+
+  // Relations
+  sessions              Session[]
+  accounts              Account[]
+  activityReservations   ActivityReservation[]
+  passReservations       PassReservation[]
+  business               BusinessProfile?
+  restaurantReservations RestaurantReservation[]
+  staysReservations      StaysReservation[]
+  rentalReservations     RentalReservation[]
+  transferReservations   TransferReservation[]
+  reviews               Review[]
+  feedbacks             Feedback[]
+  wishlists             Wishlist[]
+  preference            Preference?
+  plans                 Plan[]
+  productOrders         ProductOrder[]
+  guideProfile          GuideProfile?
+  agentProfile          AgentProfile?
+  planPurchases         PlanPurchase[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+}
+
+// ─────────────────────────────────────────
+// DESTINATIONS
+// ─────────────────────────────────────────
+
+model Destination {
+  id                String    @id @default(cuid())
+  slug              String    @unique
+  country           String
+  city              String
+  region            String?
+  description       String?   @db.Text
+  arabicDescription String?   @db.Text
+  coverImage        String?
+  gallery           String[]
+  active            Boolean   @default(true)
+  featured          Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Planner fields
+  latitude          Float?
+  longitude         Float?
+  timezone          String?
+
+  activities        Activity[]
+  stays             Stay[]
+  restaurants       Restaurant[]
+  rentals           Rental[]
+  transfers         Transfer[]
+  passes            Pass[]
+  attractions       Attraction[]
+  businessProfiles  BusinessProfile[]
+  plans             Plan[]
+  shops             Shop[]
+  guides            GuideProfile[]
+  agents            AgentProfile[]
+
+  @@index([slug])
+  @@index([active])
+}
+
+// ─────────────────────────────────────────
+// BUSINESS
+// ─────────────────────────────────────────
+
+model BusinessProfile {
+  id            String    @id @default(cuid())
+  name          String
+  description   String
+  categories    String[]
+  country       String
+  address       String?
+  region        String
+  phone         String?
+  registration  Boolean   @default(false)
+  companyRN     String?
+  website       String?
+  instagram     String?
+  facebook      String?
+  createdAt     DateTime  @default(now())
+
+  nbReviews     Int       @default(0)
+  averageRating Float?    @default(0)
+
+  isSuperhost   Boolean   @default(false)
+  superhostSince DateTime?
+
+  isVerified    Boolean   @default(false)
+  governmentId  String?
+  verifiedAt    DateTime?
+  type          String    @default("INDIVIDUAL")
+  profileImage  String?
+  languages     String?
+  responseRate  Int?
+  responseTime  String?
+
+  userId    String          @unique
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  destinationId String?
+  destination   Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  activities     Activity[]
+  stays          Stay[]
+  restaurants    Restaurant[]
+  rentals        Rental[]
+  transfers      Transfer[]
+  shops          Shop[]
+  agentReferrals AgentReferral[]
+}
+
+// ─────────────────────────────────────────
+// ACTIVITIES
+// ─────────────────────────────────────────
+
+model Activity {
+  id                String   @id @default(cuid())
+  slug              String   @unique
+  title             String
+  arabicTitle       String?
+  description       String   @db.Text
+  arabicDescription String?  @db.Text
+  category          String
+  price             Int
+  phone             String?
+  country           String
+  region            String
+  city              String?
+  address           String?
+  location          String?
+  note              String?
+  nbReviews         Int      @default(0)
+  duration          String?
+  includes          String?  @db.Text
+  excludes          String?  @db.Text
+  allowed           String?  @db.Text
+  forbidden         String?  @db.Text
+  cancelation       Boolean?
+  paynow            Boolean?
+  guide             String?
+  capacity          Int
+  availableTimes    String
+  featuredInHome    Boolean  @default(false)
+
+  // Planner fields
+  tags              String[] @default([])
+  intensity         String?
+  durationMinutes   Int?
+  bestTimeOfDay     String?
+
+  // Agent commission
+  agentCommissionEnabled Boolean @default(false)
+  agentCommissionRate    Float?
+
+  profileId         String
+  businessProfile   BusinessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  destinationId     String?
+  destination       Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  images            Images[]
+  reservations      ActivityReservation[]
+  fixedInPasses     Pass[]        @relation("FixedActivities")
+  optionalInPasses  Pass[]        @relation("OptionalActivities")
+  attractions       Attraction[]
+
+  @@index([slug])
+  @@index([destinationId, category])
+}
+
+model ActivityReservation {
+  id            String           @id @default(cuid())
+  bookingRef    String           @unique
+  date          DateTime
+  time          String
+  adults        Int
+  children      Int
+  totalPrice    Decimal
+  status        BookingStatus    @default(PENDING)
+  paymentOption PaymentOption    @default(LATER)
+  paymentMethod PaymentMethod    @default(KONNECT)
+  paymentStatus PaymentStatus    @default(UNPAID)
+  notes         String?
+  language      String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  typeInPass    PassActivityType?
+
+  // Agent attribution
+  agentId            String?
+  agentInvitationId  String?
+  commissionRate     Float?
+  commissionAmount   Decimal?       @db.Decimal(10,2)
+
+  userId        String
+  activityId    String
+  passId        String?
+
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activity        Activity          @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  passReservation PassReservation?  @relation(fields: [passId], references: [id], onDelete: Cascade)
+  agent           AgentProfile?     @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  agentInvitation AgentInvitation?  @relation(fields: [agentInvitationId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([activityId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────
+// STAYS
+// ─────────────────────────────────────────
+
+model Stay {
+  id                   String    @id @default(cuid())
+  slug                 String    @unique
+  featuredInHome       Boolean   @default(false)
+  approvalStatus       String    @default("APPROVED")
+
+  title                String
+  arabicTitle          String?
+  description          String    @db.Text
+  arabicDescription    String?   @db.Text
+  propertyType         String
+  category             String
+
+  videoTour            String?
+
+  price                Int
+  cleaningFee          Int?      @default(0)
+  serviceFee           Int?      @default(0)
+  securityDeposit      Int?      @default(0)
+  weeklyDiscount       Int?      @default(0)
+  monthlyDiscount      Int?      @default(0)
+
+  guestCount           Int       @default(1)
+  bedroomCount         Int       @default(1)
+  bedCount             Int       @default(1)
+  bathroomCount        Int       @default(1)
+  maxChildren          Int?      @default(0)
+
+  hasWifi              Boolean   @default(false)
+  hasKitchen           Boolean   @default(false)
+  hasAirConditioning   Boolean   @default(false)
+  hasHeating           Boolean   @default(false)
+  hasPool              Boolean   @default(false)
+  hasGarden            Boolean   @default(false)
+  hasBalcony           Boolean   @default(false)
+  hasParking           Boolean   @default(false)
+  hasSecurity          Boolean   @default(false)
+  hasConcierge         Boolean   @default(false)
+  wheelchairAccessible Boolean   @default(false)
+  elevatorAvailable    Boolean   @default(false)
+
+  checkInTime          String    @default("15:00")
+  checkOutTime         String    @default("11:00")
+  minStayNights        Int       @default(1)
+  maxStayNights        Int?
+  isPetFriendly        Boolean   @default(false)
+  isSmokeFree          Boolean   @default(true)
+  cancelationPolicy    String    @default("FLEXIBLE")
+
+  country              String
+  region               String
+  city                 String?
+  address              String?
+  neighborhood         String?
+  location             String?
+  latitude             Float?
+  longitude            Float?
+  locationNotes        String?   @db.Text
+
+  phone                String?
+  hostName             String    @default("")
+  hostLanguages        String?
+
+  viewCount            Int       @default(0)
+  nbReviews            Int       @default(0)
+  averageRating        Float?    @default(0)
+  lastBookedAt         DateTime?
+  bookingCount         Int       @default(0)
+
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  lastRenovated        DateTime?
+
+  profileId            String
+  businessProfile      BusinessProfile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  destinationId        String?
+  destination          Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  images               Images[]
+  reservations         StaysReservation[]
+
+  @@index([country])
+  @@index([region])
+  @@index([city])
+  @@index([price])
+  @@index([averageRating])
+  @@index([slug])
+}
+
+model StaysReservation {
+  id              String        @id @default(cuid())
+  bookingRef      String        @unique
+  status          BookingStatus @default(PENDING)
+
+  checkIn         DateTime      @db.Date
+  checkOut        DateTime      @db.Date
+  nights          Int
+
+  adults          Int           @default(1)
+  children        Int           @default(0)
+  babies          Int           @default(0)
+
+  basePrice       Decimal       @db.Decimal(10,2)
+  cleaningFee     Decimal?      @db.Decimal(10,2)
+  serviceFee      Decimal?      @db.Decimal(10,2)
+  taxes           Decimal?      @db.Decimal(10,2)
+  discount        Decimal?      @db.Decimal(10,2)
+  totalPrice      Decimal       @db.Decimal(10,2)
+  currency        CurrencyCode  @default(TND)
+
+  paymentStatus   PaymentStatus @default(UNPAID)
+  paymentOption   PaymentOption?
+  paymentMethod   PaymentMethod?
+  transactionId   String?
+  paidAmount      Decimal?      @db.Decimal(10,2)
+  refundAmount    Decimal?      @db.Decimal(10,2)
+
+  specialRequests    String?    @db.Text
+  cancellationReason String?
+  hostNotes          String?    @db.Text
+
+  contactName     String
+  contactEmail    String
+  contactPhone    String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  confirmedAt     DateTime?
+  cancelledAt     DateTime?
+
+  userId          String
+  stayId          String
+  couponId        String?
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stay            Stay     @relation(fields: [stayId], references: [id], onDelete: Cascade)
+  coupon          Coupon?  @relation(fields: [couponId], references: [id])
+
+  @@index([userId])
+  @@index([stayId])
+  @@index([checkIn])
+  @@index([status])
+}
+
+model Coupon {
+  id           String             @id @default(cuid())
+  code         String             @unique
+  discount     Int
+  validUntil   DateTime
+  reservations StaysReservation[]
+}
+
+// ─────────────────────────────────────────
+// RESTAURANTS
+// ─────────────────────────────────────────
+
+model Restaurant {
+  id                  String             @id @default(cuid())
+  slug                String             @unique
+  name                String
+  arabicName          String?
+  description         String
+  arabicDescription   String?
+  phone               String?
+  type                RestaurantType
+  category            String?
+  meals               String?
+  foodTypes           String[]
+  dietTypes           String[]
+  attributes          String[]
+  country             String
+  city                String
+  address             String?
+  location            String?
+  logo                String?
+  coverPhoto          String?
+  website             String?
+  instagram           String?
+  facebook            String?
+  pdfMenu             String?
+  note                String?
+  nbReviews           Int                @default(0)
+  reservationsEnabled Boolean
+  maxGuests           Int?
+  tables              Int?
+  featuredInHome      Boolean            @default(false)
+  createdAt           DateTime           @default(now())
+
+  profileId           String
+  businessProfile     BusinessProfile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  destinationId       String?
+  destination         Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  images              Images[]
+  menu                RestaurantMenu[]
+  hours               RestaurantHours[]
+  reservations        RestaurantReservation[]
+
+  @@index([slug])
+  @@index([destinationId, type])
+}
+
+model RestaurantMenu {
+  id          String    @id @default(cuid())
+  name        String
+  description String
+  price       Int
+  visible     Boolean   @default(true)
+  category    String?
+  createdAt   DateTime  @default(now())
+
+  restaurantId     String
+  restaurant       Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  images      Images[]
+}
+
+model RestaurantHours {
+  id               String  @id @default(cuid())
+  day              String
+  opening          String?
+  closing          String?
+  isClosed         Boolean @default(false)
+  isFullDayOpening Boolean @default(false)
+
+  restaurantId          String
+  restaurant            Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+model RestaurantReservation {
+  id          String        @id @default(cuid())
+  bookingRef  String        @unique @default(cuid())
+  date        DateTime
+  time        String
+  guests      Int           @default(2)
+  status      BookingStatus @default(PENDING)
+  notes       String?
+  guestName   String?
+  phone       String?
+  price       Int?
+  createdAt   DateTime      @default(now())
+
+  userId       String
+  restaurantId String
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────
+// PASSES
+// ─────────────────────────────────────────
+
+model Pass {
+  id                 String     @id @default(cuid())
+  passKey            String     @unique
+  name               String
+  arabicName         String?
+  description        String?    @db.Text
+  arabicDescription  String?    @db.Text
+  price              Int        @default(0)
+  discount           Int        @default(0)
+  popular            Boolean    @default(false)
+  optionalCount      Int        @default(1)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  destinationId      String?
+  destination        Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  fixedActivities    Activity[] @relation("FixedActivities")
+  optionalActivities Activity[] @relation("OptionalActivities")
+  reservations       PassReservation[]
+
+  @@map("passes")
+}
+
+model PassReservation {
+  id            String        @id @default(cuid())
+  bookingRef    String        @unique
+  passKey       String
+  date          DateTime
+  participants  Int
+  totalPrice    Decimal
+  status        BookingStatus @default(PENDING)
+  paymentOption PaymentOption @default(LATER)
+  paymentMethod PaymentMethod @default(KONNECT)
+  paymentStatus PaymentStatus @default(UNPAID)
+  notes         String?
+  language      String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  expiresAt     DateTime
+
+  userId                String
+  passId                String?
+
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pass                  Pass?                 @relation(fields: [passId], references: [id], onDelete: SetNull)
+  activityReservations  ActivityReservation[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────
+// ATTRACTIONS & PLANS
+// ─────────────────────────────────────────
+
+model Attraction {
+  id           String                  @id @default(uuid())
+  title        String
+  slug         String                  @unique
+  description  String
+  overview     String?
+  location     String
+  hours        String?
+  fees         String?
+  coordinates  Json?
+  category     String
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+
+  hasFee        Boolean  @default(false)
+  feeAmount     Int?
+  feeNote       String?
+
+  destinationId String?
+  destination   Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  images       Images[]
+  translations AttractionTranslation[]
+  activities   Activity[]
+
+  @@index([destinationId, category])
+}
+
+model AttractionTranslation {
+  id           String     @id @default(uuid())
+  locale       String
+  title        String
+  description  String
+  overview     String?
+
+  attractionId String
+  attraction   Attraction @relation(fields: [attractionId], references: [id])
+}
+
+model Plan {
+  id          String    @id @default(uuid())
+  title       String?
+  duration    Int
+  preferences Json
+  itinerary   Json
+  isPublic    Boolean   @default(false)
+  viewCount   Int       @default(0)
+  generatedBy String?
+  createdAt   DateTime  @default(now())
+
+  // Guide marketplace fields
+  planType      PlanType  @default(USER_SAVED)
+  price         Int       @default(0)
+  isPaidPlan    Boolean   @default(false)
+  purchaseCount Int       @default(0)
+  summary       String?   @db.Text
+  previewDays   Int       @default(1)
+  tags          String[]  @default([])
+  difficulty    String?
+  suitableFor   String[]  @default([])
+  season        String?
+
+  userId        String?
+  user          User?        @relation(fields: [userId], references: [id])
+
+  destinationId String?
+  destination   Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  guideId       String?
+  guide         GuideProfile? @relation(fields: [guideId], references: [id], onDelete: SetNull)
+
+  purchases     PlanPurchase[]
+
+  @@index([id])
+  @@index([userId, createdAt])
+  @@index([isPublic, destinationId])
+  @@index([guideId, planType])
+  @@index([destinationId, planType, isPublic])
+  @@index([destinationId, purchaseCount])
+}
+
+// ─────────────────────────────────────────
+// GUIDES
+// ─────────────────────────────────────────
+
+model GuideProfile {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  displayName     String
+  bio             String   @db.Text
+  arabicBio       String?  @db.Text
+  tagline         String?
+  avatarUrl       String?
+  coverUrl        String?
+
+  specializations String[] @default([])
+  languages       String[] @default([])
+  experienceYears Int?
+
+  country         String
+  destinationId   String?
+  destination     Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  note            String?
+  nbReviews       Int      @default(0)
+  planCount       Int      @default(0)
+  totalSales      Int      @default(0)
+
+  isVerified      Boolean  @default(false)
+  isFeatured      Boolean  @default(false)
+  isActive        Boolean  @default(true)
+
+  website         String?
+  instagram       String?
+  facebook        String?
+  tiktok          String?
+
+  createdAt       DateTime @default(now())
+
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+
+  plans           Plan[]
+
+  @@index([destinationId, isActive])
+  @@index([isFeatured, isActive])
+}
+
+model PlanPurchase {
+  id          String   @id @default(cuid())
+  purchaseRef String   @unique
+  amount      Int
+  platformFee Int
+  guideEarns  Int
+  createdAt   DateTime @default(now())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  planId      String
+  plan        Plan     @relation(fields: [planId], references: [id])
+
+  @@unique([userId, planId])
+  @@index([planId])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────
+// REVIEWS, IMAGES, WISHLIST
+// ─────────────────────────────────────────
+
+model Review {
+  id           String       @id @default(cuid())
+  userName     String
+  title        String?
+  rating       Int
+  comment      String?
+  response     String?
+  responseDate String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  relationId   String
+  relationType RelationType
+
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images       Images[]
+
+  @@index([relationId, relationType])
+}
+
+model Images {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String   @default("")
+  createdAt DateTime @default(now())
+
+  activityId   String?
+  activity     Activity?   @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  stayId       String?
+  stay         Stay?       @relation(fields: [stayId], references: [id], onDelete: Cascade)
+
+  restaurantId      String?
+  restaurant        Restaurant?      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  restaurantMenuId  String?
+  restaurantMenu    RestaurantMenu?  @relation(fields: [restaurantMenuId], references: [id], onDelete: Cascade)
+
+  reviewId     String?
+  review       Review?     @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  attractionId String?
+  attraction   Attraction? @relation(fields: [attractionId], references: [id], onDelete: Cascade)
+
+  feedbackId   String?
+  feedback     Feedback?   @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+
+  rentalId     String?
+  rental       Rental?     @relation(fields: [rentalId], references: [id], onDelete: Cascade)
+
+  transferId   String?
+  transfer     Transfer?   @relation(fields: [transferId], references: [id], onDelete: Cascade)
+
+  shopId       String?
+  shop         Shop?       @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  productId    String?
+  product      Product?    @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  guidniReviewId String?
+  guidniReview   GuidniReview? @relation(fields: [guidniReviewId], references: [id], onDelete: Cascade)
+}
+
+model Wishlist {
+  id           String       @id @default(cuid())
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  relationId   String
+  relationType RelationType
+
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, relationId])
+}
+
+// ─────────────────────────────────────────
+// PREFERENCES & MISC
+// ─────────────────────────────────────────
+
+model Preference {
+  id        String       @id @default(cuid())
+  currency  CurrencyCode @default(TND)
+  language  String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  userId    String       @unique
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  message   String
+  type      String
+  url       String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images    Images[]
+
+  @@map("feedback")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  reservationId String
+  amount        Decimal       @db.Decimal(10,2)
+  status        PaymentStatus
+  method        PaymentMethod
+  transactionId String?
+  createdAt     DateTime      @default(now())
+}
+
+// ─────────────────────────────────────────
+// RENTALS
+// ─────────────────────────────────────────
+
+model Rental {
+  id               String     @id @default(cuid())
+  slug             String     @unique
+  title            String
+  arabicTitle      String?
+  description      String     @db.Text
+  arabicDescription String?   @db.Text
+  type             RentalType
+  pricePerDay      Int
+  pricePerHour     Int?
+  minDays          Int        @default(1)
+  capacity         Int        @default(1)
+  brand            String?
+  model            String?
+  year             Int?
+  color            String?
+  transmission     String?
+  fuelType         String?
+  hasAC            Boolean    @default(false)
+  hasGPS           Boolean    @default(false)
+  hasInsurance     Boolean    @default(false)
+  requiresLicense  Boolean    @default(true)
+  country          String
+  region           String
+  city             String?
+  address          String?
+  phone            String?
+  featuredInHome   Boolean    @default(false)
+  nbReviews        Int        @default(0)
+
+  profileId        String
+  businessProfile  BusinessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  destinationId    String?
+  destination      Destination?    @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  images           Images[]
+  reservations     RentalReservation[]
+
+  @@index([slug])
+}
+
+model RentalReservation {
+  id            String        @id @default(cuid())
+  bookingRef    String        @unique
+  startDate     DateTime
+  endDate       DateTime
+  days          Int
+  totalPrice    Decimal       @db.Decimal(10,2)
+  status        BookingStatus @default(PENDING)
+  paymentOption PaymentOption @default(LATER)
+  paymentMethod PaymentMethod @default(KONNECT)
+  paymentStatus PaymentStatus @default(UNPAID)
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  userId        String
+  rentalId      String
+
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rental        Rental        @relation(fields: [rentalId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([rentalId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────
+// TRANSFERS
+// ─────────────────────────────────────────
+
+model Transfer {
+  id                String       @id @default(cuid())
+  slug              String       @unique
+  title             String
+  arabicTitle       String?
+  description       String       @db.Text
+  arabicDescription String?      @db.Text
+  type              TransferType
+
+  // Pricing — only the relevant field(s) are set per type
+  pricePerTrip      Int?         // AIRPORT_TRANSFER, TAXI, SHUTTLE (flat rate)
+  pricePerHour      Int?         // CHAUFFEUR
+  pricePerPerson    Int?         // SHUTTLE per-head (optional alternative)
+
+  // Vehicle / service details
+  capacity          Int          @default(4)
+  vehicleType       String?      // "Sedan", "SUV", "Van", "Minibus"
+  brand             String?
+  model             String?
+  year              Int?
+  isAC              Boolean      @default(true)
+  isMeetGreet       Boolean      @default(false)
+  isChildSeat       Boolean      @default(false)
+  languages         String?      // driver languages (comma-separated)
+  phone             String?
+
+  // Location
+  country           String
+  region            String
+  city              String?
+  address           String?
+
+  note              String?      // aggregated rating string e.g. "4.5"
+  nbReviews         Int          @default(0)
+  featuredInHome    Boolean      @default(false)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  profileId         String
+  businessProfile   BusinessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  destinationId     String?
+  destination       Destination?    @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  images            Images[]
+  reservations      TransferReservation[]
+
+  @@index([slug])
+  @@index([type])
+}
+
+model TransferReservation {
+  id              String        @id @default(cuid())
+  bookingRef      String        @unique
+
+  date            DateTime
+  time            String        // "HH:MM"
+  pickupLocation  String
+  dropoffLocation String?
+  passengers      Int           @default(1)
+  hoursRequested  Int?          // CHAUFFEUR only
+  flightNumber    String?       // AIRPORT_TRANSFER optional
+  contactName     String
+  contactPhone    String?
+  notes           String?       @db.Text
+
+  totalPrice      Decimal       @db.Decimal(10,2)
+  status          BookingStatus @default(PENDING)
+  paymentOption   PaymentOption @default(LATER)
+  paymentMethod   PaymentMethod @default(KONNECT)
+  paymentStatus   PaymentStatus @default(UNPAID)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  userId          String
+  transferId      String
+
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transfer        Transfer      @relation(fields: [transferId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([transferId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────
+// SHOPS
+// ─────────────────────────────────────────
+
+model Shop {
+  id                String           @id @default(cuid())
+  slug              String           @unique
+  name              String
+  arabicName        String?
+  description       String           @db.Text
+  arabicDescription String?          @db.Text
+  category          String
+  phone             String?
+  country           String
+  region            String
+  city              String?
+  address           String?
+  location          String?
+  coverPhoto        String?
+  logo              String?
+  website           String?
+  instagram         String?
+  facebook          String?
+  note              String?
+  nbReviews         Int              @default(0)
+  isOpen            Boolean          @default(true)
+  featuredInHome    Boolean          @default(false)
+  deliveryMethods   DeliveryMethod[]
+  freeShippingAbove Int?
+  minOrderAmount    Int?
+  createdAt         DateTime         @default(now())
+
+  profileId         String
+  businessProfile   BusinessProfile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  destinationId     String?
+  destination       Destination?     @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  products          Product[]
+  images            Images[]
+  orders            ProductOrder[]
+
+  @@index([slug])
+}
+
+model Product {
+  id                String   @id @default(cuid())
+  slug              String   @unique
+  name              String
+  arabicName        String?
+  description       String   @db.Text
+  arabicDescription String?  @db.Text
+  price             Int
+  comparePrice      Int?
+  category          String
+  material          String?
+  origin            String?
+  weight            Int?
+  stock             Int      @default(0)
+  isHandmade        Boolean  @default(false)
+  isLocalOnly       Boolean  @default(false)
+  featured          Boolean  @default(false)
+  tags              String[]
+  createdAt         DateTime @default(now())
+
+  shopId            String
+  shop              Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  images            Images[]
+  orderItems        ProductOrderItem[]
+
+  @@index([slug])
+  @@index([shopId])
+}
+
+model ProductOrder {
+  id              String           @id @default(cuid())
+  orderRef        String           @unique
+  status          OrderStatus      @default(PENDING)
+  deliveryMethod  DeliveryMethod
+  deliveryAddress String?          @db.Text
+  deliveryCity    String?
+  deliveryCountry String?
+  notes           String?
+  subtotal        Int
+  deliveryCost    Int              @default(0)
+  total           Int
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  shopId          String
+  shop            Shop             @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  items           ProductOrderItem[]
+
+  @@index([userId])
+  @@index([shopId])
+  @@index([status])
+}
+
+model ProductOrderItem {
+  id        String       @id @default(cuid())
+  quantity  Int
+  unitPrice Int
+
+  productId String
+  product   Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  orderId   String
+  order     ProductOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────
+// BADGES
+// ─────────────────────────────────────────
+
+model ListingBadge {
+  id           String       @id @default(cuid())
+  badgeKey     BadgeKey
+  relationType RelationType
+  relationId   String
+  assignedAt   DateTime     @default(now())
+  assignedBy   String?
+  note         String?
+
+  @@unique([badgeKey, relationType, relationId])
+}
+
+model GuidniReview {
+  id           String             @id @default(cuid())
+  relationType RelationType
+  relationId   String
+  status       GuidniReviewStatus @default(PENDING)
+
+  reviewerName  String?
+  reviewerTitle String?
+  visitedAt     DateTime?
+  season        String?
+
+  summaryQuote String?
+  fullReview   String?  @db.Text
+  whatWeLoved  String?  @db.Text
+  worthKnowing String?  @db.Text
+  bestFor      String?
+
+  scoreAccuracy Int?
+  scoreQuality  Int?
+  scoreValue    Int?
+  scorePresent  Int?
+  scoreHost     Int?
+  scoreTotal    Int?
+
+  partnerResponse     String?  @db.Text
+  partnerResponseDate DateTime?
+
+  tiktokUrl    String?
+  instagramUrl String?
+  facebookUrl  String?
+
+  images      Images[]
+
+  requestedBy  String?
+  assignedTo   String?
+  partnerOffer String?  @db.Text
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime?
+
+  @@unique([relationType, relationId])
+}
+
+// ─────────────────────────────────────────
+// LOCAL AGENT PROGRAM
+// ─────────────────────────────────────────
+
+model AgentProfile {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  displayName String
+  pseudonym   String?   @unique
+  phone       String
+  country     String
+  city        String
+  bio         String?   @db.Text
+  avatarUrl   String?
+
+  tier        AgentTier @default(STARTER)
+  points      Int       @default(0)
+  totalEarned Decimal   @default(0) @db.Decimal(10,2)
+
+  isVerified  Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  verifiedAt  DateTime?
+
+  destinationId String?
+  destination   Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id])
+
+  invitations          AgentInvitation[]
+  earnings             AgentEarning[]
+  agentPoints          AgentPoint[]
+  referrals            AgentReferral[]
+  redemptions          AgentRedemption[]
+  activityReservations ActivityReservation[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([destinationId, isActive])
+  @@index([tier, points])
+}
+
+model AgentInvitation {
+  id           String           @id @default(cuid())
+  token        String           @unique @default(cuid())
+  status       InvitationStatus @default(PENDING)
+
+  listingType  String           // "ACTIVITY"
+  listingId    String
+
+  touristEmail String?
+  touristPhone String?
+  note         String?          @db.Text
+
+  date         String?
+  timeSlot     String?
+  adults       Int              @default(1)
+  children     Int              @default(0)
+
+  expiresAt    DateTime
+  openedAt     DateTime?
+  bookedAt     DateTime?
+
+  agentId      String
+  agent        AgentProfile     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  activityReservations ActivityReservation[]
+
+  createdAt    DateTime         @default(now())
+
+  @@index([agentId, status])
+  @@index([token])
+}
+
+model AgentEarning {
+  id               String        @id @default(cuid())
+  bookingRef       String
+  listingType      String
+  listingId        String
+  commissionRate   Float
+  bookingAmount    Decimal       @db.Decimal(10,2)
+  commissionAmount Decimal       @db.Decimal(10,2)
+  status           EarningStatus @default(PENDING)
+  confirmedAt      DateTime?
+  paidAt           DateTime?
+  note             String?
+
+  agentId          String
+  agent            AgentProfile  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  createdAt        DateTime      @default(now())
+
+  @@index([agentId, status])
+  @@index([bookingRef])
+}
+
+model AgentPoint {
+  id          String           @id @default(cuid())
+  type        AgentPointType
+  amount      Int
+  description String?
+  status      AgentPointStatus @default(CONFIRMED)
+  referenceId String?          // bookingRef, businessProfileId, etc.
+
+  agentId     String
+  agent       AgentProfile     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime         @default(now())
+
+  @@index([agentId, type])
+  @@index([agentId, createdAt])
+}
+
+model AgentReferral {
+  id                String              @id @default(cuid())
+  status            AgentReferralStatus @default(PENDING)
+  partnerName       String
+  partnerEmail      String?
+  partnerPhone      String?
+  partnerType       String?             // "ACTIVITY", "RESTAURANT", etc.
+  partnerCity       String?
+  agentNote         String?             @db.Text
+
+  signupAt          DateTime?
+  verifiedAt        DateTime?
+  firstListingAt    DateTime?
+  firstBookingAt    DateTime?
+
+  pointsAwarded     Int                 @default(0)
+
+  agentId           String
+  agent             AgentProfile        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  businessProfileId String?
+  businessProfile   BusinessProfile?    @relation(fields: [businessProfileId], references: [id], onDelete: SetNull)
+
+  createdAt         DateTime            @default(now())
+
+  @@index([agentId, status])
+  @@index([businessProfileId])
+}
+
+model AgentRedemption {
+  id           String           @id @default(cuid())
+  points       Int
+  amountTND    Decimal          @db.Decimal(10,2)
+  status       RedemptionStatus @default(PENDING)
+  method       String           @default("BANK_TRANSFER")
+  accountInfo  String?          @db.Text
+  processedAt  DateTime?
+  note         String?
+
+  agentId      String
+  agent        AgentProfile     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime         @default(now())
+
+  @@index([agentId, status])
+}
+
+// ─────────────────────────────────────────
+// AGENT ENUMS
+// ─────────────────────────────────────────
+
+enum AgentTier {
+  STARTER
+  PRO
+  ELITE
+}
+
+enum InvitationStatus {
+  PENDING
+  OPENED
+  BOOKED
+  EXPIRED
+  CANCELLED
+}
+
+enum EarningStatus {
+  PENDING
+  CONFIRMED
+  PAID
+  CANCELLED
+}
+
+enum AgentPointType {
+  BOOKING_COMMISSION
+  REFERRAL_SIGNUP
+  REFERRAL_VERIFIED
+  REFERRAL_FIRST_LISTING
+  REFERRAL_FIRST_BOOKING
+  TIER_BONUS
+  REDEMPTION
+}
+
+enum AgentPointStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+enum AgentReferralStatus {
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+}
+
+enum RedemptionStatus {
+  PENDING
+  PROCESSING
+  PAID
+  REJECTED
+}
