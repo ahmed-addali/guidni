@@ -1,7 +1,7 @@
 """DB Events — SQLAlchemy event listeners for incremental RAG index updates.
 
 Listens to after_insert, after_update, after_delete events on the
-Activity, Stay, Yummy, and Attraction models. When data changes,
+Activity, Stay, Restaurant, and Attraction models. When data changes,
 automatically triggers re-indexing of only the affected entity.
 
 Uses asyncio background tasks to avoid blocking DB commits.
@@ -11,7 +11,7 @@ import asyncio
 import logging
 from sqlalchemy import event
 
-from app.db.models import Activity, Stay, Yummy, Attraction
+from app.db.models import Activity, Stay, Restaurant, Attraction
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 _MODEL_TYPE_MAP = {
     Activity: "activity",
     Stay: "stay",
-    Yummy: "yummy",
+    Restaurant: "restaurant",
     Attraction: "attraction",
 }
 

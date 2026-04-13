@@ -12,8 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.db.models import (
-    User, Activity, Images, Stay, Yummy, YummyHours, YummyMenu,
-    ActivityReservation, StaysReservation, Review, Wishlist, Preference,
+    User, Activity, Images, Stay, Restaurant, RestaurantHours, RestaurantMenu,
+    ActivityReservation, StaysReservation, RestaurantReservation, Review, Wishlist, Preference,
     Pass, PassReservation, Attraction,
     PlannerConversation, PlannerMessage, GeneratedPlan, ActivityIntelligence,
 )
@@ -119,9 +119,9 @@ async def get_user_wishlists(session: AsyncSession, user_id: str) -> list[dict]:
             stay = await session.execute(select(Stay.title).where(Stay.id == w.relationId))
             row = stay.scalar_one_or_none()
             item["title"] = row if row else "Unknown"
-        elif w.relationType == "YUMMY":
-            yummy = await session.execute(select(Yummy.name).where(Yummy.id == w.relationId))
-            row = yummy.scalar_one_or_none()
+        elif w.relationType == "RESTAURANT":
+            restaurant = await session.execute(select(Restaurant.name).where(Restaurant.id == w.relationId))
+            row = restaurant.scalar_one_or_none()
             item["title"] = row if row else "Unknown"
         items.append(item)
 
@@ -319,45 +319,45 @@ async def get_restaurants_by_region(
     cuisine_type: str | None = None,
     limit: int = 10,
 ) -> list[dict]:
-    """Get restaurants/yummy places in a region."""
-    query = select(Yummy).options(
-        selectinload(Yummy.images),
-        selectinload(Yummy.hours),
+    """Get restaurants in a region."""
+    query = select(Restaurant).options(
+        selectinload(Restaurant.images),
+        selectinload(Restaurant.hours),
     )
 
     conditions = []
     if region:
-        # Yummy doesn't have region — we use city 
-        conditions.append(Yummy.city.ilike(f"%{region}%"))
+        # Match using city (similar to the legacy yummy implementation)
+        conditions.append(Restaurant.city.ilike(f"%{region}%"))
     if cuisine_type:
-        conditions.append(Yummy.category.ilike(f"%{cuisine_type}%"))
+        conditions.append(Restaurant.category.ilike(f"%{cuisine_type}%"))
 
     if conditions:
         query = query.where(and_(*conditions))
 
     query = query.limit(limit)
     result = await session.execute(query)
-    yummies = result.scalars().all()
+    restaurants = result.scalars().all()
 
     return [
         {
-            "id": y.id,
-            "name": y.name,
-            "description": y.description[:200] + "..." if len(y.description) > 200 else y.description,
-            "type": y.type,
-            "category": y.category,
-            "city": y.city,
-            "phone": y.phone,
-            "note": y.note,
-            "nbReviews": y.nbReviews,
-            "reservationsEnabled": y.reservationsEnabled,
+            "id": r.id,
+            "name": r.name,
+            "description": r.description[:200] + "..." if len(r.description) > 200 else r.description,
+            "type": r.type,
+            "category": r.category,
+            "city": r.city,
+            "phone": r.phone,
+            "note": r.note,
+            "nbReviews": r.nbReviews,
+            "reservationsEnabled": r.reservationsEnabled,
             "hours": [
                 {"day": h.day, "opening": h.opening, "closing": h.closing, "isClosed": h.isClosed}
-                for h in (y.hours or [])
+                for h in (r.hours or [])
             ],
-            "images": [{"url": img.url, "alt": img.alt} for img in (y.images or [])[:3]],
+            "images": [{"url": img.url, "alt": img.alt} for img in (r.images or [])[:3]],
         }
-        for y in yummies
+        for r in restaurants
     ]
 
 

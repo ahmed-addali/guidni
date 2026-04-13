@@ -21,6 +21,7 @@ from app.schemas.responses import PlannerResponse, ThinkingStep, QuestionOption
 from app.schemas.plan import FullPlan
 from app.schemas.plan_request import PlanRequest, parse_chat_to_plan_request
 from app.db.connection import async_session, engine
+from app.db.models import Base
 from app.db import queries
 from app.agent.brain import run_agent
 from app.services.plan_pipeline import run_plan_pipeline
@@ -104,6 +105,16 @@ async def lifespan(app: FastAPI):
         logger.info("   Groq Model: %s", settings.GROQ_MODEL)
     logger.info("   Database: %s", settings.DATABASE_URL[:50] + "...")
     logger.info("   Default Region: %s", settings.DEFAULT_REGION)
+
+     # ==========================================
+    # NEW: Create missing AI-specific DB tables
+    # ==========================================
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("✅ Verified and created missing AI database tables")
+    except Exception as e:
+        logger.error("⚠️ Failed to create DB tables: %s", e, exc_info=True)
 
     # Initialize RAG
     try:

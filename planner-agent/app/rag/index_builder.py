@@ -25,7 +25,7 @@ from sqlalchemy.orm import selectinload
 
 from app.config import settings
 from app.db.connection import async_session
-from app.db.models import Activity, Attraction, Stay, Yummy
+from app.db.models import Activity, Attraction, Stay, Restaurant
 
 logger = logging.getLogger(__name__)
 
@@ -139,11 +139,11 @@ def _stay_tags(s: Stay) -> list[str]:
     return _unique(tags)
 
 
-def _yummy_tags(y: Yummy) -> list[str]:
+def _restaurant_tags(r: Restaurant) -> list[str]:
     tags = []
-    tags.extend(_tags_from_list_fields(y.type, y.category, y.meals))
+    tags.extend(_tags_from_list_fields(r.type, r.category, r.meals))
     tags.extend(_tags_from_bool_map({
-        "reservations_enabled": y.reservationsEnabled,
+        "reservations_enabled": r.reservationsEnabled,
     }))
     return _unique(tags)
 
@@ -177,17 +177,17 @@ def _stay_narrative(s: Stay) -> str:
     ).strip()
 
 
-def _yummy_narrative(y: Yummy) -> str:
-    venue_type = str(y.type or "venue").lower().replace("_", " ")
-    cuisine = ", ".join(_to_string_list(y.category))
-    meals = ", ".join(_to_string_list(y.meals))
+def _restaurant_narrative(r: Restaurant) -> str:
+    venue_type = str(r.type or "venue").lower().replace("_", " ")
+    cuisine = ", ".join(_to_string_list(r.category))
+    meals = ", ".join(_to_string_list(r.meals))
     cuisine_text = f" focused on {cuisine}" if cuisine else ""
     meals_text = f" serving {meals}" if meals else ""
-    reservation_text = " accepts reservations" if y.reservationsEnabled else " does not require reservations"
-    description = f". {y.description}" if y.description else ""
-    location = f" in {y.city}" if y.city else ""
+    reservation_text = " accepts reservations" if r.reservationsEnabled else " does not require reservations"
+    description = f". {r.description}" if r.description else ""
+    location = f" in {r.city}" if r.city else ""
     return (
-        f"{y.name} is a {venue_type}{cuisine_text}{location}{meals_text} and{reservation_text}{description}"
+        f"{r.name} is a {venue_type}{cuisine_text}{location}{meals_text} and{reservation_text}{description}"
     ).strip()
 
 
@@ -242,20 +242,20 @@ def _stay_payload(s: Stay) -> dict[str, Any]:
     }
 
 
-def _yummy_payload(y: Yummy) -> dict[str, Any]:
+def _restaurant_payload(r: Restaurant) -> dict[str, Any]:
     return {
         "entity_type": "restaurant",
-        "entity_id": str(y.id),
-        "title": y.name,
-        "description": (y.description or "")[:280],
-        "venue_type": str(y.type or ""),
-        "category": _to_string_list(y.category),
-        "country": y.country or "",
-        "region": y.city or "",
-        "city": y.city or "",
-        "location": y.location or "",
-        "thumbnail_url": _thumbnail_url(y),
-        "tags": _yummy_tags(y),
+        "entity_id": str(r.id),
+        "title": r.name,
+        "description": (r.description or "")[:280],
+        "venue_type": str(r.type or ""),
+        "category": _to_string_list(r.category),
+        "country": r.country or "",
+        "region": r.city or "",
+        "city": r.city or "",
+        "location": r.location or "",
+        "thumbnail_url": _thumbnail_url(r),
+        "tags": _restaurant_tags(r),
         "is_enriched": False,
     }
 
@@ -309,11 +309,11 @@ async def _stay_to_qdrant_point(s: Stay) -> qmodels.PointStruct:
     return qmodels.PointStruct(id=_point_uuid("stay", str(s.id)), vector=vector, payload=payload)
 
 
-async def _yummy_to_qdrant_point(y: Yummy) -> qmodels.PointStruct:
-    text = _yummy_narrative(y)
-    payload = _yummy_payload(y)
+async def _restaurant_to_qdrant_point(r: Restaurant) -> qmodels.PointStruct:
+    text = _restaurant_narrative(r)
+    payload = _restaurant_payload(r)
     vector = await _embed_text(text)
-    return qmodels.PointStruct(id=_point_uuid("restaurant", str(y.id)), vector=vector, payload=payload)
+    return qmodels.PointStruct(id=_point_uuid("restaurant", str(r.id)), vector=vector, payload=payload)
 
 
 async def _attraction_to_qdrant_point(a: Attraction) -> qmodels.PointStruct:
@@ -395,13 +395,13 @@ async def build_full_index() -> AsyncQdrantClient:
         for stay in stays:
             all_points.append(await _stay_to_qdrant_point(stay))
 
-        yummy_result = await session.execute(
-            select(Yummy)
-            .options(selectinload(Yummy.images), selectinload(Yummy.hours), selectinload(Yummy.menu))
+        restaurant_result = await session.execute(
+            select(Restaurant)
+            .options(selectinload(Restaurant.images), selectinload(Restaurant.hours), selectinload(Restaurant.menu))
         )
-        yummies = yummy_result.scalars().all()
-        for yummy in yummies:
-            all_points.append(await _yummy_to_qdrant_point(yummy))
+        restaurants = restaurant_result.scalars().all()
+        for restaurant in restaurants:
+            all_points.append(await _restaurant_to_qdrant_point(restaurant))
 
         attraction_result = await session.execute(select(Attraction))
         attractions = attraction_result.scalars().all()
@@ -413,8 +413,8 @@ async def build_full_index() -> AsyncQdrantClient:
         await _upsert_points(all_points[i:i + batch_size], wait=True)
 
     logger.info(
-        "Qdrant rebuild complete: %d points (activities=%d, stays=%d, yummies=%d, attractions=%d)",
-        len(all_points), len(activities), len(stays), len(yummies), len(attractions),
+        "Qdrant rebuild complete: %d points (activities=%d, stays=%d, restaurants=%d, attractions=%d)",
+        len(all_points), len(activities), len(stays), len(restaurants), len(attractions),
     )
 
     # Future async enrichment worker (Celery/RQ):
@@ -451,15 +451,15 @@ async def upsert_entity(entity_type: str, entity_id: str) -> None:
             if entity and entity.approvalStatus == "APPROVED":
                 point = await _stay_to_qdrant_point(entity)
 
-        elif entity_type in ("yummy", "restaurant"):
+        elif entity_type in ("restaurant", "yummy"):
             result = await session.execute(
-                select(Yummy)
-                .where(Yummy.id == entity_id)
-                .options(selectinload(Yummy.images), selectinload(Yummy.hours), selectinload(Yummy.menu))
+                select(Restaurant)
+                .where(Restaurant.id == entity_id)
+                .options(selectinload(Restaurant.images), selectinload(Restaurant.hours), selectinload(Restaurant.menu))
             )
             entity = result.scalar_one_or_none()
             if entity:
-                point = await _yummy_to_qdrant_point(entity)
+                point = await _restaurant_to_qdrant_point(entity)
 
         elif entity_type == "attraction":
             result = await session.execute(select(Attraction).where(Attraction.id == entity_id))
