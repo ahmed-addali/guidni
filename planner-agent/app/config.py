@@ -40,6 +40,7 @@ class _EnvSettings:
             "RAG_QDRANT_TIMEOUT": "10",
             "RAG_ENABLE_RERANKING": "false",
             "RAG_ENABLE_HYBRID_SEARCH": "false",
+            "VECTOR_ENGINE": "pgvector",
         }
         value = os.environ.get(name, defaults.get(name, ""))
 

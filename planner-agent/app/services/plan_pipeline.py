@@ -287,51 +287,51 @@ async def _gather_context(request: PlanRequest) -> PlanningContext:
 
     logger.debug("Weather constraints: %s", weather_constraints)
 
-    # Retrieval is strictly filtered by Qdrant (price/city/entity_type/tags).
-    logger.info("Executing concurrent RAG queries for activities, restaurants, stays, and attractions...")
-    activities_task = rag_query(
-        query=" ".join(request.interests) or "travel activities",
-        entity_types=["activity"],
-        region=request.region,
-        city=request.region,
-        max_price=budget["budget_per_activity"],
-        tags=tags,
-        top_k=max(10, request.num_days * 4),
-    )
-    restaurants_task = rag_query(
-        query=f"restaurants food dining {request.region}",
-        entity_types=["restaurant"],
-        city=request.region,
-        max_price=budget["meal_budget"],
-        tags=tags,
-        top_k=max(8, request.num_days * 3),
-    )
-    stays_task = rag_query(
-        query=f"{request.accommodation_type} accommodation {request.region}",
-        entity_types=["stay"],
-        region=request.region,
-        city=request.region,
-        max_price=budget["budget_per_night"],
-        tags=tags,
-        top_k=6,
-    )
-    attractions_task = rag_query(
-        query=f"attractions sightseeing {request.region}",
-        entity_types=["attraction"],
-        region=request.region,
-        city=request.region,
-        tags=tags,
-        top_k=max(6, request.num_days * 2),
-    )
-    profile_task = _fetch_user_profile(request.user_id)
+    # Retrieval is filtered by the configured vector engine (Qdrant or pgvector).
+    logger.info("Executing RAG queries for activities, restaurants, stays, and attractions...")
+    profile_task = asyncio.create_task(_fetch_user_profile(request.user_id))
 
-    activities, restaurants, stays, attractions, profile = await asyncio.gather(
-        activities_task,
-        restaurants_task,
-        stays_task,
-        attractions_task,
-        profile_task,
-    )
+    async with async_session() as session:
+        activities = await rag_query(
+            query=" ".join(request.interests) or "travel activities",
+            entity_types=["activity"],
+            region=request.region,
+            city=request.region,
+            max_price=budget["budget_per_activity"],
+            tags=tags,
+            top_k=max(10, request.num_days * 4),
+            session=session,
+        )
+        restaurants = await rag_query(
+            query=f"restaurants food dining {request.region}",
+            entity_types=["restaurant"],
+            city=request.region,
+            max_price=budget["meal_budget"],
+            tags=tags,
+            top_k=max(8, request.num_days * 3),
+            session=session,
+        )
+        stays = await rag_query(
+            query=f"{request.accommodation_type} accommodation {request.region}",
+            entity_types=["stay"],
+            region=request.region,
+            city=request.region,
+            max_price=budget["budget_per_night"],
+            tags=tags,
+            top_k=6,
+            session=session,
+        )
+        attractions = await rag_query(
+            query=f"attractions sightseeing {request.region}",
+            entity_types=["attraction"],
+            region=request.region,
+            city=request.region,
+            tags=tags,
+            top_k=max(6, request.num_days * 2),
+            session=session,
+        )
+
+    profile = await profile_task
 
     if not activities and not attractions:
         logger.warning("No activity/attraction candidates returned from RAG for region=%s", request.region)
