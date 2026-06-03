@@ -14,6 +14,7 @@ import { HomeAttractionsSection } from "@/components/home/HomeAttractionsSection
 import { HomeGuidesSection } from "@/components/home/HomeGuidesSection";
 import { AIPlannerSection } from "@/components/home/AIPlannerSection";
 import { BecomeAgentSection } from "@/components/home/BecomeAgentSection";
+import { RecommendationsSection } from "@/components/home/RecommendationsSection";
 import { TrustStrip } from "@/components/home/TrustStrip";
 import { InfoSection } from "@/components/home/InfoSection";
 import { getDestinations } from "@/lib/actions/destinations";
@@ -41,6 +42,8 @@ export default async function HomePage({ params }: { params: Params }) {
       )}
 
       <div className="divide-y divide-gray-100">
+        <RecommendationsSection locale={locale} />
+        
         <Suspense fallback={<SectionSkeleton />}>
           <ActivitiesSection locale={locale} />
         </Suspense>

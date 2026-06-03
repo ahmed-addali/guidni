@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { StayCard } from "@/components/stays/StayCard";
 import type { StayListItem } from "@/types/stay";
 
@@ -7,8 +8,10 @@ type Props = {
   locale: string;
 };
 
-export function StayRelatedSection({ stays, label, locale }: Props) {
+export async function StayRelatedSection({ stays, label, locale }: Props) {
   if (stays.length === 0) return null;
+
+  const t = await getTranslations({ locale, namespace: "StaysPage" });
 
   return (
     <div>
@@ -19,6 +22,8 @@ export function StayRelatedSection({ stays, label, locale }: Props) {
             key={stay.id}
             stay={stay}
             locale={locale}
+            perNight={t("perNight")}
+            currency={t("currency")}
           />
         ))}
       </div>

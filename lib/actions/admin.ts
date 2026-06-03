@@ -1,6 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { cache } from "react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -198,13 +199,14 @@ export const getAdminActivities = cache(async () => {
   await requireAdmin();
 
   return prisma.activity.findMany({
-    orderBy: { title: "asc" },
+    orderBy: { id: "desc" },
     select: {
       id: true,
       title: true,
       slug: true,
-      category: true,
+      categories: true,
       price: true,
+      status: true,
       featuredInHome: true,
       destination: { select: { city: true } },
       businessProfile: { select: { name: true } },
@@ -219,18 +221,37 @@ export async function toggleActivityFeatured(id: string, featured: boolean) {
   return { success: true };
 }
 
+export async function adminUpdateActivityStatus(
+  activityId: string,
+  status: "ACTIVE" | "SUSPENDED" | "DRAFT"
+) {
+  await requireAdmin();
+
+  await prisma.activity.update({
+    where: { id: activityId },
+    data: {
+      status,
+      ...(status === "ACTIVE" ? { publishedAt: new Date() } : {}),
+    },
+  });
+
+  return { success: true as const };
+}
+
 export const getAdminStays = cache(async () => {
   await requireAdmin();
 
   return prisma.stay.findMany({
-    orderBy: { title: "asc" },
+    orderBy: { id: "desc" },
     select: {
       id: true,
       title: true,
       slug: true,
       propertyType: true,
       price: true,
+      approvalStatus: true,
       featuredInHome: true,
+      createdAt: true,
       destination: { select: { city: true } },
       businessProfile: { select: { name: true } },
     },
@@ -241,7 +262,69 @@ export async function toggleStayFeatured(id: string, featured: boolean) {
   await requireAdmin();
 
   await prisma.stay.update({ where: { id }, data: { featuredInHome: featured } });
-  return { success: true };
+  return { success: true as const };
+}
+
+export async function adminUpdateStayStatus(
+  stayId: string,
+  status: "APPROVED" | "SUSPENDED" | "DRAFT"
+) {
+  await requireAdmin();
+
+  await prisma.stay.update({
+    where: { id: stayId },
+    data: { approvalStatus: status },
+  });
+
+  revalidatePath("/");
+  return { success: true as const };
+}
+
+// ─────────────────────────────────────────
+// Admin — Restaurants
+// ─────────────────────────────────────────
+
+export const getAdminRestaurants = cache(async () => {
+  await requireAdmin();
+
+  return prisma.restaurant.findMany({
+    orderBy: { id: "desc" },
+    select: {
+      id:             true,
+      name:           true,
+      slug:           true,
+      type:           true,
+      approvalStatus: true,
+      featuredInHome: true,
+      reservationsEnabled: true,
+      createdAt:      true,
+      destination:    { select: { city: true } },
+      businessProfile: { select: { name: true } },
+    },
+  });
+});
+
+export async function toggleRestaurantFeatured(id: string, featured: boolean) {
+  await requireAdmin();
+
+  await prisma.restaurant.update({ where: { id }, data: { featuredInHome: featured } });
+  revalidatePath("/");
+  return { success: true as const };
+}
+
+export async function adminUpdateRestaurantStatus(
+  restaurantId: string,
+  status: "APPROVED" | "SUSPENDED" | "DRAFT"
+) {
+  await requireAdmin();
+
+  await prisma.restaurant.update({
+    where: { id: restaurantId },
+    data: { approvalStatus: status },
+  });
+
+  revalidatePath("/");
+  return { success: true as const };
 }
 
 // ─────────────────────────────────────────
@@ -308,6 +391,7 @@ export const getAdminDestinations = cache(async () => {
   return prisma.destination.findMany({
     orderBy: { city: "asc" },
     include: {
+      images: { select: { url: true }, take: 1 },
       _count: { select: { activities: true, stays: true } },
     },
   });

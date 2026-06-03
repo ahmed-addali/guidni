@@ -4,7 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { TbCar } from "react-icons/tb";
 import { FiMapPin, FiStar } from "react-icons/fi";
 import { Separator } from "@/components/ui/separator";
-import { getRentalBySlug, getRelatedRentals } from "@/lib/actions/rentals";
+import { getRentalBySlug, getRelatedRentals, getPublicRentalUnavailableDates } from "@/lib/actions/rentals";
+import { PLATFORM_CURRENCY } from "@/lib/utils/constants";
 import { getReviews, hasReviewed, hasCompletedBooking } from "@/lib/actions/reviews";
 import { isInWishlist } from "@/lib/actions/wishlist";
 import { getManualBadges, getGuidniReview } from "@/lib/actions/badges";
@@ -17,6 +18,8 @@ import { ReviewsSection } from "@/components/activities/ReviewsSection";
 import { RatingSummary } from "@/components/shared/RatingSummary";
 import { DescriptionWithToggle } from "@/components/shared/DescriptionWithToggle";
 import { ImageGallery } from "@/components/shared/ImageGallery";
+import { DetailPageTracker } from "@/components/shared/DetailPageTracker";
+import { RelationType } from "@prisma/client";
 import { RentalAnchorNav } from "./_components/RentalAnchorNav";
 import { RentalMobileBar } from "./_components/RentalMobileBar";
 import { RentalBookingWidget } from "./_components/RentalBookingWidget";
@@ -47,17 +50,18 @@ export default async function RentalDetailPage({ params }: { params: Params }) {
   ]);
   if (!rental) notFound();
 
-  const [reviews, alreadyReviewed, completedBooking, wishlisted, manualBadges, guidniReview, relatedRentals] =
+  const [reviews, alreadyReviewed, completedBooking, wishlisted, manualBadges, guidniReview, relatedRentals, unavailableDates] =
     await Promise.all([
-      getReviews(rental.id, "RENTAL"),
+      getReviews(rental.id, RelationType.RENTAL),
       hasReviewed(rental.id, "RENTAL"),
       hasCompletedBooking(rental.id, "RENTAL"),
       isInWishlist(rental.id, "RENTAL"),
-      getManualBadges(rental.id, "RENTAL"),
-      getGuidniReview(rental.id, "RENTAL"),
+      getManualBadges(rental.id, RelationType.RENTAL),
+      getGuidniReview(rental.id, RelationType.RENTAL),
       rental.destinationId
         ? getRelatedRentals(rental.id, rental.destinationId)
         : Promise.resolve([]),
+      getPublicRentalUnavailableDates(rental.id),
     ]);
 
   const canReview = completedBooking && !alreadyReviewed;
@@ -68,11 +72,15 @@ export default async function RentalDetailPage({ params }: { params: Params }) {
   const averageRating = rental.note ? parseFloat(rental.note) : null;
 
   const TYPE_LABELS: Record<string, string> = {
-    CAR:     t("rental.typeCar"),
-    BIKE:    t("rental.typeBike"),
-    SCOOTER: t("rental.typeScooter"),
-    BOAT:    t("rental.typeBoat"),
-    OTHER:   t("rental.typeOther"),
+    CAR:       t("rental.typeCar"),
+    MOTORBIKE: t("rental.typeMotorbike"),
+    SCOOTER:   t("rental.typeScooter"),
+    BICYCLE:   t("rental.typeBicycle"),
+    BOAT:      t("rental.typeBoat"),
+    QUAD:      t("rental.typeQuad"),
+    BUGGY:     t("rental.typeBuggy"),
+    JET_SKI:   t("rental.typeJetSki"),
+    OTHER:     t("rental.typeOther"),
   };
 
   const features = [
@@ -113,6 +121,9 @@ export default async function RentalDetailPage({ params }: { params: Params }) {
     doneMessage:      t("rental.widget.doneMessage"),
     pickDateErr:      t("rental.widget.pickDateErr"),
     minDaysErr:       t.raw("rental.widget.minDaysErr") as string,
+    unavailableRange: t("rental.widget.unavailableRange"),
+    viewBooking:      t("rental.widget.viewBooking"),
+    bookAgain:        t("rental.widget.bookAgain"),
   };
 
   const hasHighlights = rental.hasAC || rental.hasGPS || rental.hasInsurance ||
@@ -120,6 +131,7 @@ export default async function RentalDetailPage({ params }: { params: Params }) {
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-20 py-8 pb-16 lg:pb-16">
+      <DetailPageTracker listingId={rental.id} listingType="RENTAL" />
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-sm text-gray-400 mb-5">
@@ -187,6 +199,8 @@ export default async function RentalDetailPage({ params }: { params: Params }) {
           title={rental.title}
           allPhotosLabel={t("rental.allPhotos")}
           photosLabel={t("rental.photos")}
+          listingId={rental.id}
+          listingType="RENTAL"
         />
       ) : (
         <div className="h-72 sm:h-96 bg-gray-100 rounded-2xl flex items-center justify-center mb-2">
@@ -299,6 +313,7 @@ export default async function RentalDetailPage({ params }: { params: Params }) {
             rentalId={rental.id}
             pricePerDay={rental.pricePerDay}
             minDays={rental.minDays}
+            unavailableDates={unavailableDates}
             labels={widgetLabels}
           />
 
@@ -306,12 +321,12 @@ export default async function RentalDetailPage({ params }: { params: Params }) {
           <div className="mt-4 bg-white border border-gray-100 rounded-2xl p-5 space-y-3 text-sm">
             <div className="flex justify-between text-gray-600">
               <span>{t("rental.pricePerDay")}</span>
-              <span className="font-semibold text-gray-900">{rental.pricePerDay} TND</span>
+              <span className="font-semibold text-gray-900">{rental.pricePerDay} {PLATFORM_CURRENCY}</span>
             </div>
             {rental.pricePerHour && (
               <div className="flex justify-between text-gray-600">
                 <span>{t("rental.pricePerHour")}</span>
-                <span className="font-semibold text-gray-900">{rental.pricePerHour} TND</span>
+                <span className="font-semibold text-gray-900">{rental.pricePerHour} {PLATFORM_CURRENCY}</span>
               </div>
             )}
             <div className="flex justify-between text-gray-600">

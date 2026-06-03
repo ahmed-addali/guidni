@@ -2,9 +2,7 @@
 
 import { cache } from "react";
 import { prisma } from "@/lib/db";
-import type { BadgeKey, Prisma } from "@prisma/client";
-
-type RelationType = Prisma.ListingBadgeCreateInput["relationType"];
+import type { RelationType, BadgeKey } from "@prisma/client";
 
 export type BadgeKeyValue = BadgeKey;
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { prisma } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
@@ -26,8 +27,23 @@ import { ActivityMobileBookingBar } from "./_components/ActivityMobileBookingBar
 import { ActivityHostStrip } from "./_components/ActivityHostStrip";
 import { ActivityRelatedSection } from "./_components/ActivityRelatedSection";
 import { DescriptionWithToggle } from "@/components/shared/DescriptionWithToggle";
+import { DetailPageTracker } from "@/components/shared/DetailPageTracker";
+import { RelationType } from "@prisma/client";
 
 type Params = Promise<{ locale: string; activitySlug: string }>;
+
+export const revalidate = 3600; // ISR — revalidate every hour
+
+export async function generateStaticParams() {
+  const activities = await prisma.activity.findMany({
+    where:  { status: "ACTIVE" },
+    select: { slug: true },
+  });
+  const locales = ["en", "fr", "ar"];
+  return activities.flatMap((a: { slug: string }) =>
+    locales.map((locale) => ({ locale, activitySlug: a.slug }))
+  );
+}
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { activitySlug, locale } = await params;
@@ -56,11 +72,11 @@ export default async function ActivityPage({ params }: { params: Params }) {
   if (!activity) notFound();
 
   const [reviews, completedBooking, alreadyReviewed, manualBadges, guidniReview, relatedActivities] = await Promise.all([
-    getReviews(activity.id, "ACTIVITY"),
+    getReviews(activity.id, RelationType.ACTIVITY),
     hasCompletedBooking(activity.id, "ACTIVITY"),
     hasReviewed(activity.id, "ACTIVITY"),
-    getManualBadges(activity.id, "ACTIVITY"),
-    getGuidniReview(activity.id, "ACTIVITY"),
+    getManualBadges(activity.id, RelationType.ACTIVITY),
+    getGuidniReview(activity.id, RelationType.ACTIVITY),
     activity.destinationId
       ? getRelatedActivities(activity.id, activity.destinationId)
       : Promise.resolve([]),
@@ -87,7 +103,50 @@ export default async function ActivityPage({ params }: { params: Params }) {
   const hasPassDeals =
     activity.fixedInPasses.length > 0 || activity.optionalInPasses.length > 0;
 
+  // ── JSON-LD structured data ───────────────────────────────────────────────
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TouristAttraction",
+    name: title,
+    description: description.slice(0, 300),
+    url: `${process.env.NEXT_PUBLIC_APP_URL}/${locale}/activities/${activitySlug}`,
+    image: activity.images.map((img) => img.url),
+    ...(activity.city && {
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: activity.city,
+        addressRegion:   activity.region,
+        addressCountry:  activity.country,
+      },
+    }),
+    ...(averageRating && activity.nbReviews > 0 && {
+      aggregateRating: {
+        "@type":       "AggregateRating",
+        ratingValue:   averageRating.toFixed(1),
+        reviewCount:   activity.nbReviews,
+        bestRating:    5,
+        worstRating:   1,
+      },
+    }),
+    offers: {
+      "@type":         "Offer",
+      price:           activity.price,
+      priceCurrency:   "TND",
+      availability:    "https://schema.org/InStock",
+      url:             `${process.env.NEXT_PUBLIC_APP_URL}/${locale}/activities/${activitySlug}`,
+    },
+    provider: {
+      "@type": "Organization",
+      name:    activity.businessProfile.name,
+    },
+  };
+
   return (
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
     <div className="max-w-screen-xl mx-auto px-4 md:px-20 py-8 pb-16 lg:pb-16">
 
       {/* ── Breadcrumb ── */}
@@ -155,12 +214,17 @@ export default async function ActivityPage({ params }: { params: Params }) {
         </div>
       </div>
 
+      {/* ── Recommendation tracking (dwell time) ── */}
+      <DetailPageTracker listingId={activity.id} listingType="ACTIVITY" />
+
       {/* ── Gallery ── */}
       <ImageGallery
         images={activity.images}
         title={title}
         allPhotosLabel={t("allPhotos")}
         photosLabel={t("photos")}
+        listingId={activity.id}
+        listingType="ACTIVITY"
       />
 
       {/* ── Anchor navigation ── */}
@@ -184,7 +248,7 @@ export default async function ActivityPage({ params }: { params: Params }) {
 
           {/* Quick facts */}
           <ActivityQuickFacts
-            category={activity.category}
+            category={activity.categories[0] ?? ""}
             duration={activity.duration}
             capacity={activity.capacity}
             guide={activity.guide}
@@ -442,5 +506,6 @@ export default async function ActivityPage({ params }: { params: Params }) {
       />
 
     </div>
+    </>
   );
 }

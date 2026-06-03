@@ -8,7 +8,8 @@ import {
   CarouselPrevious,
   CarouselNext,
 } from "@/components/ui/carousel";
-import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
+import { RestaurantCard, type RestaurantCardLabels } from "@/components/restaurants/RestaurantCard";
+import { TrackedCard } from "@/components/shared/TrackedCard";
 import type { RestaurantListItem } from "@/lib/actions/restaurants";
 import type { BadgeKey } from "@prisma/client";
 
@@ -16,9 +17,10 @@ interface Props {
   restaurants: RestaurantListItem[];
   locale: string;
   badgesMap?: Record<string, BadgeKey[]>;
+  cardLabels?: RestaurantCardLabels;
 }
 
-export function RestaurantsCarousel({ restaurants, locale, badgesMap = {} }: Props) {
+export function RestaurantsCarousel({ restaurants, locale, badgesMap = {}, cardLabels }: Props) {
   return (
     <Carousel
       opts={{ align: "start", loop: true }}
@@ -28,7 +30,9 @@ export function RestaurantsCarousel({ restaurants, locale, badgesMap = {} }: Pro
       <CarouselContent className="-ml-4" viewportClassName="overflow-visible sm:overflow-hidden">
         {restaurants.map((r) => (
           <CarouselItem key={r.id} className="pl-4 basis-[85%] sm:basis-1/2 lg:basis-1/3">
-            <RestaurantCard restaurant={r} locale={locale} badges={badgesMap[r.id]} />
+            <TrackedCard listingId={r.id} listingType="RESTAURANT">
+              <RestaurantCard restaurant={r} locale={locale} badges={badgesMap[r.id]} cardLabels={cardLabels} />
+            </TrackedCard>
           </CarouselItem>
         ))}
       </CarouselContent>

@@ -41,9 +41,9 @@ export async function DestinationsGrid() {
               href={`/${locale}/activities?destination=${dest.slug}`}
               className="group relative rounded-xl overflow-hidden aspect-[4/3] cursor-pointer"
             >
-              {dest.coverImage ? (
+              {dest.images?.[0]?.url ? (
                 <img
-                  src={dest.coverImage}
+                  src={dest.images[0].url}
                   alt={dest.city}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />

@@ -3,9 +3,11 @@
 import { useState, useTransition } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { FiPlus, FiTrash2, FiEdit2, FiX, FiCheck } from "react-icons/fi";
 import { UtensilsCrossed } from "lucide-react";
 import { addMenuItem, deleteMenuItem, updateMenuItem } from "@/lib/actions/partner-restaurants";
+import { ImageUploader } from "@/components/upload/ImageUploader";
 
 type MenuItem = {
   id:          string;
@@ -26,6 +28,7 @@ function AddMenuItemForm({
   restaurantId: string;
   onAdded: (item: MenuItem) => void;
 }) {
+  const t = useTranslations("PartnerDashboard.editRestaurant.menu");
   const [open, setOpen]     = useState(false);
   const [pending, start]    = useTransition();
   const [form, setForm]     = useState({ name: "", description: "", price: 0, category: "", visible: true });
@@ -35,12 +38,12 @@ function AddMenuItemForm({
     start(async () => {
       const res = await addMenuItem(restaurantId, form);
       if (res.success && res.item) {
-        toast.success("Menu item added");
+        toast.success(t("addSuccess"));
         onAdded(res.item as MenuItem);
         setForm({ name: "", description: "", price: 0, category: "", visible: true });
         setOpen(false);
       } else {
-        toast.error((res as any).error ?? "Failed to add item");
+        toast.error((res as any).error ?? t("addFailed"));
       }
     });
   }
@@ -53,7 +56,7 @@ function AddMenuItemForm({
         className="flex items-center gap-2 text-sm text-primary border border-primary/30 bg-primary/5 rounded-xl px-4 py-2.5 hover:bg-primary/10 transition-colors font-medium"
       >
         <FiPlus className="h-4 w-4" />
-        Add menu item
+        {t("addButton")}
       </button>
     );
   }
@@ -61,43 +64,43 @@ function AddMenuItemForm({
   return (
     <form onSubmit={handleSubmit} className="border border-gray-200 rounded-2xl p-5 space-y-4 bg-gray-50">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-700">New menu item</h3>
+        <h3 className="text-sm font-semibold text-gray-700">{t("newItemTitle")}</h3>
         <button type="button" onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-700">
           <FiX className="h-4 w-4" />
         </button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-gray-600">Name *</label>
+          <label className="text-xs font-medium text-gray-600">{t("nameLabel")}</label>
           <input required value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} className={inputCls} />
         </div>
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-gray-600">Category</label>
-          <input value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))} placeholder="e.g. Starters" className={inputCls} />
+          <label className="text-xs font-medium text-gray-600">{t("categoryLabel")}</label>
+          <input value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))} placeholder={t("categoryPlaceholder")} className={inputCls} />
         </div>
         <div className="sm:col-span-2 space-y-1.5">
-          <label className="text-xs font-medium text-gray-600">Description *</label>
+          <label className="text-xs font-medium text-gray-600">{t("descriptionLabel")}</label>
           <textarea required value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} rows={2} className={`${inputCls} resize-none`} />
         </div>
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-gray-600">Price (TND) *</label>
+          <label className="text-xs font-medium text-gray-600">{t("priceLabel")}</label>
           <input required type="number" min={0} value={form.price} onChange={(e) => setForm((p) => ({ ...p, price: parseInt(e.target.value) || 0 }))} className={inputCls} />
         </div>
         <div className="flex items-end pb-1">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={form.visible} onChange={(e) => setForm((p) => ({ ...p, visible: e.target.checked }))}
               className="h-4 w-4 rounded border-gray-300" />
-            <span className="text-sm text-gray-600">Visible to guests</span>
+            <span className="text-sm text-gray-600">{t("visibleLabel")}</span>
           </label>
         </div>
       </div>
       <div className="flex justify-end gap-3">
         <button type="button" onClick={() => setOpen(false)} className="text-sm text-gray-500 border border-gray-200 rounded-xl px-4 py-2 hover:border-gray-400 transition-colors">
-          Cancel
+          {t("cancel")}
         </button>
         <button type="submit" disabled={pending} className="flex items-center gap-2 text-sm bg-primary text-white rounded-xl px-5 py-2 hover:bg-primary/90 transition-colors disabled:opacity-50">
           <FiCheck className="h-4 w-4" />
-          {pending ? "Adding…" : "Add item"}
+          {pending ? t("adding") : t("addItem")}
         </button>
       </div>
     </form>
@@ -113,6 +116,7 @@ function EditMenuItemForm({
   onSaved:  () => void;
   onCancel: () => void;
 }) {
+  const t = useTranslations("PartnerDashboard.editRestaurant.menu");
   const [pending, start] = useTransition();
   const [form, setForm]  = useState({
     name:        item.name,
@@ -127,10 +131,10 @@ function EditMenuItemForm({
     start(async () => {
       const res = await updateMenuItem(item.id, form);
       if (res.success) {
-        toast.success("Item updated");
+        toast.success(t("updateSuccess"));
         onSaved();
       } else {
-        toast.error((res as any).error ?? "Failed to update");
+        toast.error((res as any).error ?? t("updateFailed"));
       }
     });
   }
@@ -138,36 +142,46 @@ function EditMenuItemForm({
   return (
     <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-gray-600">Name *</label>
+        <label className="text-xs font-medium text-gray-600">{t("nameLabel")}</label>
         <input required value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} className={inputCls} />
       </div>
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-gray-600">Category</label>
+        <label className="text-xs font-medium text-gray-600">{t("categoryLabel")}</label>
         <input value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))} className={inputCls} />
       </div>
       <div className="sm:col-span-2 space-y-1.5">
-        <label className="text-xs font-medium text-gray-600">Description *</label>
+        <label className="text-xs font-medium text-gray-600">{t("descriptionLabel")}</label>
         <textarea required value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} rows={2} className={`${inputCls} resize-none`} />
       </div>
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-gray-600">Price (TND)</label>
+        <label className="text-xs font-medium text-gray-600">{t("priceEditLabel")}</label>
         <input type="number" min={0} value={form.price} onChange={(e) => setForm((p) => ({ ...p, price: parseInt(e.target.value) || 0 }))} className={inputCls} />
       </div>
       <div className="flex items-end pb-1">
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" checked={form.visible} onChange={(e) => setForm((p) => ({ ...p, visible: e.target.checked }))}
             className="h-4 w-4 rounded border-gray-300" />
-          <span className="text-sm text-gray-600">Visible</span>
+          <span className="text-sm text-gray-600">{t("visibleShort")}</span>
         </label>
       </div>
       <div className="sm:col-span-2 flex justify-end gap-3">
         <button type="button" onClick={onCancel} className="text-sm text-gray-500 border border-gray-200 rounded-xl px-4 py-2 hover:border-gray-400 transition-colors">
-          Cancel
+          {t("cancel")}
         </button>
         <button type="submit" disabled={pending} className="flex items-center gap-2 text-sm bg-primary text-white rounded-xl px-5 py-2 hover:bg-primary/90 transition-colors disabled:opacity-50">
           <FiCheck className="h-4 w-4" />
-          {pending ? "Saving…" : "Save"}
+          {pending ? t("savingItem") : t("save")}
         </button>
+      </div>
+      {/* Image upload */}
+      <div className="sm:col-span-2 pt-1">
+        <p className="text-xs font-medium text-gray-600 mb-2">{t("imageLabel")}</p>
+        <ImageUploader
+          entity="menu-item"
+          entityId={item.id}
+          images={item.images}
+          maxImages={1}
+        />
       </div>
     </form>
   );
@@ -180,6 +194,7 @@ export function MenuTab({
   restaurantId: string;
   menu: MenuItem[];
 }) {
+  const t = useTranslations("PartnerDashboard.editRestaurant.menu");
   const [menu, setMenu]       = useState<MenuItem[]>(initialMenu);
   const [editing, setEditing] = useState<string | null>(null);
   const [deleting, setDel]    = useState<string | null>(null);
@@ -190,15 +205,15 @@ export function MenuTab({
   }
 
   function handleDelete(id: string) {
-    if (!confirm("Delete this menu item?")) return;
+    if (!confirm(t("deleteConfirm"))) return;
     setDel(id);
     start(async () => {
       const res = await deleteMenuItem(id);
       if (res.success) {
-        toast.success("Item deleted");
+        toast.success(t("deleteSuccess"));
         setMenu((p) => p.filter((i) => i.id !== id));
       } else {
-        toast.error((res as any).error ?? "Failed to delete");
+        toast.error((res as any).error ?? t("deleteFailed"));
       }
       setDel(null);
     });
@@ -206,25 +221,27 @@ export function MenuTab({
 
   // Group by category
   const grouped = menu.reduce<Record<string, MenuItem[]>>((acc, item) => {
-    const key = item.category ?? "Uncategorized";
+    const key = item.category ?? t("uncategorized");
     if (!acc[key]) acc[key] = [];
     acc[key].push(item);
     return acc;
   }, {});
 
+  const itemCountKey = menu.length === 1 ? "itemCountSingle" : "itemCountPlural";
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-semibold text-gray-800">Menu items</h2>
-          <p className="text-xs text-gray-400 mt-0.5">{menu.length} item{menu.length === 1 ? "" : "s"}</p>
+          <h2 className="text-base font-semibold text-gray-800">{t("heading")}</h2>
+          <p className="text-xs text-gray-400 mt-0.5">{t(itemCountKey, { count: menu.length })}</p>
         </div>
       </div>
 
       {menu.length === 0 ? (
         <div className="border-2 border-dashed border-gray-200 rounded-2xl py-14 flex flex-col items-center justify-center gap-3 text-gray-400">
           <UtensilsCrossed className="h-8 w-8" />
-          <p className="text-sm">No menu items yet.</p>
+          <p className="text-sm">{t("empty")}</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -251,7 +268,9 @@ export function MenuTab({
                         <div className="flex items-center gap-2 flex-wrap">
                           <h4 className="font-semibold text-gray-800 text-sm">{item.name}</h4>
                           {!item.visible && (
-                            <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">Hidden</span>
+                            <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                              {t("hidden")}
+                            </span>
                           )}
                         </div>
                         <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{item.description}</p>
@@ -283,10 +302,7 @@ export function MenuTab({
                     {editing === item.id && (
                       <EditMenuItemForm
                         item={item}
-                        onSaved={() => {
-                          setEditing(null);
-                          // Optimistic: the revalidation will refetch on next navigation
-                        }}
+                        onSaved={() => setEditing(null)}
                         onCancel={() => setEditing(null)}
                       />
                     )}

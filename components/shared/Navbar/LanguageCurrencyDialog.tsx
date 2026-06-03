@@ -49,6 +49,7 @@ export function LanguageCurrencyDialog() {
   function handleSave() {
     startTransition(() => {
       localStorage.setItem("currency", selectedCurrency);
+      window.dispatchEvent(new Event("currencyChange"));
       if (selectedLang !== locale) {
         const pathWithoutLocale = pathname.replace(`/${locale}`, "") || "/";
         router.replace(`/${selectedLang}${pathWithoutLocale}`);

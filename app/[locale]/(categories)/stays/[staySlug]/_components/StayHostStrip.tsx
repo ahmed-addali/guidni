@@ -1,4 +1,4 @@
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, Zap, Clock } from "lucide-react";
 
 type Props = {
   hostName: string;
@@ -6,10 +6,13 @@ type Props = {
   profileImage?: string | null;
   isVerified: boolean;
   memberSince: string;
+  responseTime?: "quickly" | "within_day" | null;
   labels: {
     hostedBy: string;
     speaks: string;
     memberSince: string;
+    respondsQuickly?: string;
+    respondsWithinDay?: string;
   };
 };
 
@@ -19,6 +22,7 @@ export function StayHostStrip({
   profileImage,
   isVerified,
   memberSince,
+  responseTime,
   labels,
 }: Props) {
   const initials = hostName
@@ -62,6 +66,18 @@ export function StayHostStrip({
           <p className="text-xs text-gray-400 mt-1">
             {labels.speaks}: {langs}
           </p>
+        )}
+        {responseTime === "quickly" && labels.respondsQuickly && (
+          <div className="flex items-center gap-1 mt-1.5">
+            <Zap className="h-3 w-3 text-green-500 shrink-0" />
+            <span className="text-xs text-green-600 font-medium">{labels.respondsQuickly}</span>
+          </div>
+        )}
+        {responseTime === "within_day" && labels.respondsWithinDay && (
+          <div className="flex items-center gap-1 mt-1.5">
+            <Clock className="h-3 w-3 text-blue-500 shrink-0" />
+            <span className="text-xs text-blue-600 font-medium">{labels.respondsWithinDay}</span>
+          </div>
         )}
       </div>
     </div>

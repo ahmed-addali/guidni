@@ -3,7 +3,9 @@
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { FiCalendar, FiUser, FiMapPin } from "react-icons/fi";
+import { useLocale } from "next-intl";
 import { updateTransferReservationStatus } from "@/lib/actions/transfer-reservations";
+import { PLATFORM_CURRENCY } from "@/lib/utils/constants";
 import type { BookingStatus } from "@prisma/client";
 
 interface Reservation {
@@ -40,9 +42,14 @@ const STATUS_BADGE: Record<BookingStatus, string> = {
 };
 
 export function ReservationsTab({ initialReservations }: { initialReservations: Reservation[] }) {
+  const locale                          = useLocale();
   const [reservations, setReservations] = useState(initialReservations);
   const [filter, setFilter]             = useState<BookingStatus | "ALL">("ALL");
   const [pending, start]                = useTransition();
+
+  function fmtDate(d: Date | string) {
+    return new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" }).format(new Date(d));
+  }
 
   const visible = filter === "ALL" ? reservations : reservations.filter((r) => r.status === filter);
 
@@ -59,7 +66,7 @@ export function ReservationsTab({ initialReservations }: { initialReservations: 
   }
 
   return (
-    <div className="space-y-5">
+    <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
       {/* Filter pills */}
       <div className="flex flex-wrap gap-2">
         {STATUS_FILTERS.map(({ value, label }) => (
@@ -108,12 +115,12 @@ export function ReservationsTab({ initialReservations }: { initialReservations: 
               <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                 <span className="flex items-center gap-1.5">
                   <FiCalendar className="h-3.5 w-3.5 text-gray-400" />
-                  {new Date(r.date).toLocaleDateString()} at {r.time}
+                  {fmtDate(r.date)} at {r.time}
                 </span>
                 <span>{r.passengers} passenger{r.passengers !== 1 ? "s" : ""}</span>
                 {r.hoursRequested && <span>{r.hoursRequested} hr{r.hoursRequested !== 1 ? "s" : ""}</span>}
                 {r.flightNumber && <span>✈ {r.flightNumber}</span>}
-                <span className="font-semibold text-gray-900">{r.totalPrice.toString()} TND</span>
+                <span className="font-semibold text-gray-900">{r.totalPrice.toString()} {PLATFORM_CURRENCY}</span>
               </div>
 
               <div className="flex flex-wrap gap-3 text-xs text-gray-500">

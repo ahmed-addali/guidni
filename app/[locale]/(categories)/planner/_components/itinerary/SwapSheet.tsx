@@ -4,16 +4,41 @@ import Image from "next/image";
 import { X, RefreshCw, Star } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { getSwapAlternatives } from "@/lib/actions/planner";
-import type { PlanItem, PlanSlot, UserPreferences } from "@/lib/planner/types";
+import type { PlanItem, PlanBlock, UserPreferences } from "@/lib/planner/types";
 
 type Props = {
-  slot: PlanSlot | null;
+  slot: PlanBlock | null;
   preferences: UserPreferences;
   destinationId: string;
   existingItemIds: string[];
-  onSelect: (slot: PlanSlot, replacement: PlanItem) => void;
+  onSelect: (slot: PlanBlock, replacement: PlanItem) => void;
   onClose: () => void;
 };
+
+/* ── Price delta badge ───────────────────────────────────────────────────────── */
+
+function PriceDelta({ current, alternative }: { current: number; alternative: number }) {
+  const delta = alternative - current;
+
+  if (delta === 0) {
+    return (
+      <span className="text-[11px] font-semibold text-gray-400 shrink-0">same price</span>
+    );
+  }
+
+  const sign = delta > 0 ? "+" : "−";
+  const abs  = Math.abs(delta);
+
+  return (
+    <span className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-md shrink-0 ${
+      delta > 0
+        ? "bg-red-50 text-red-600"
+        : "bg-green-50 text-green-600"
+    }`}>
+      {sign} TND {abs}
+    </span>
+  );
+}
 
 export function SwapSheet({
   slot,
@@ -70,7 +95,7 @@ export function SwapSheet({
               Replace &ldquo;{slot.item.name}&rdquo;
             </p>
             <p className="text-xs text-gray-400 mt-0.5">
-              Best alternatives for this {slot.slotType} slot
+              Best alternatives for this {slot.slotType ?? slot.item.type.toLowerCase()} slot
             </p>
           </div>
           <button
@@ -128,7 +153,7 @@ export function SwapSheet({
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
-                    <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-400">
+                    <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-400 flex-wrap">
                       {item.rating && (
                         <span className="flex items-center gap-0.5">
                           <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
@@ -143,8 +168,8 @@ export function SwapSheet({
                     </div>
                   </div>
 
-                  {/* Select indicator */}
-                  <div className="text-xs text-primary font-medium shrink-0">Select</div>
+                  {/* Price delta vs current item */}
+                  <PriceDelta current={slot.item.price} alternative={item.price} />
                 </button>
               ))}
             </div>

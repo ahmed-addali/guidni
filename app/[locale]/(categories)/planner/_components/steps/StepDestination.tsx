@@ -1,7 +1,10 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { MapPin, Calendar, Leaf, Zap, Flame } from "lucide-react";
+import { Leaf, Zap, Flame } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import { DatePickerInput } from "@/components/shared/DatePickerInput";
+import { DestinationInput } from "@/components/shared/DestinationInput";
 import type { TravelStyle, UserPreferences } from "@/lib/planner/types";
 
 type DestinationOption = {
@@ -28,30 +31,24 @@ export function StepDestination({ preferences, destinations, onChange }: Props) 
     { value: "active",   label: t("styleActive"),   desc: t("styleActiveDesc"),   icon: <Flame className="h-5 w-5" /> },
   ];
 
+  // Date value for DatePickerInput
+  const selectedDate = preferences.startDate ? parseISO(preferences.startDate) : undefined;
+
   return (
     <div className="space-y-8">
 
-      {/* Destination */}
+      {/* Destination — country + city */}
       <div className="space-y-3">
         <label className="block text-sm font-semibold text-gray-700">{t("whereGoing")}</label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {destinations.map((dest) => {
-            const active = preferences.destinationId === dest.id;
-            return (
-              <button
-                key={dest.id}
-                type="button"
-                onClick={() => onChange({ destinationId: dest.id, destinationName: `${dest.city}, ${dest.country}`, destinationCity: dest.city })}
-                className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-medium transition-colors ${
-                  active ? "bg-primary text-white border-primary" : "bg-white border-gray-200 text-gray-700 hover:border-primary/40 hover:bg-gray-50"
-                }`}
-              >
-                <MapPin className="h-4 w-4 shrink-0" />
-                <span className="truncate">{dest.city}</span>
-              </button>
-            );
+        <DestinationInput
+          destinations={destinations}
+          value={preferences.destinationId}
+          onChange={(opt) => onChange({
+            destinationId:   opt.id,
+            destinationName: `${opt.city}, ${opt.country}`,
+            destinationCity: opt.city,
           })}
-        </div>
+        />
       </div>
 
       {/* Arrival date */}
@@ -60,13 +57,14 @@ export function StepDestination({ preferences, destinations, onChange }: Props) 
           {t("whenArriving")}{" "}
           <span className="text-gray-400 font-normal">{t("optional")}</span>
         </label>
-        <div className="relative max-w-xs">
-          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-          <input
-            type="date"
-            value={preferences.startDate ?? ""}
-            onChange={(e) => onChange({ startDate: e.target.value || undefined })}
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/60 transition-colors"
+        <div className="w-full max-w-xs px-4 py-2.5 border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary/60 transition-colors bg-white">
+          <DatePickerInput
+            selected={selectedDate}
+            minDate={new Date()}
+            placeholder={t("whenArriving")}
+            onDateChange={(date) =>
+              onChange({ startDate: date ? format(date, "yyyy-MM-dd") : undefined })
+            }
           />
         </div>
         <p className="text-xs text-gray-400">{t("dateHelp")}</p>

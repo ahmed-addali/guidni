@@ -8,6 +8,7 @@ type Booking = {
   id: string;
   bookingRef: string;
   title: string;
+  listingId: string;
   date: string;
   checkOut?: string;
   nights?: number;
@@ -29,13 +30,22 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function BookingsClient({ bookings }: { bookings: Booking[] }) {
-  const [filter, setFilter]     = useState<string>("ALL");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [listingFilter, setListingFilter] = useState<string>("ALL");
   const [pending, startTransition] = useTransition();
   const [updating, setUpdating] = useState<string | null>(null);
 
-  const filtered = filter === "ALL"
-    ? bookings
-    : bookings.filter((b) => b.status === filter);
+  // Build unique listing options: id → title (deduplicated)
+  const listingOptions = Array.from(
+    new Map(bookings.map((b) => [b.listingId, b.title])).entries()
+  ).sort((a, b) => a[1].localeCompare(b[1]));
+
+  const filtered = bookings
+    .filter((b) => statusFilter === "ALL" || b.status === statusFilter)
+    .filter((b) => listingFilter === "ALL" || b.listingId === listingFilter);
+
+  // Keep legacy alias for tab counts
+  const filter = statusFilter;
 
   function handleStatusChange(id: string, type: "activity" | "stay" | "restaurant" | "rental", status: string) {
     setUpdating(id);
@@ -52,24 +62,41 @@ export function BookingsClient({ bookings }: { bookings: Booking[] }) {
 
   return (
     <div className="space-y-5">
-      {/* Filter tabs */}
-      <div className="flex gap-2 flex-wrap">
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setFilter(tab)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-              filter === tab
-                ? "bg-primary text-white border-primary"
-                : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-            }`}
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Status tabs */}
+        <div className="flex gap-2 flex-wrap">
+          {STATUS_TABS.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setStatusFilter(tab)}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                filter === tab
+                  ? "bg-primary text-white border-primary"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+              }`}
+            >
+              {tab.charAt(0) + tab.slice(1).toLowerCase()}
+              <span className="ml-1.5 text-xs opacity-70">
+                ({tab === "ALL" ? bookings.length : bookings.filter((b) => b.status === tab).length})
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Listing filter */}
+        {listingOptions.length > 1 && (
+          <select
+            value={listingFilter}
+            onChange={(e) => setListingFilter(e.target.value)}
+            className="border border-gray-200 rounded-xl px-3 py-1.5 text-sm text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
           >
-            {tab.charAt(0) + tab.slice(1).toLowerCase()}
-            <span className="ml-1.5 text-xs opacity-70">
-              ({tab === "ALL" ? bookings.length : bookings.filter((b) => b.status === tab).length})
-            </span>
-          </button>
-        ))}
+            <option value="ALL">All listings</option>
+            {listingOptions.map(([id, title]) => (
+              <option key={id} value={id}>{title}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Table */}

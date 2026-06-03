@@ -22,7 +22,7 @@ export function StayMobileBookingBar({ price, averageRating, nbReviews, labels }
         {(averageRating ?? 0) > 0 && nbReviews > 0 && (
           <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
             <FiStar className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-            <span className="font-medium text-gray-700">{averageRating.toFixed(1)}</span>
+            <span className="font-medium text-gray-700">{averageRating!.toFixed(1)}</span>
             <span>· {nbReviews} {labels.reviews}</span>
           </div>
         )}

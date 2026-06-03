@@ -8,9 +8,13 @@ import { cn } from "@/lib/utils";
 
 const TYPE_EMOJI: Record<string, string> = {
   CAR:              "🚗",
-  BIKE:             "🚲",
+  MOTORBIKE:        "🏍️",
   SCOOTER:          "🛵",
+  BICYCLE:          "🚲",
   BOAT:             "⛵",
+  QUAD:             "🏎️",
+  BUGGY:            "🪖",
+  JET_SKI:          "🌊",
   OTHER:            "🔧",
   AIRPORT_TRANSFER: "✈️",
   TAXI:             "🚕",
@@ -36,9 +40,13 @@ export function TransportFilterChips() {
 
   const TYPE_LABEL: Record<string, string> = {
     CAR:              t("cars"),
-    BIKE:             t("bikes"),
+    MOTORBIKE:        t("motorbikes"),
     SCOOTER:          t("scooters"),
+    BICYCLE:          t("bicycles"),
     BOAT:             t("boats"),
+    QUAD:             t("quads"),
+    BUGGY:            t("buggies"),
+    JET_SKI:          t("jetSkis"),
     OTHER:            t("other"),
     AIRPORT_TRANSFER: t("airportTransfers"),
     TAXI:             t("cityTaxi"),

@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { MaxWidthWrapper } from "@/components/shared/MaxWidthWrapper";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { getStayBookingById } from "@/lib/actions/user-bookings";
+import { CURRENCY } from "@/lib/constants/payments";
 import { FiCalendar, FiMapPin, FiUsers } from "react-icons/fi";
 import { IoBedOutline } from "react-icons/io5";
 import { ChevronLeft } from "lucide-react";
@@ -26,7 +27,7 @@ export default async function StayBookingDetailPage({ params }: { params: Params
   const stay = booking.stay;
 
   const fmtDate = (d: Date) =>
-    d.toLocaleDateString("en-GB", {
+    d.toLocaleDateString(locale, {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -126,32 +127,32 @@ export default async function StayBookingDetailPage({ params }: { params: Params
           <h3 className="font-semibold text-gray-900">{t("priceBreakdown")}</h3>
           <div className="flex justify-between text-gray-600">
             <span>
-              {stay.price} TND × {booking.nights} {t("nights")}
+              {stay.price} {CURRENCY} × {booking.nights} {t("nights")}
             </span>
-            <span>{basePrice} TND</span>
+            <span>{basePrice} {CURRENCY}</span>
           </div>
           {cleaningFee > 0 && (
             <div className="flex justify-between text-gray-600">
               <span>{t("cleaningFee")}</span>
-              <span>{cleaningFee} TND</span>
+              <span>{cleaningFee} {CURRENCY}</span>
             </div>
           )}
           {serviceFee > 0 && (
             <div className="flex justify-between text-gray-600">
               <span>{t("serviceFee")}</span>
-              <span>{serviceFee} TND</span>
+              <span>{serviceFee} {CURRENCY}</span>
             </div>
           )}
           {taxes > 0 && (
             <div className="flex justify-between text-gray-600">
               <span>{t("taxes")}</span>
-              <span>{taxes} TND</span>
+              <span>{taxes} {CURRENCY}</span>
             </div>
           )}
           <Separator />
           <div className="flex justify-between font-semibold text-gray-900">
             <span>{t("total")}</span>
-            <span>{total} TND</span>
+            <span>{total} {CURRENCY}</span>
           </div>
         </div>
 
@@ -199,6 +200,7 @@ export default async function StayBookingDetailPage({ params }: { params: Params
             label={t("cancel")}
             confirmLabel={t("confirmCancel")}
             cancelLabel={t("keepBooking")}
+            successLabel={t("cancelSuccess")}
           />
         )}
       </div>

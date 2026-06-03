@@ -9,6 +9,7 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import { ShopCard } from "@/components/shops/ShopCard";
+import { TrackedCard } from "@/components/shared/TrackedCard";
 import { getShopCategoryLabel } from "@/lib/utils/shop-categories";
 import type { BadgeKey } from "@prisma/client";
 
@@ -48,6 +49,7 @@ export function ShopsCarousel({ shops, locale, badgesMap = {} }: Props) {
       <CarouselContent className="-ml-4" viewportClassName="overflow-visible sm:overflow-hidden">
         {shops.map((shop) => (
           <CarouselItem key={shop.id} className="pl-4 basis-[85%] sm:basis-1/2 lg:basis-1/3">
+            <TrackedCard listingId={shop.id} listingType="SHOP">
             <ShopCard
               id={shop.id}
               slug={shop.slug}
@@ -66,6 +68,7 @@ export function ShopsCarousel({ shops, locale, badgesMap = {} }: Props) {
               locale={locale}
               badges={badgesMap[shop.id]}
             />
+            </TrackedCard>
           </CarouselItem>
         ))}
       </CarouselContent>

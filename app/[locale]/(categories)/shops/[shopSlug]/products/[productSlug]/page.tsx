@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { RelationType } from "@prisma/client";
 import { Separator } from "@/components/ui/separator";
 import { getProductBySlug, getShopProducts } from "@/lib/actions/shops";
 import { getReviews, hasCompletedBooking, hasReviewed } from "@/lib/actions/reviews";
@@ -17,16 +18,40 @@ import { ProductQuickFacts } from "./_components/ProductQuickFacts";
 import { ProductMobileBar } from "./_components/ProductMobileBar";
 import { MoreFromShop } from "./_components/MoreFromShop";
 import { getShopCategoryLabel, getProductCategoryLabel } from "@/lib/utils/shop-categories";
+import { SITE_URL } from "@/lib/utils/constants";
 
 type Params = Promise<{ locale: string; shopSlug: string; productSlug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
-  const { shopSlug, productSlug } = await params;
+  const { locale, shopSlug, productSlug } = await params;
   const product = await getProductBySlug(shopSlug, productSlug);
   if (!product) return {};
+  const name        = locale === "ar" && product.arabicName ? product.arabicName : product.name;
+  const title       = `${name} · ${product.shop.name} · Guidni`;
+  const description = (
+    locale === "ar" && product.arabicDescription
+      ? product.arabicDescription
+      : product.description
+  ).slice(0, 160);
+  const image     = product.images[0]?.url ?? null;
+  const canonical = `${SITE_URL}/${locale}/shops/${shopSlug}/products/${productSlug}`;
   return {
-    title: `${product.name} · ${product.shop.name} · Guidni`,
-    description: product.description.slice(0, 160),
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url:  canonical,
+      type: "website",
+      ...(image ? { images: [{ url: image, width: 1200, height: 630, alt: name }] } : {}),
+    },
+    twitter: {
+      card:        image ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
+    },
   };
 }
 
@@ -41,7 +66,7 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
   if (!product) notFound();
 
   const [reviews, completedBooking, alreadyReviewed, moreProducts] = await Promise.all([
-    getReviews(product.id, "PRODUCT"),
+    getReviews(product.id, RelationType.PRODUCT),
     hasCompletedBooking(product.id, "PRODUCT"),
     hasReviewed(product.id, "PRODUCT"),
     getShopProducts(product.shopId, product.id),
@@ -68,10 +93,8 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
   const productCategoryLabel = getProductCategoryLabel(product.category, locale);
 
   const deliveryLabels: Record<string, string> = {
-    PICKUP:         t("delivery.pickup"),
-    LOCAL_DELIVERY: t("delivery.local"),
-    NATIONWIDE:     t("delivery.nationwide"),
-    INTERNATIONAL:  t("delivery.international"),
+    PICKUP:   t("delivery.pickup"),
+    DELIVERY: t("delivery.delivery"),
   };
 
   return (
@@ -184,7 +207,7 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
                 {product.stock === 0
                   ? t("outOfStock")
                   : product.stock <= 5
-                  ? t("onlyLeft").replace("{count}", product.stock.toString())
+                  ? t("onlyLeft", { count: product.stock })
                   : t("inStock")}
               </span>
 
@@ -336,6 +359,7 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
         addToCart:  t("addToCart"),
         added:      t("added"),
         outOfStock: t("outOfStock"),
+        price:      t("price"),
       }}
     />
     </>

@@ -13,6 +13,7 @@ import {
   CalendarDays,
   Heart,
   LogOut,
+  Map,
   MessageSquare,
   Settings,
   ShoppingBag,
@@ -96,7 +97,8 @@ export function UserButton() {
   const nav = (path: string) => router.push(`/${locale}${path}`);
 
   const userItems: NavItem[] = [
-    { icon: <CalendarDays className="h-4 w-4" />, label: t("myBookings"), href: "/bookings" },
+    { icon: <Map           className="h-4 w-4" />, label: t("myPlans"),    href: "/my-plans" },
+    { icon: <CalendarDays  className="h-4 w-4" />, label: t("myBookings"), href: "/bookings" },
     { icon: <MessageSquare className="h-4 w-4" />, label: t("myReviews"),  href: "/reviews" },
     { icon: <ShoppingBag   className="h-4 w-4" />, label: t("myOrders"),   href: "/orders" },
     { icon: <Heart         className="h-4 w-4" />, label: t("wishlist"),    href: "/wishlist" },

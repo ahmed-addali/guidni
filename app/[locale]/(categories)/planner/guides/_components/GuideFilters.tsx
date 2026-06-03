@@ -2,18 +2,23 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useCallback, useRef, useState } from "react";
+import { FiSearch, FiX } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 
 interface Props {
   activeSpec?: string;
   activeSort: string;
+  activeQuery?: string;
 }
 
-export function GuideFilters({ activeSpec, activeSort }: Props) {
-  const t       = useTranslations("GuidesListing");
-  const router  = useRouter();
+export function GuideFilters({ activeSpec, activeSort, activeQuery }: Props) {
+  const t        = useTranslations("GuidesListing");
+  const router   = useRouter();
   const pathname = usePathname();
-  const params  = useSearchParams();
+  const params   = useSearchParams();
+  const [searchVal, setSearchVal] = useState(activeQuery ?? "");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const SPECIALIZATIONS = [
     { id: "adventures",      label: t("specAdventures") },
@@ -49,8 +54,39 @@ export function GuideFilters({ activeSpec, activeSort }: Props) {
     setParam("spec", activeSpec === id ? null : id);
   }
 
+  const handleSearch = useCallback((value: string) => {
+    setSearchVal(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setParam("q", value.trim() || null);
+    }, 350);
+  }, [params, pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
-    <div className="space-y-3 mb-8">
+    <div className="space-y-4 mb-8">
+      {/* Search input */}
+      <div className="relative max-w-sm">
+        <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+        <input
+          type="text"
+          value={searchVal}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder={t("searchPlaceholder")}
+          className="w-full pl-9 pr-8 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+        />
+        {searchVal && (
+          <button
+            type="button"
+            onClick={() => handleSearch("")}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="Clear search"
+          >
+            <FiX className="h-3.5 w-3.5" />
+          </button>
+        )}
+      </div>
+
+      <div className="space-y-3">
       {/* Specialization chips */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         <button
@@ -102,6 +138,7 @@ export function GuideFilters({ activeSpec, activeSort }: Props) {
             </button>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

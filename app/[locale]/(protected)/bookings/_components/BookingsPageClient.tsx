@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ActivityBookingCard } from "./ActivityBookingCard";
 import { StayBookingCard } from "./StayBookingCard";
 import { PassBookingCard } from "./PassBookingCard";
@@ -134,7 +135,11 @@ export function BookingsPageClient({
   locale,
   labels,
 }: Props) {
-  const [tab, setTab] = useState<Tab>("activities");
+  const searchParams = useSearchParams();
+  const VALID_TABS: Tab[] = ["activities", "stays", "passes", "rentals", "transfers"];
+  const tabParam = searchParams.get("tab") as Tab | null;
+  const initialTab: Tab = tabParam && VALID_TABS.includes(tabParam) ? tabParam : "activities";
+  const [tab, setTab] = useState<Tab>(initialTab);
 
   const counts = {
     activities: activityBookings.length,

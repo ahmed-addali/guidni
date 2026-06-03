@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   try {
     const activity = await prisma.activity.findUnique({
       where: { id: activityId },
-      select: { capacity: true, availableTimes: true },
+      select: { capacity: true, timeSlots: { select: { time: true } } },
     });
 
     if (!activity) {
@@ -36,10 +36,7 @@ export async function POST(request: Request) {
     }
 
     // Return slots where remaining capacity fits the requested group
-    const allSlots = activity.availableTimes
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const allSlots = activity.timeSlots.map((s) => s.time);
 
     const requested = adults + children;
     const availableSlots = allSlots.filter(

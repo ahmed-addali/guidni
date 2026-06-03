@@ -3,6 +3,7 @@
 import Autoplay from "embla-carousel-autoplay";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { StayCard } from "@/components/stays/StayCard";
+import { TrackedCard } from "@/components/shared/TrackedCard";
 import type { StayListItem } from "@/types/stay";
 import type { BadgeKey } from "@prisma/client";
 
@@ -10,9 +11,11 @@ interface Props {
   stays: StayListItem[];
   locale: string;
   badgesMap?: Record<string, BadgeKey[]>;
+  perNight?: string;
+  currency?: string;
 }
 
-export function StaysCarousel({ stays, locale, badgesMap = {} }: Props) {
+export function StaysCarousel({ stays, locale, badgesMap = {}, perNight, currency }: Props) {
   return (
     <Carousel
       opts={{ loop: true, align: "start" }}
@@ -22,7 +25,9 @@ export function StaysCarousel({ stays, locale, badgesMap = {} }: Props) {
       <CarouselContent viewportClassName="overflow-visible sm:overflow-hidden">
         {stays.map((stay) => (
           <CarouselItem key={stay.id} className="basis-[85%] sm:basis-1/2 lg:basis-1/3">
-            <StayCard stay={stay} locale={locale} badges={badgesMap[stay.id]} />
+            <TrackedCard listingId={stay.id} listingType="STAY">
+              <StayCard stay={stay} locale={locale} badges={badgesMap[stay.id]} perNight={perNight} currency={currency} />
+            </TrackedCard>
           </CarouselItem>
         ))}
       </CarouselContent>

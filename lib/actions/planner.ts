@@ -6,7 +6,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getPlannerData } from "@/lib/planner/assembler";
 import { scoreItem, scoreRestaurant } from "@/lib/planner/engine";
-import type { PlanDay, PlanItem, PlanItemType, UserPreferences } from "@/lib/planner/types";
+import type { PlanItinerary, PlanItem, PlanItemType, UserPreferences } from "@/lib/planner/types";
 
 // ─────────────────────────────────────────────────────────────
 // Re-export assembler for use in pages
@@ -21,7 +21,7 @@ export { getPlannerData };
 export async function savePlan(input: {
   title?: string;
   preferences: UserPreferences;
-  itinerary: PlanDay[];
+  itinerary: PlanItinerary;
   destinationId: string;
 }): Promise<{ success: true; data: { id: string } } | { success: false; error: string }> {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -58,7 +58,7 @@ export const getPlan = cache(async (planId: string) => {
     include: {
       destination: { select: { id: true, slug: true, city: true, country: true } },
       guide: {
-        select: { slug: true, displayName: true, avatarUrl: true, isVerified: true },
+        select: { id: true, slug: true, displayName: true, avatarUrl: true, isVerified: true, chatEnabled: true },
       },
     },
   });
@@ -69,7 +69,7 @@ export const getPlan = cache(async (planId: string) => {
   // Fire-and-forget view count increment
   prisma.plan
     .update({ where: { id: planId }, data: { viewCount: { increment: 1 } } })
-    .catch(() => {});
+    .catch(() => { });
 
   return plan;
 });
@@ -123,7 +123,7 @@ export async function deletePlan(
 
 export async function updatePlan(
   planId: string,
-  data: { title?: string; isPublic?: boolean; itinerary?: PlanDay[] }
+  data: { title?: string; isPublic?: boolean; itinerary?: PlanItinerary }
 ): Promise<{ success: true } | { success: false; error: string }> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) return { success: false as const, error: "Not authenticated" };
@@ -160,12 +160,12 @@ export async function getSwapAlternatives(input: {
 
     const pool: PlanItem[] = (() => {
       switch (input.itemType) {
-        case "ACTIVITY":    return plannerData.activities;
-        case "ATTRACTION":  return plannerData.attractions;
-        case "RESTAURANT":  return plannerData.restaurants;
-        case "TRANSFER":    return plannerData.transfers;
-        case "RENTAL":      return plannerData.rentals;
-        default:            return plannerData.activities;
+        case "ACTIVITY": return plannerData.activities;
+        case "ATTRACTION": return plannerData.attractions;
+        case "RESTAURANT": return plannerData.restaurants;
+        case "TRANSFER": return plannerData.transfers;
+        case "RENTAL": return plannerData.rentals;
+        default: return plannerData.activities;
       }
     })();
 
@@ -178,10 +178,10 @@ export async function getSwapAlternatives(input: {
         _score:
           item.type === "RESTAURANT"
             ? scoreRestaurant(
-                item,
-                input.preferences,
-                input.slotType === "lunch" ? "lunch" : "evening"
-              )
+              item,
+              input.preferences,
+              input.slotType === "lunch" ? "lunch" : "evening"
+            )
             : scoreItem(item, input.preferences),
       }))
       .sort((a, b) => b._score - a._score)
@@ -190,5 +190,52 @@ export async function getSwapAlternatives(input: {
     return { success: true as const, data: scored };
   } catch {
     return { success: false as const, error: "Failed to load alternatives" };
+  }
+}
+// ─────────────────────────────────────────────────────────────
+// Generate a plan using AI Agent
+// ─────────────────────────────────────────────────────────────
+
+function mapBudget(b: number | undefined) {
+  switch (b) {
+    case 1: return "budget";
+    case 3: return "luxury";
+    default: return "mid-range";
+  }
+}
+
+function mapGroup(g?: string) {
+  if (!g) return "solo";
+  if (g === "friends") return "group";
+  return g;
+}
+
+export async function generatePlan(preferences: UserPreferences): Promise<{ success: true; data: any } | { success: false; error: string }> {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user) return { success: false as const, error: "Not authenticated" };
+
+    const planRequest = {
+      ...preferences,
+      user_id: session.user.id,
+      model: "lightning/lightning-ai/gpt-oss-120b",
+    };
+
+    const agentUrl = process.env.PLANNER_AGENT_URL ?? "http://localhost:8000/plan";
+
+    const resp = await fetch(agentUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(planRequest),
+    });
+
+    const data = await resp.json().catch(() => null);
+    if (!resp.ok) {
+      return { success: false as const, error: data ?? "Agent error" };
+    }
+
+    return { success: true as const, data };
+  } catch (e: any) {
+    return { success: false as const, error: e?.message ?? String(e) };
   }
 }

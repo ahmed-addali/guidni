@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { FiUsers, FiInfo } from "react-icons/fi";
@@ -19,6 +20,7 @@ export function AgentProgramSection({
   agentCommissionEnabled: initialEnabled,
   agentCommissionRate:    initialRate,
 }: Props) {
+  const t = useTranslations("Components.agentProgramSection");
   const [isPending, startTransition] = useTransition();
   const [enabled, setEnabled]        = useState(initialEnabled);
   const [rate, setRate]              = useState(initialRate ?? 5);
@@ -36,7 +38,7 @@ export function AgentProgramSection({
     startTransition(async () => {
       const result = await updateActivityAgentCommission(activityId, newEnabled, newRate / 100);
       if (result.success) {
-        toast.success(newEnabled ? "Agent program enabled" : "Agent program disabled");
+        toast.success(newEnabled ? t("enabledToast") : t("disabledToast"));
       } else {
         toast.error(result.error);
       }
@@ -49,11 +51,9 @@ export function AgentProgramSection({
         <div>
           <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
             <FiUsers className="h-4 w-4 text-primary" />
-            Local Agent Program
+            {t("title")}
           </h3>
-          <p className="text-xs text-gray-400 mt-0.5">
-            Allow verified Guidni agents to promote this activity and earn a commission.
-          </p>
+          <p className="text-xs text-gray-400 mt-0.5">{t("hint")}</p>
         </div>
         <button
           type="button"
@@ -76,7 +76,7 @@ export function AgentProgramSection({
         <div className="space-y-4 pl-6 border-l-2 border-primary/10">
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
-              Commission rate for agents
+              {t("commissionLabel")}
             </label>
             <div className="flex items-center gap-3">
               <input
@@ -92,22 +92,22 @@ export function AgentProgramSection({
                 {rate}%
               </span>
             </div>
-            <p className="text-xs text-gray-400">Between 3% and 20%</p>
+            <p className="text-xs text-gray-400">{t("commissionRange")}</p>
           </div>
 
           {/* Preview */}
           <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 space-y-1.5">
-            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Preview</p>
+            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">{t("previewTitle")}</p>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Activity price</span>
+              <span className="text-gray-600">{t("activityPrice")}</span>
               <span className="font-medium text-gray-900">{activityPrice} TND</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Agent earns ({rate}%)</span>
+              <span className="text-gray-600">{t("agentEarns", { rate })}</span>
               <span className="font-semibold text-primary">{commissionTND} TND</span>
             </div>
             <div className="flex items-center justify-between text-sm border-t border-primary/10 pt-1.5">
-              <span className="text-gray-600">You keep</span>
+              <span className="text-gray-600">{t("youKeep")}</span>
               <span className="font-semibold text-gray-900">
                 {(activityPrice - parseFloat(commissionTND)).toFixed(2)} TND
               </span>
@@ -116,10 +116,7 @@ export function AgentProgramSection({
 
           <div className="flex items-start gap-2 text-xs text-gray-400">
             <FiInfo className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-            <p>
-              Commission is calculated on the base activity price (before taxes and service fees),
-              per person. It is deducted from your payout after the booking is confirmed.
-            </p>
+            <p>{t("infoNote")}</p>
           </div>
 
           <button
@@ -129,7 +126,7 @@ export function AgentProgramSection({
             className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-60"
           >
             {isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-            Save commission settings
+            {t("save")}
           </button>
         </div>
       )}

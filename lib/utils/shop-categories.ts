@@ -7,6 +7,7 @@ export type ShopCategory = {
 export type ProductCategory = {
   id: string;
   label: { en: string; fr: string; ar: string };
+  icon: string;
 };
 
 export const SHOP_CATEGORIES: ShopCategory[] = [
@@ -23,14 +24,14 @@ export const SHOP_CATEGORIES: ShopCategory[] = [
 ];
 
 export const PRODUCT_CATEGORIES: ProductCategory[] = [
-  { id: "crafts",       label: { en: "Crafts",       fr: "Artisanat",   ar: "حرف" } },
-  { id: "clothing",     label: { en: "Clothing",     fr: "Vêtements",   ar: "ملابس" } },
-  { id: "accessories",  label: { en: "Accessories",  fr: "Accessoires", ar: "إكسسوارات" } },
-  { id: "jewelry",      label: { en: "Jewelry",      fr: "Bijoux",      ar: "مجوهرات" } },
-  { id: "ceramics",     label: { en: "Ceramics",     fr: "Céramique",   ar: "فخار" } },
-  { id: "food_drink",   label: { en: "Food & Drink", fr: "Alimentation",ar: "أغذية ومشروبات" } },
-  { id: "wellness",     label: { en: "Wellness",     fr: "Bien-être",   ar: "عافية" } },
-  { id: "other",        label: { en: "Other",        fr: "Autre",       ar: "أخرى" } },
+  { id: "crafts",       icon: "🪡", label: { en: "Crafts",       fr: "Artisanat",   ar: "حرف" } },
+  { id: "clothing",     icon: "👘", label: { en: "Clothing",     fr: "Vêtements",   ar: "ملابس" } },
+  { id: "accessories",  icon: "💍", label: { en: "Accessories",  fr: "Accessoires", ar: "إكسسوارات" } },
+  { id: "jewelry",      icon: "✨", label: { en: "Jewelry",      fr: "Bijoux",      ar: "مجوهرات" } },
+  { id: "ceramics",     icon: "🏺", label: { en: "Ceramics",     fr: "Céramique",   ar: "فخار" } },
+  { id: "food_drink",   icon: "🫙", label: { en: "Food & Drink", fr: "Alimentation",ar: "أغذية ومشروبات" } },
+  { id: "wellness",     icon: "🌸", label: { en: "Wellness",     fr: "Bien-être",   ar: "عافية" } },
+  { id: "other",        icon: "🎁", label: { en: "Other",        fr: "Autre",       ar: "أخرى" } },
 ];
 
 export function getShopCategoryLabel(

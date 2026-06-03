@@ -29,7 +29,7 @@ export function StayHighlights({ stay, labels }: Props) {
   type Highlight = { icon: React.ReactNode; label: string };
   const highlights: Highlight[] = [];
 
-  if (stay.cancelationPolicy === "flexible" || stay.cancelationPolicy === "FLEXIBLE") {
+  if (stay.cancelationPolicy?.toLowerCase() === "flexible") {
     highlights.push({ icon: <Check className="h-4 w-4 text-green-600" />, label: labels.freeCancel });
   }
   if (stay.averageRating && stay.averageRating >= 4.5) {

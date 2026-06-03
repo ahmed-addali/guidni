@@ -9,6 +9,7 @@ import { getRestaurantBySlug } from "@/lib/actions/restaurants";
 import { getManualBadges } from "@/lib/actions/badges";
 import { getAutoBadges } from "@/lib/utils/badge-utils";
 import { BadgeList } from "@/components/badges/BadgeList";
+import { RelationType } from "@prisma/client";
 import { MenuTab } from "../_components/MenuTab";
 
 type Params = Promise<{ locale: string; slug: string }>;
@@ -38,7 +39,7 @@ export default async function PublicMenuPage({
 
   if (!restaurant) notFound();
 
-  const manualBadges = await getManualBadges(restaurant.id, "RESTAURANT");
+  const manualBadges = await getManualBadges(restaurant.id, RelationType.RESTAURANT);
   const autoBadges = getAutoBadges({ note: restaurant.note, nbReviews: restaurant.nbReviews });
   const allBadges = [...manualBadges, ...autoBadges];
 

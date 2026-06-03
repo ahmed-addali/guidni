@@ -3,9 +3,7 @@
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import type { Prisma } from "@prisma/client";
-
-type RelationType = Prisma.ListingBadgeCreateInput["relationType"];
+import type { RelationType } from "@prisma/client";
 
 export async function getPartnerBadgesAndReviews() {
   const session = await auth.api.getSession({ headers: await headers() });

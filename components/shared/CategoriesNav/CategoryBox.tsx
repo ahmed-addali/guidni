@@ -1,11 +1,13 @@
 "use client";
 
+import type { ComponentType } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { IconType } from "react-icons";
+
+type IconComponent = ComponentType<{ size?: number | string; className?: string }>;
 
 interface CategoryBoxProps {
-  icon: IconType;
+  icon: IconComponent;
   label: string;
   route: string;
   selected?: boolean;

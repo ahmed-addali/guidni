@@ -31,6 +31,8 @@ interface DatePickerInputProps {
   selected?: Date;
   placeholder?: string;
   className?: string;
+  /** ISO date strings (YYYY-MM-DD) that should be shown as blocked/unavailable */
+  disabledDates?: string[];
 }
 
 export function DatePickerInput({
@@ -39,6 +41,7 @@ export function DatePickerInput({
   selected,
   placeholder = "Pick a date",
   className,
+  disabledDates = [],
 }: DatePickerInputProps) {
   const locale = useLocale();
   const [currentMonth, setCurrentMonth] = useState<Date>(selected ?? new Date());
@@ -49,8 +52,14 @@ export function DatePickerInput({
 
   const today = startOfDay(new Date());
   const minDay = minDate ? startOfDay(minDate) : today;
+  const disabledSet = new Set(disabledDates);
+
+  function isBlocked(day: Date) {
+    return disabledSet.has(format(day, "yyyy-MM-dd"));
+  }
 
   function handleSelect(day: Date) {
+    if (isBlocked(day)) return;
     onDateChange(day);
     setOpen(false);
   }
@@ -133,9 +142,11 @@ export function DatePickerInput({
               <div key={`e-${i}`} className="h-8 w-8" />
             ))}
             {days.map((day) => {
-              const isSelected = selected ? isSameDay(day, selected) : false;
-              const isToday    = isSameDay(day, today);
-              const isDisabled = isBefore(startOfDay(day), minDay);
+              const isSelected  = selected ? isSameDay(day, selected) : false;
+              const isToday     = isSameDay(day, today);
+              const isPast      = isBefore(startOfDay(day), minDay);
+              const isBlockedDay = isBlocked(day);
+              const isDisabled  = isPast || isBlockedDay;
               return (
                 <button
                   key={day.toISOString()}
@@ -143,11 +154,12 @@ export function DatePickerInput({
                   onClick={() => !isDisabled && handleSelect(day)}
                   disabled={isDisabled}
                   className={cn(
-                    "h-8 w-8 rounded-full text-sm flex items-center justify-center transition-colors",
+                    "h-8 w-8 rounded-full text-sm flex items-center justify-center transition-colors relative",
                     isSelected && "bg-primary text-white font-semibold",
                     !isSelected && isToday && "border border-primary text-primary font-medium",
                     !isSelected && !isToday && !isDisabled && "text-gray-700 hover:bg-gray-100",
-                    isDisabled && "text-gray-300 cursor-not-allowed"
+                    isPast && "text-gray-300 cursor-not-allowed",
+                    isBlockedDay && !isSelected && "text-red-300 cursor-not-allowed line-through"
                   )}
                 >
                   {format(day, "d")}

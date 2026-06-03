@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { CURRENCY } from "@/lib/constants/payments";
 import { FiMapPin, FiStar } from "react-icons/fi";
 import { Separator } from "@/components/ui/separator";
 import { getRestaurantBySlug, getRelatedRestaurants } from "@/lib/actions/restaurants";
@@ -9,11 +10,13 @@ import { getManualBadges, getGuidniReview } from "@/lib/actions/badges";
 import { getAutoBadges } from "@/lib/utils/badge-utils";
 import { BadgeList } from "@/components/badges/BadgeList";
 import { GuidniReviewSection } from "@/components/badges/GuidniReviewSection";
+import { RelationType } from "@prisma/client";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { ReviewsSection } from "@/components/activities/ReviewsSection";
 import { RatingSummary } from "@/components/shared/RatingSummary";
 import { DescriptionWithToggle } from "@/components/shared/DescriptionWithToggle";
 import { ImageGallery } from "@/components/shared/ImageGallery";
+import { DetailPageTracker } from "@/components/shared/DetailPageTracker";
 import { ShareButton } from "@/app/[locale]/(categories)/stays/[staySlug]/_components/ShareButton";
 import { RestaurantAnchorNav } from "./_components/RestaurantAnchorNav";
 import { RestaurantInfoStrip } from "./_components/RestaurantInfoStrip";
@@ -26,17 +29,40 @@ import { ReservationWidget } from "./_components/ReservationWidget";
 type Params = Promise<{ locale: string; slug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const restaurant = await getRestaurantBySlug(slug);
   if (!restaurant) return {};
+
+  const description = (
+    locale === "ar" && restaurant.arabicName
+      ? restaurant.arabicName
+      : restaurant.description
+  ).slice(0, 160);
+
+  const images = [
+    ...(restaurant.coverPhoto ? [restaurant.coverPhoto] : []),
+    ...restaurant.images.map((i) => i.url),
+  ];
+
+  const url = `/${locale}/restaurants/${slug}`;
+
   return {
-    title: restaurant.name,
-    description: restaurant.description.slice(0, 160),
+    title: `${restaurant.name} · Guidni`,
+    description,
+    alternates: { canonical: url },
     openGraph: {
-      images: [
-        ...(restaurant.coverPhoto ? [restaurant.coverPhoto] : []),
-        ...restaurant.images.map((i) => i.url),
-      ],
+      type: "website",
+      locale,
+      url,
+      title: `${restaurant.name} · Guidni`,
+      description,
+      images,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${restaurant.name} · Guidni`,
+      description,
+      images,
     },
   };
 }
@@ -52,11 +78,11 @@ export default async function RestaurantDetailPage({ params }: { params: Params 
 
   const [reviews, alreadyReviewed, completedBooking, manualBadges, guidniReview, relatedRestaurants] =
     await Promise.all([
-      getReviews(restaurant.id, "RESTAURANT"),
+      getReviews(restaurant.id, RelationType.RESTAURANT),
       hasReviewed(restaurant.id, "RESTAURANT"),
       hasCompletedBooking(restaurant.id, "RESTAURANT"),
-      getManualBadges(restaurant.id, "RESTAURANT"),
-      getGuidniReview(restaurant.id, "RESTAURANT"),
+      getManualBadges(restaurant.id, RelationType.RESTAURANT),
+      getGuidniReview(restaurant.id, RelationType.RESTAURANT),
       restaurant.destinationId
         ? getRelatedRestaurants(restaurant.id, restaurant.destinationId)
         : Promise.resolve([]),
@@ -87,7 +113,7 @@ export default async function RestaurantDetailPage({ params }: { params: Params 
 
   const rating = restaurant.note ? parseFloat(restaurant.note) : 0;
 
-  const todayName = new Date().toLocaleDateString("en-US", { weekday: "long" });
+  const todayName = new Date().toLocaleDateString(locale, { weekday: "long" });
 
   const typeLabel =
     t(`type.${restaurant.type}` as Parameters<typeof t>[0]) ?? restaurant.type;
@@ -156,12 +182,17 @@ export default async function RestaurantDetailPage({ params }: { params: Params 
         </div>
       </div>
 
+      {/* ── Recommendation tracking (dwell time) ── */}
+      <DetailPageTracker listingId={restaurant.id} listingType="RESTAURANT" />
+
       {/* ── Gallery ── */}
       <ImageGallery
-        images={allImages.map((url) => ({ url }))}
+        images={allImages.map((url, i) => ({ id: `img-${i}`, url }))}
         title={name}
         allPhotosLabel={t("allPhotos")}
         photosLabel={t("photos")}
+        listingId={restaurant.id}
+        listingType="RESTAURANT"
       />
 
       {/* ── Anchor nav ── */}
@@ -249,7 +280,7 @@ export default async function RestaurantDetailPage({ params }: { params: Params 
                           <p className="text-xs text-gray-400 truncate">{item.description}</p>
                         )}
                       </div>
-                      <span className="text-sm font-semibold text-gray-900 shrink-0">{item.price} TND</span>
+                      <span className="text-sm font-semibold text-gray-900 shrink-0">{item.price} {CURRENCY}</span>
                     </a>
                   );
                 })}
@@ -294,20 +325,22 @@ export default async function RestaurantDetailPage({ params }: { params: Params 
               restaurantId={restaurant.id}
               restaurantName={name}
               maxGuests={restaurant.maxGuests}
-              locale={locale}
               labels={{
-                title:           t("widget.title"),
-                date:            t("widget.date"),
-                time:            t("widget.time"),
-                guests:          t("widget.guests"),
-                maxGuests:       t.raw("widget.maxGuests") as string,
-                notes:           t("widget.notes"),
-                notesPlaceholder: t("widget.notesPlaceholder"),
-                submit:          t("widget.submit"),
-                submitting:      t("widget.submitting"),
-                cancelNote:      t("widget.cancelNote"),
-                successTitle:    t("widget.successTitle"),
-                successMessage:  t.raw("widget.successMessage") as string,
+                title:               t("widget.title"),
+                date:                t("widget.date"),
+                time:                t("widget.time"),
+                guests:              t("widget.guests"),
+                maxGuests:           t.raw("widget.maxGuests") as string,
+                guestName:           t("widget.guestName"),
+                guestNamePlaceholder: t("widget.guestNamePlaceholder"),
+                phone:               t("widget.phone"),
+                notes:               t("widget.notes"),
+                notesPlaceholder:    t("widget.notesPlaceholder"),
+                submit:              t("widget.submit"),
+                submitting:          t("widget.submitting"),
+                cancelNote:          t("widget.cancelNote"),
+                successTitle:        t("widget.successTitle"),
+                successMessage:      t.raw("widget.successMessage") as string,
               }}
             />
           ) : (
@@ -424,6 +457,15 @@ export default async function RestaurantDetailPage({ params }: { params: Params 
             restaurants={relatedRestaurants}
             locale={locale}
             label={t("relatedTitle", { city: restaurant.destination?.city ?? "" })}
+            cardLabels={{
+              typeLabels: {
+                RESTAURANT: t("type.RESTAURANT"),
+                CAFEE_SHOP: t("type.CAFEE_SHOP"),
+                BOTH:       t("type.BOTH"),
+              },
+              reservationAvailable: t("card.reservationsAvailable"),
+              walkinOnly:           t("card.walkinOnly"),
+            }}
           />
         </>
       )}

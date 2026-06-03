@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { BookOpen, X } from "lucide-react";
 import { requestGuidniReview } from "@/lib/actions/partner-badges";
-
-type RelationType = Parameters<typeof requestGuidniReview>[1];
+import type { RelationType } from "@prisma/client";
 
 interface Props {
   listingId:    string;
@@ -14,6 +14,7 @@ interface Props {
 }
 
 export function RequestReviewDialog({ listingId, relationType, offerHint }: Props) {
+  const t = useTranslations("Components.requestReviewDialog");
   const [open, setOpen]         = useState(false);
   const [, start]               = useTransition();
   const [bestTimes, setBestTimes]     = useState("");
@@ -26,26 +27,26 @@ export function RequestReviewDialog({ listingId, relationType, offerHint }: Prop
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!offer.trim()) {
-      toast.error("Please describe your offer for the Guidni reviewer.");
+      toast.error(t("offerRequired"));
       return;
     }
     setSubmitting(true);
     const fullOffer = [
       offer.trim(),
-      bestTimes  ? `Best times: ${bestTimes.trim()}` : "",
-      highlight  ? `Highlight: ${highlight.trim()}`  : "",
-      contactName  ? `Contact: ${contactName.trim()}` : "",
-      contactPhone ? `Phone: ${contactPhone.trim()}`  : "",
+      bestTimes    ? `${t("bestTimesKey")}: ${bestTimes.trim()}`    : "",
+      highlight    ? `${t("highlightKey")}: ${highlight.trim()}`    : "",
+      contactName  ? `${t("contactKey")}: ${contactName.trim()}`    : "",
+      contactPhone ? `${t("phoneKey")}: ${contactPhone.trim()}`     : "",
     ].filter(Boolean).join("\n");
 
     start(async () => {
       const res = await requestGuidniReview(listingId, relationType, fullOffer);
       if (res.success) {
-        toast.success("Review requested! Our team will be in touch.");
+        toast.success(t("successToast"));
         setOpen(false);
         setBestTimes(""); setHighlight(""); setContactName(""); setContactPhone(""); setOffer("");
       } else {
-        toast.error("error" in res ? res.error : "Failed to request review");
+        toast.error("error" in res ? res.error : t("errorToast"));
       }
       setSubmitting(false);
     });
@@ -55,11 +56,11 @@ export function RequestReviewDialog({ listingId, relationType, offerHint }: Prop
     <>
       <button
         onClick={() => setOpen(true)}
-        title="Request Guidni Review"
+        title={t("triggerTitle")}
         className="flex items-center gap-1 text-xs px-3 py-1.5 border border-primary/20 rounded-lg text-primary hover:bg-primary/5 transition-colors"
       >
         <BookOpen className="h-3.5 w-3.5" />
-        <span className="hidden md:inline">Request Review</span>
+        <span className="hidden md:inline">{t("triggerLabel")}</span>
       </button>
 
       {open && (
@@ -77,14 +78,13 @@ export function RequestReviewDialog({ listingId, relationType, offerHint }: Prop
               <div>
                 <h2 className="font-semibold text-gray-900 flex items-center gap-2">
                   <BookOpen className="h-4 w-4 text-primary" />
-                  Request a Guidni Review
+                  {t("dialogTitle")}
                 </h2>
-                <p className="text-xs text-gray-500 mt-1">
-                  Our team will visit your listing and publish an editorial review. The review is always honest.
-                </p>
+                <p className="text-xs text-gray-500 mt-1">{t("dialogSubtitle")}</p>
               </div>
               <button
                 onClick={() => setOpen(false)}
+                aria-label={t("closeAriaLabel")}
                 className="text-gray-400 hover:text-gray-600 transition-colors shrink-0 ml-4"
               >
                 <X className="h-5 w-5" />
@@ -95,7 +95,7 @@ export function RequestReviewDialog({ listingId, relationType, offerHint }: Prop
               {/* Offer — required */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Your offer for the reviewer <span className="text-red-500">*</span>
+                  {t("offerLabel")} <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   value={offer}
@@ -105,21 +105,19 @@ export function RequestReviewDialog({ listingId, relationType, offerHint }: Prop
                   required
                   className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none"
                 />
-                <p className="text-xs text-gray-400 mt-1">
-                  This is shared only with our ops team — never published or shown to users.
-                </p>
+                <p className="text-xs text-gray-400 mt-1">{t("offerNote")}</p>
               </div>
 
               {/* Best times */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Best times to visit
+                  {t("bestTimesLabel")}
                 </label>
                 <input
                   type="text"
                   value={bestTimes}
                   onChange={(e) => setBestTimes(e.target.value)}
-                  placeholder="e.g. weekday evenings, lunch service Fri–Sun"
+                  placeholder={t("bestTimesPlaceholder")}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                 />
               </div>
@@ -127,13 +125,13 @@ export function RequestReviewDialog({ listingId, relationType, offerHint }: Prop
               {/* What to highlight */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  What should we highlight?
+                  {t("highlightLabel")}
                 </label>
                 <input
                   type="text"
                   value={highlight}
                   onChange={(e) => setHighlight(e.target.value)}
-                  placeholder="e.g. our new summer menu, renovated sea-view rooms"
+                  placeholder={t("highlightPlaceholder")}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                 />
               </div>
@@ -142,7 +140,7 @@ export function RequestReviewDialog({ listingId, relationType, offerHint }: Prop
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Contact name
+                    {t("contactNameLabel")}
                   </label>
                   <input
                     type="text"
@@ -154,7 +152,7 @@ export function RequestReviewDialog({ listingId, relationType, offerHint }: Prop
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Direct phone
+                    {t("contactPhoneLabel")}
                   </label>
                   <input
                     type="tel"
@@ -168,10 +166,10 @@ export function RequestReviewDialog({ listingId, relationType, offerHint }: Prop
 
               {/* Info box */}
               <div className="bg-primary/5 rounded-xl p-4 text-xs text-gray-600 space-y-1">
-                <p className="font-medium text-gray-800">What happens next?</p>
-                <p>Our team reviews all requests weekly and prioritises based on platform needs.</p>
-                <p>If selected, a Guidni reviewer will visit unannounced within your declared availability window.</p>
-                <p>The review will be published on your listing page <strong>and</strong> shared on our Instagram, Facebook, and TikTok.</p>
+                <p className="font-medium text-gray-800">{t("whatNextTitle")}</p>
+                <p>{t("whatNextP1")}</p>
+                <p>{t("whatNextP2")}</p>
+                <p>{t("whatNextP3")}</p>
               </div>
 
               {/* Actions */}
@@ -181,14 +179,14 @@ export function RequestReviewDialog({ listingId, relationType, offerHint }: Prop
                   onClick={() => setOpen(false)}
                   className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
                   className="px-5 py-2 text-sm font-medium bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60"
                 >
-                  {submitting ? "Submitting…" : "Submit Request"}
+                  {submitting ? t("submitting") : t("submit")}
                 </button>
               </div>
             </form>

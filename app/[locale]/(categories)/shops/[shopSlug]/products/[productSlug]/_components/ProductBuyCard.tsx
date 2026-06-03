@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { FiMinus, FiPlus, FiShoppingCart } from "react-icons/fi";
 import { FaBolt } from "react-icons/fa6";
 import { toast } from "sonner";
+import { PLATFORM_CURRENCY } from "@/lib/utils/constants";
 
-type DeliveryMethod = "PICKUP" | "LOCAL_DELIVERY" | "NATIONWIDE" | "INTERNATIONAL";
+type DeliveryMethod = "PICKUP" | "DELIVERY";
 
 interface CartItem {
   productId:  string;
@@ -106,10 +107,10 @@ export function ProductBuyCard({
     <div className="bg-white border border-gray-100 rounded-2xl p-5 space-y-4 sticky top-24">
       {/* Price */}
       <div className="flex items-baseline gap-2 flex-wrap">
-        <span className="text-2xl font-bold text-gray-900">{price} TND</span>
+        <span className="text-2xl font-bold text-gray-900">{price} {PLATFORM_CURRENCY}</span>
         {comparePrice && comparePrice > price && (
           <>
-            <span className="text-base text-gray-400 line-through">{comparePrice} TND</span>
+            <span className="text-base text-gray-400 line-through">{comparePrice} {PLATFORM_CURRENCY}</span>
             <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
               -{discount}%
             </span>
@@ -130,7 +131,7 @@ export function ProductBuyCard({
         {stockStatus === "out"
           ? labels.outOfStock
           : stockStatus === "low"
-          ? labels.onlyLeft.replace("{count}", stock.toString())
+          ? labels.onlyLeft
           : labels.inStock}
       </p>
 
@@ -155,7 +156,7 @@ export function ProductBuyCard({
               <FiPlus className="h-3.5 w-3.5" />
             </button>
             <span className="text-sm font-semibold text-gray-900 ml-2">
-              = {price * qty} TND
+              = {price * qty} {PLATFORM_CURRENCY}
             </span>
           </div>
         </div>

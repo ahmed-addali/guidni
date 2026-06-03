@@ -101,6 +101,22 @@ export async function updateGuideProfile(
   return { success: true as const };
 }
 
+export async function updateGuideChatEnabled(
+  enabled: boolean
+): Promise<{ success: true } | { success: false; error: string }> {
+  const session = await getSession();
+  if (!session?.user) return { success: false as const, error: "Not authenticated" };
+
+  const guide = await requireGuideProfile(session.user.id);
+  if (!guide) return { success: false as const, error: "No guide profile found" };
+
+  await prisma.guideProfile.update({
+    where: { id: guide.id },
+    data:  { chatEnabled: enabled },
+  });
+  return { success: true as const };
+}
+
 // ─────────────────────────────────────────────────────────────
 // Guide plan management
 // ─────────────────────────────────────────────────────────────
@@ -122,16 +138,17 @@ export async function getMyGuidePlans() {
       isPublic:     true,
       price:        true,
       purchaseCount:true,
-      viewCount:    true,
-      summary:      true,
-      tags:         true,
-      difficulty:   true,
-      suitableFor:  true,
-      season:       true,
-      previewDays:  true,
-      preferences:  true,
-      createdAt:    true,
-      destination:  { select: { city: true, slug: true } },
+      viewCount:         true,
+      moderationStatus:  true,
+      summary:           true,
+      tags:              true,
+      difficulty:        true,
+      suitableFor:       true,
+      season:            true,
+      previewDays:       true,
+      preferences:       true,
+      createdAt:         true,
+      destination:       { select: { city: true, slug: true } },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -145,7 +162,10 @@ export async function getMyGuidePlanById(planId: string) {
   if (!guide) return null;
 
   const plan = await prisma.plan.findUnique({ where: { id: planId } });
-  if (!plan || plan.guideId !== guide.id) return null;
+  // Allow access if the guide owns the plan directly (already published)
+  // OR if the plan belongs to this user but hasn't been linked to the guide yet
+  if (!plan) return null;
+  if (plan.guideId !== guide.id && plan.userId !== session.user.id) return null;
   return plan;
 }
 
@@ -267,30 +287,67 @@ export async function addGuideNoteToSlot(
   if (!guide) return { success: false as const, error: "No guide profile" };
 
   const plan = await prisma.plan.findUnique({ where: { id: planId } });
-  if (!plan || plan.guideId !== guide.id)
+  if (!plan || (plan.guideId !== guide.id && plan.userId !== session.user.id))
     return { success: false as const, error: "Plan not found" };
 
   // Mutate the itinerary JSON to add guideNote to the target slot
   const itinerary = plan.itinerary as Array<{
     dayNumber: number;
-    slots: Array<{ id: string; guideNote?: string }>;
+    blocks: Array<{ id: string; guideNote?: string }>;
     [key: string]: unknown;
   }>;
 
   let found = false;
   const updated = itinerary.map((day) => ({
     ...day,
-    slots: day.slots.map((slot) => {
-      if (slot.id === slotId) {
+    blocks: day.blocks.map((block) => {
+      if (block.id === slotId) {
         found = true;
-        return { ...slot, guideNote: note || undefined };
+        return { ...block, guideNote: note || undefined };
       }
-      return slot;
+      return block;
     }),
   }));
 
-  if (!found) return { success: false as const, error: "Slot not found" };
+  if (!found) return { success: false as const, error: "Block not found" };
 
   await prisma.plan.update({ where: { id: planId }, data: { itinerary: updated } });
   return { success: true as const };
+}
+
+/** Duplicate a guide plan — creates a private draft copy owned by the same guide. */
+export async function duplicateGuidePlan(
+  planId: string
+): Promise<{ success: true; newPlanId: string } | { success: false; error: string }> {
+  const session = await getSession();
+  if (!session?.user) return { success: false as const, error: "Not authenticated" };
+
+  const guide = await requireGuideProfile(session.user.id);
+  if (!guide) return { success: false as const, error: "No guide profile" };
+
+  const plan = await prisma.plan.findUnique({ where: { id: planId } });
+  if (!plan || (plan.guideId !== guide.id && plan.userId !== session.user.id))
+    return { success: false as const, error: "Plan not found" };
+
+  const newPlan = await prisma.plan.create({
+    data: {
+      userId:        plan.userId,
+      destinationId: plan.destinationId,
+      duration:      plan.duration,
+      planType:      "USER_SAVED",   // always start as draft
+      isPublic:      false,
+      title:         plan.title ? `${plan.title} (copy)` : null,
+      summary:       plan.summary,
+      tags:          plan.tags,
+      difficulty:    plan.difficulty,
+      suitableFor:   plan.suitableFor,
+      season:        plan.season,
+      previewDays:   plan.previewDays,
+      itinerary:     plan.itinerary ?? [],
+      preferences:   plan.preferences ?? {},
+      // guideId intentionally not copied — must be re-published
+    },
+  });
+
+  return { success: true as const, newPlanId: newPlan.id };
 }

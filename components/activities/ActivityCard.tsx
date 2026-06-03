@@ -12,7 +12,7 @@ type ActivityCardProps = {
     slug: string;
     title: string;
     arabicTitle?: string | null;
-    category: string;
+    categories: string[];
     price: number;
     region: string;
     city?: string | null;
@@ -40,8 +40,7 @@ export function ActivityCard({ activity, locale, initialIsWishlisted, badges }: 
     .filter(Boolean)
     .join(", ");
 
-  // Only show the first category in the badge
-  const primaryCategory = activity.category.split(",")[0].trim();
+  const primaryCategory = activity.categories[0] ?? "";
   const categoryLabel = getCategoryLabel(primaryCategory, locale);
 
   return (

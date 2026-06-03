@@ -42,10 +42,9 @@ next-env.d.ts
 
 # Local image uploads
 uploads/
-planner-agent/venv/
-planner-agent/logs/
-__pycache__/
-rag_storage/
+
+start_guidni.sh
+rapport
+# Ignore Backend on Frontend Remote
 brain/
 planner-agent/
-rapport/

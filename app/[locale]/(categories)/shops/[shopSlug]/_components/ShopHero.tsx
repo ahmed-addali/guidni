@@ -5,26 +5,27 @@ import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { ShareButton } from "@/app/[locale]/(categories)/stays/[staySlug]/_components/ShareButton";
 
 interface Props {
-  id:            string;
-  name:          string;
-  categoryLabel: string;
-  city?:         string | null;
-  country:       string;
-  note?:         string | null;
-  nbReviews:     number;
-  isOpen:        boolean;
-  coverPhoto?:   string | null;
-  logo?:         string | null;
-  locale:        string;
-  openLabel:     string;
-  closedLabel:   string;
-  shareLabel:    string;
-  copiedLabel:   string;
+  id:                   string;
+  name:                 string;
+  categoryLabel:        string;
+  city?:                string | null;
+  country:              string;
+  note?:                string | null;
+  nbReviews:            number;
+  isOpen:               boolean;
+  coverPhoto?:          string | null;
+  logo?:                string | null;
+  locale:               string;
+  initialIsWishlisted?: boolean;
+  openLabel:            string;
+  closedLabel:          string;
+  shareLabel:           string;
+  copiedLabel:          string;
 }
 
 export function ShopHero({
   id, name, categoryLabel, city, country, note, nbReviews, isOpen,
-  coverPhoto, logo, locale, openLabel, closedLabel, shareLabel, copiedLabel,
+  coverPhoto, logo, locale, initialIsWishlisted, openLabel, closedLabel, shareLabel, copiedLabel,
 }: Props) {
   const rating = note ? parseFloat(note) : null;
 
@@ -57,7 +58,7 @@ export function ShopHero({
           copiedLabel={copiedLabel}
           className="flex items-center justify-center w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-sm hover:bg-white transition-all"
         />
-        <WishlistButton listingId={id} relationType="SHOP" locale={locale} />
+        <WishlistButton listingId={id} relationType="SHOP" locale={locale} initialIsWishlisted={initialIsWishlisted} />
       </div>
 
       {/* Bottom content */}
@@ -98,11 +99,11 @@ export function ShopHero({
               {city ? `${city}, ${country}` : country}
             </span>
             {rating !== null && nbReviews > 0 && (
-              <span className="flex items-center gap-1">
+              <a href="#shop-reviews" className="flex items-center gap-1 hover:underline">
                 <FiStar className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
                 <span className="font-semibold text-white">{rating.toFixed(1)}</span>
                 <span>({nbReviews})</span>
-              </span>
+              </a>
             )}
           </div>
         </div>

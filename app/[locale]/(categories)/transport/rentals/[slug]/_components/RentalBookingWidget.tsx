@@ -1,15 +1,20 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { toast } from "sonner";
-import { FiCheck, FiMinus, FiPlus } from "react-icons/fi";
+import { FiCheck, FiAlertTriangle, FiCalendar, FiArrowRight } from "react-icons/fi";
+import { format, eachDayOfInterval } from "date-fns";
 import { DatePickerInput } from "@/components/shared/DatePickerInput";
 import { createRentalReservation } from "@/lib/actions/rental-reservations";
+import { PLATFORM_CURRENCY } from "@/lib/utils/constants";
 
 interface Props {
-  rentalId:    string;
-  pricePerDay: number;
-  minDays:     number;
+  rentalId:          string;
+  pricePerDay:       number;
+  minDays:           number;
+  unavailableDates?: string[];
   labels: {
     perDay:       string;
     pickupDate:   string;
@@ -19,16 +24,22 @@ interface Props {
     reserve:      string;
     reserving:    string;
     total:        string;
-    minDays:      string;
-    noCharge:     string;
-    doneTitle:    string;
-    doneMessage:  string;
-    pickDateErr:  string;
-    minDaysErr:   string;
+    minDays:          string;
+    noCharge:         string;
+    doneTitle:        string;
+    doneMessage:      string;
+    pickDateErr:      string;
+    minDaysErr:       string;
+    unavailableRange: string;
+    viewBooking:      string;
+    bookAgain:        string;
   };
 }
 
-export function RentalBookingWidget({ rentalId, pricePerDay, minDays, labels }: Props) {
+export function RentalBookingWidget({ rentalId, pricePerDay, minDays, unavailableDates = [], labels }: Props) {
+  const params = useParams();
+  const locale = params.locale as string;
+
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate,   setEndDate]   = useState<Date | undefined>();
   const [notes,     setNotes]     = useState("");
@@ -40,6 +51,15 @@ export function RentalBookingWidget({ rentalId, pricePerDay, minDays, labels }: 
     const diff = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
     return diff < minDays ? 0 : Math.round(diff);
   })();
+
+  const unavailableSet = useMemo(() => new Set(unavailableDates), [unavailableDates]);
+
+  const hasConflict = useMemo(() => {
+    if (!startDate || !endDate || startDate >= endDate) return false;
+    return eachDayOfInterval({ start: startDate, end: endDate }).some(
+      (d) => unavailableSet.has(format(d, "yyyy-MM-dd"))
+    );
+  }, [startDate, endDate, unavailableSet]);
 
   const total = days * pricePerDay;
 
@@ -61,12 +81,31 @@ export function RentalBookingWidget({ rentalId, pricePerDay, minDays, labels }: 
 
   if (done) {
     return (
-      <div className="bg-white border border-gray-100 rounded-2xl p-6 text-center space-y-3">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 text-center space-y-4">
         <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mx-auto">
           <FiCheck className="h-6 w-6 text-green-600" />
         </div>
-        <p className="font-semibold text-gray-900">{labels.doneTitle}</p>
-        <p className="text-sm text-gray-500">{labels.doneMessage}</p>
+        <div className="space-y-1">
+          <p className="font-semibold text-gray-900">{labels.doneTitle}</p>
+          <p className="text-sm text-gray-500">{labels.doneMessage}</p>
+        </div>
+        <div className="flex flex-col gap-2 pt-1">
+          <Link
+            href={`/${locale}/bookings?tab=rentals`}
+            className="flex items-center justify-center gap-2 bg-primary text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
+          >
+            <FiArrowRight className="h-4 w-4" />
+            {labels.viewBooking}
+          </Link>
+          <button
+            type="button"
+            onClick={() => { setDone(false); setStartDate(undefined); setEndDate(undefined); setNotes(""); }}
+            className="flex items-center justify-center gap-2 text-sm font-medium text-gray-600 border border-gray-200 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            <FiCalendar className="h-4 w-4" />
+            {labels.bookAgain}
+          </button>
+        </div>
       </div>
     );
   }
@@ -78,7 +117,7 @@ export function RentalBookingWidget({ rentalId, pricePerDay, minDays, labels }: 
     <div id="booking-widget" className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
       {/* Price display */}
       <div className="flex items-baseline gap-1">
-        <span className="text-2xl font-bold text-gray-900">{pricePerDay} TND</span>
+        <span className="text-2xl font-bold text-gray-900">{pricePerDay} {PLATFORM_CURRENCY}</span>
         <span className="text-sm text-gray-400">{labels.perDay}</span>
       </div>
 
@@ -95,6 +134,7 @@ export function RentalBookingWidget({ rentalId, pricePerDay, minDays, labels }: 
               }}
               minDate={new Date()}
               placeholder={labels.pickupDate}
+              disabledDates={unavailableDates}
             />
           </div>
         </div>
@@ -108,6 +148,7 @@ export function RentalBookingWidget({ rentalId, pricePerDay, minDays, labels }: 
               onDateChange={setEndDate}
               minDate={startDate ?? new Date()}
               placeholder={labels.returnDate}
+              disabledDates={unavailableDates}
             />
           </div>
         </div>
@@ -125,27 +166,35 @@ export function RentalBookingWidget({ rentalId, pricePerDay, minDays, labels }: 
         </div>
       </div>
 
+      {/* Unavailable range warning */}
+      {hasConflict && (
+        <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+          <FiAlertTriangle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+          <p className="text-sm text-red-600">{labels.unavailableRange}</p>
+        </div>
+      )}
+
       {/* Pricing summary */}
-      {days > 0 && (
+      {days > 0 && !hasConflict && (
         <div className="bg-gray-50 rounded-xl border border-gray-200 p-3 space-y-1.5 text-sm">
           <div className="flex justify-between text-gray-600">
-            <span>{pricePerDay} TND × {days} {labels.perDay.replace("/", "").trim()}</span>
-            <span>{total} TND</span>
+            <span>{pricePerDay} {PLATFORM_CURRENCY} × {days} {labels.perDay.replace("/", "").trim()}</span>
+            <span>{total} {PLATFORM_CURRENCY}</span>
           </div>
           <div className="flex justify-between font-semibold text-gray-900 pt-1 border-t border-gray-200">
             <span>{labels.total}</span>
-            <span>{total} TND</span>
+            <span>{total} {PLATFORM_CURRENCY}</span>
           </div>
         </div>
       )}
 
-      {startDate && endDate && days < minDays && days > 0 && (
+      {startDate && endDate && days < minDays && days > 0 && !hasConflict && (
         <p className="text-xs text-red-500">{labels.minDays.replace("{n}", String(minDays))}</p>
       )}
 
       <button
         onClick={handleBook}
-        disabled={pending || !startDate || !endDate || days < minDays}
+        disabled={pending || !startDate || !endDate || days < minDays || hasConflict}
         className="w-full bg-primary text-white rounded-xl py-3 text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
       >
         {pending ? labels.reserving : labels.reserve}

@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { TbRoute } from "react-icons/tb";
 import { FiMapPin, FiStar } from "react-icons/fi";
 import { Separator } from "@/components/ui/separator";
-import { getTransferBySlug, getRelatedTransfers } from "@/lib/actions/transfers";
+import { getTransferBySlug, getRelatedTransfers, getPublicTransferUnavailableDates, getTransferBookedSlots } from "@/lib/actions/transfers";
 import { getReviews, hasReviewed, hasCompletedBooking } from "@/lib/actions/reviews";
 import { isInWishlist } from "@/lib/actions/wishlist";
 import { getManualBadges, getGuidniReview } from "@/lib/actions/badges";
@@ -17,6 +17,8 @@ import { ReviewsSection } from "@/components/activities/ReviewsSection";
 import { RatingSummary } from "@/components/shared/RatingSummary";
 import { DescriptionWithToggle } from "@/components/shared/DescriptionWithToggle";
 import { ImageGallery } from "@/components/shared/ImageGallery";
+import { DetailPageTracker } from "@/components/shared/DetailPageTracker";
+import { RelationType } from "@prisma/client";
 import { TransferAnchorNav } from "./_components/TransferAnchorNav";
 import { TransferMobileBar } from "./_components/TransferMobileBar";
 import { TransferBookingWidget } from "./_components/TransferBookingWidget";
@@ -47,17 +49,19 @@ export default async function TransferDetailPage({ params }: { params: Params })
   ]);
   if (!transfer) notFound();
 
-  const [reviews, alreadyReviewed, completedBooking, wishlisted, manualBadges, guidniReview, relatedTransfers] =
+  const [reviews, alreadyReviewed, completedBooking, wishlisted, manualBadges, guidniReview, relatedTransfers, unavailableDates, bookedSlots] =
     await Promise.all([
-      getReviews(transfer.id, "TRANSFER"),
+      getReviews(transfer.id, RelationType.TRANSFER),
       hasReviewed(transfer.id, "TRANSFER"),
       hasCompletedBooking(transfer.id, "TRANSFER"),
       isInWishlist(transfer.id, "TRANSFER"),
-      getManualBadges(transfer.id, "TRANSFER"),
-      getGuidniReview(transfer.id, "TRANSFER"),
+      getManualBadges(transfer.id, RelationType.TRANSFER),
+      getGuidniReview(transfer.id, RelationType.TRANSFER),
       transfer.destinationId
         ? getRelatedTransfers(transfer.id, transfer.destinationId)
         : Promise.resolve([]),
+      getPublicTransferUnavailableDates(transfer.id),
+      getTransferBookedSlots(transfer.id),
     ]);
 
   const canReview = completedBooking && !alreadyReviewed;
@@ -129,10 +133,14 @@ export default async function TransferDetailPage({ params }: { params: Params })
     errPickup:           t("transfer.widget.errPickup"),
     errName:             t("transfer.widget.errName"),
     errMinHour:          t("transfer.widget.errMinHour"),
+    errTimeConflict:     t("transfer.widget.errTimeConflict"),
+    viewBooking:         t("transfer.widget.viewBooking"),
+    bookAgain:           t("transfer.widget.bookAgain"),
   };
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-20 py-8 pb-16 lg:pb-16">
+      <DetailPageTracker listingId={transfer.id} listingType="TRANSFER" />
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-sm text-gray-400 mb-5">
@@ -200,6 +208,8 @@ export default async function TransferDetailPage({ params }: { params: Params })
           title={transfer.title}
           allPhotosLabel={t("transfer.allPhotos")}
           photosLabel={t("transfer.photos")}
+          listingId={transfer.id}
+          listingType="TRANSFER"
         />
       ) : (
         <div className="h-72 sm:h-96 bg-gray-100 rounded-2xl flex items-center justify-center mb-2">
@@ -316,6 +326,8 @@ export default async function TransferDetailPage({ params }: { params: Params })
             pricePerPerson={transfer.pricePerPerson}
             capacity={transfer.capacity}
             locale={locale}
+            unavailableDates={unavailableDates}
+            bookedSlots={bookedSlots}
             labels={widgetLabels}
           />
 

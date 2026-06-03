@@ -63,7 +63,7 @@ export default async function AdminListingsPage({ params }: { params: Params }) 
                         </td>
                         <td className="px-6 py-3.5">
                           <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
-                            {a.category}
+                            {a.categories[0] ?? "—"}
                           </span>
                         </td>
                         <td className="px-6 py-3.5 text-gray-600">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { QRCodeSVG } from "react-qr-code";
+import QRCode from "react-qr-code";
 import { Download, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -116,7 +116,7 @@ export function QrTab({ restaurantSlug, locale, labels }: Props) {
         <p className="text-sm font-medium text-gray-700">{labels.previewLabel}</p>
         <div ref={qrRef} className="flex justify-center">
           <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-            <QRCodeSVG value={qrUrl} size={180} />
+            <QRCode value={qrUrl} size={180} />
           </div>
         </div>
         <div className="space-y-1">

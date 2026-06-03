@@ -13,7 +13,7 @@ type RelatedTransfer = {
   city: string | null;
   country: string;
   images: { id: string; url: string }[];
-  destination: { slug: string; city: string };
+  destination: { slug: string; city: string } | null;
 };
 
 const TYPE_LABELS_MAP: Record<string, string> = {

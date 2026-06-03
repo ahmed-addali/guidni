@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { FiMapPin, FiStar } from "react-icons/fi";
-import { getStayBySlug, getRelatedStays } from "@/lib/actions/stays";
+import { getStayBySlug, getRelatedStays, getUnavailableDates, getHostResponseTime } from "@/lib/actions/stays";
 import { getReviews, hasCompletedBooking, hasReviewed } from "@/lib/actions/reviews";
 import { getManualBadges, getGuidniReview } from "@/lib/actions/badges";
 import { getAutoBadges } from "@/lib/utils/badge-utils";
@@ -25,18 +25,28 @@ import { StayAnchorNav } from "./_components/StayAnchorNav";
 import { StayMobileBookingBar } from "./_components/StayMobileBookingBar";
 import { StayRelatedSection } from "./_components/StayRelatedSection";
 import { ShareButton } from "./_components/ShareButton";
+import { WhatsAppShareButton } from "@/components/shared/WhatsAppShareButton";
+import { RelationType } from "@prisma/client";
+import { DetailPageTracker } from "@/components/shared/DetailPageTracker";
 
 type Params = Promise<{ locale: string; staySlug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { staySlug, locale } = await params;
-  const stay = await getStayBySlug(staySlug);
-  if (!stay) return { title: "Stay Not Found" };
-  const title = locale === "ar" && stay.arabicTitle ? stay.arabicTitle : stay.title;
+  const [stay, t] = await Promise.all([
+    getStayBySlug(staySlug),
+    getTranslations({ locale, namespace: "StayPage.notFound" }),
+  ]);
+  if (!stay) return { title: t("title") };
+  const isAr = locale === "ar";
+  const title = isAr && stay.arabicTitle ? stay.arabicTitle : stay.title;
+  const description = isAr && stay.arabicDescription
+    ? stay.arabicDescription.slice(0, 160)
+    : stay.description.slice(0, 160);
   return {
     title,
-    description: stay.description.slice(0, 160),
-    openGraph: { images: stay.images.map((img) => img.url) },
+    description,
+    openGraph: { title, description, images: stay.images.map((img) => img.url) },
   };
 }
 
@@ -50,15 +60,17 @@ export default async function StayPage({ params }: { params: Params }) {
 
   if (!stay) notFound();
 
-  const [reviews, completedBooking, alreadyReviewed, manualBadges, guidniReview, relatedStays] = await Promise.all([
-    getReviews(stay.id, "STAY"),
+  const [reviews, completedBooking, alreadyReviewed, manualBadges, guidniReview, relatedStays, unavailableDates, responseTime] = await Promise.all([
+    getReviews(stay.id, RelationType.STAY),
     hasCompletedBooking(stay.id, "STAY"),
     hasReviewed(stay.id, "STAY"),
-    getManualBadges(stay.id, "STAY"),
-    getGuidniReview(stay.id, "STAY"),
+    getManualBadges(stay.id, RelationType.STAY),
+    getGuidniReview(stay.id, RelationType.STAY),
     stay.destinationId
       ? getRelatedStays(stay.id, stay.destinationId)
       : Promise.resolve([]),
+    getUnavailableDates(stay.id),
+    getHostResponseTime(stay.id),
   ]);
 
   const canReview = completedBooking && !alreadyReviewed;
@@ -122,7 +134,7 @@ export default async function StayPage({ params }: { params: Params }) {
             {(stay.averageRating ?? 0) > 0 && stay.nbReviews > 0 ? (
               <a href="#reviews-section" className="flex items-center gap-1 hover:underline">
                 <FiStar className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
-                <span className="font-medium text-gray-700">{stay.averageRating.toFixed(1)}</span>
+                <span className="font-medium text-gray-700">{stay.averageRating!.toFixed(1)}</span>
                 <span>· {stay.nbReviews} {t("reviews")}</span>
               </a>
             ) : null}
@@ -142,6 +154,7 @@ export default async function StayPage({ params }: { params: Params }) {
             copiedLabel={t("shareCopied")}
             className="h-9 w-9 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 transition-colors"
           />
+          <WhatsAppShareButton title={title} />
           <WishlistButton
             listingId={stay.id}
             relationType="STAY"
@@ -150,12 +163,17 @@ export default async function StayPage({ params }: { params: Params }) {
         </div>
       </div>
 
+      {/* ── Recommendation tracking (dwell time) ── */}
+      <DetailPageTracker listingId={stay.id} listingType="STAY" />
+
       {/* ── Gallery ── */}
       <StayGallery
         images={stay.images}
         title={title}
         allPhotosLabel={t("allPhotos")}
         photosLabel={t("photos")}
+        listingId={stay.id}
+        listingType="STAY"
       />
 
       {/* ── Anchor navigation ── */}
@@ -181,10 +199,13 @@ export default async function StayPage({ params }: { params: Params }) {
             profileImage={stay.businessProfile?.profileImage}
             isVerified={stay.businessProfile?.isVerified ?? false}
             memberSince={memberYear}
+            responseTime={responseTime}
             labels={{
-              hostedBy:    t("host.hostedBy", { type: stay.category, name: hostName }),
-              speaks:      t("host.speaks"),
-              memberSince: t("memberSince"),
+              hostedBy:          t("host.hostedBy", { type: stay.category, name: hostName }),
+              speaks:            t("host.speaks"),
+              memberSince:       t("memberSince"),
+              respondsQuickly:   t("respondsQuickly"),
+              respondsWithinDay: t("respondsWithinDay"),
             }}
           />
 
@@ -292,6 +313,11 @@ export default async function StayPage({ params }: { params: Params }) {
           <StayBookingCard
             stayId={stay.id}
             price={stay.price}
+            unavailableDates={[
+              ...unavailableDates.blocked,
+              ...unavailableDates.confirmed,
+              ...unavailableDates.pending,
+            ]}
             cleaningFee={stay.cleaningFee ?? 0}
             weeklyDiscount={stay.weeklyDiscount ?? 0}
             monthlyDiscount={stay.monthlyDiscount ?? 0}
@@ -307,9 +333,10 @@ export default async function StayPage({ params }: { params: Params }) {
               taxes:       t("taxes"),
               discount:    t("discount"),
               total:       t("total"),
-              bookNow:     t("bookNow"),
-              bookingNote: t("bookingNote"),
-              reviews:     t("reviews"),
+              bookNow:          t("bookNow"),
+              bookingNote:      t("bookingNote"),
+              datesUnavailable: t("datesUnavailable"),
+              reviews:          t("reviews"),
               adults:      t("booking.adults"),
               children:    t("booking.children"),
               checkIn:     t("booking.checkIn"),

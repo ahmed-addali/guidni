@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { FaStore } from "react-icons/fa6";
 import { FiPackage } from "react-icons/fi";
-import { getShopsPaginated } from "@/lib/actions/shops";
+import { getShopsPaginated, getProductsPaginated } from "@/lib/actions/shops";
 import { getDestinationSlug } from "@/lib/actions/destination-cookie";
 import { getDestinationBySlug } from "@/lib/actions/destinations";
 import { getBadgesForListings } from "@/lib/actions/badges";
@@ -15,7 +15,6 @@ import { ShopSearch } from "./_components/ShopSearch";
 import { ShopFilterSheet } from "./_components/ShopFilterSheet";
 import { ShopFilterChips } from "./_components/ShopFilterChips";
 import { getShopCategoryLabel } from "@/lib/utils/shop-categories";
-import { getShops } from "@/lib/actions/shops";
 
 type Params       = Promise<{ locale: string }>;
 type SearchParams = Promise<{
@@ -48,49 +47,43 @@ export default async function ShopsPage({
   const mode_      = mode === "products" ? "products" : "shops";
   const categories = category ? category.split(",").filter(Boolean) : [];
 
-  const [shopsResult, destinationRecord] = await Promise.all([
+  const [shopsResult, productsResult, destinationRecord] = await Promise.all([
     mode_ === "shops"
       ? getShopsPaginated({ destinationSlug: destination, categories, search: q, page })
+      : null,
+    mode_ === "products"
+      ? getProductsPaginated({
+          destinationSlug: destination,
+          categories,
+          handmade: handmade === "true",
+          search: q,
+          page,
+        })
       : null,
     getDestinationBySlug(destination),
   ]);
 
-  const shops      = shopsResult?.shops ?? [];
-  const total      = shopsResult?.total ?? 0;
-  const totalPages = shopsResult?.totalPages ?? 1;
+  const shops           = shopsResult?.shops ?? [];
+  const total           = shopsResult?.total ?? 0;
+  const totalPages      = shopsResult?.totalPages ?? 1;
+  const allProducts     = (productsResult?.products ?? []).map((p) => ({
+    id:           p.id,
+    slug:         p.slug,
+    shopSlug:     p.shop.slug,
+    name:         p.name,
+    arabicName:   p.arabicName ?? null,
+    shopName:     p.shop.name,
+    price:        p.price,
+    comparePrice: p.comparePrice,
+    isHandmade:   p.isHandmade,
+    imageUrl:     p.images[0]?.url ?? null,
+  }));
+  const productTotal     = productsResult?.total ?? 0;
+  const productTotalPages = productsResult?.totalPages ?? 1;
 
   const badgesMap = shops.length > 0
     ? await getBadgesForListings(shops.map((s) => s.id), "SHOP")
     : {};
-
-  // Products mode: fetch shops filtered by categories, then flatten + filter
-  let allProducts: {
-    id: string; slug: string; shopSlug: string; name: string; arabicName: string | null;
-    shopName: string; price: number; comparePrice: number | null;
-    isHandmade: boolean; imageUrl: string | null;
-  }[] = [];
-
-  if (mode_ === "products") {
-    const shopsForProducts = await getShops(destination, categories);
-    for (const shop of shopsForProducts) {
-      for (const product of shop.products) {
-        if (handmade === "true" && !product.isHandmade) continue;
-        if (q && !product.name.toLowerCase().includes(q.toLowerCase())) continue;
-        allProducts.push({
-          id:           product.id,
-          slug:         product.slug,
-          shopSlug:     shop.slug,
-          name:         product.name,
-          arabicName:   product.arabicName,
-          shopName:     shop.name,
-          price:        product.price,
-          comparePrice: product.comparePrice,
-          isHandmade:   product.isHandmade,
-          imageUrl:     product.images[0]?.url ?? null,
-        });
-      }
-    }
-  }
 
   const destinationCity = destinationRecord?.city ?? null;
 
@@ -158,7 +151,7 @@ export default async function ShopsPage({
           <p className="text-sm text-gray-500">
             {mode_ === "shops"
               ? t("shopsCount", { count: total })
-              : t("productsCount", { count: allProducts.length })}
+              : t("productsCount", { count: productTotal })}
           </p>
         </div>
 
@@ -220,24 +213,36 @@ export default async function ShopsPage({
               <p className="text-sm text-muted-foreground max-w-xs">{t("emptyHint")}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {allProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  slug={product.slug}
-                  shopSlug={product.shopSlug}
-                  name={product.name}
-                  shopName={product.shopName}
-                  price={product.price}
-                  comparePrice={product.comparePrice}
-                  isHandmade={product.isHandmade}
-                  imageUrl={product.imageUrl}
-                  locale={locale}
-                  handmadeLabel={t("handmade")}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {allProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    id={product.id}
+                    slug={product.slug}
+                    shopSlug={product.shopSlug}
+                    name={product.name}
+                    shopName={product.shopName}
+                    price={product.price}
+                    comparePrice={product.comparePrice}
+                    isHandmade={product.isHandmade}
+                    imageUrl={product.imageUrl}
+                    locale={locale}
+                    handmadeLabel={t("handmade")}
+                  />
+                ))}
+              </div>
+              {productTotalPages > 1 && (
+                <Suspense>
+                  <Pagination
+                    currentPage={page}
+                    totalPages={productTotalPages}
+                    previousLabel={t("previous")}
+                    nextLabel={t("next")}
+                  />
+                </Suspense>
+              )}
+            </>
           )
         )}
 

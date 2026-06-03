@@ -7,20 +7,28 @@ import type { RestaurantListItem } from "@/lib/actions/restaurants";
 import { BadgeList } from "@/components/badges/BadgeList";
 import type { BadgeKey } from "@prisma/client";
 
-const TYPE_LABELS: Record<string, string> = {
-  RESTAURANT:  "Restaurant",
-  CAFEE_SHOP:  "Café",
-  BOTH:        "Restaurant & Café",
+const TYPE_LABELS_DEFAULT: Record<string, string> = {
+  RESTAURANT: "Restaurant",
+  CAFEE_SHOP: "Café",
+  BOTH:       "Restaurant & Café",
 };
+
+export interface RestaurantCardLabels {
+  typeLabels?: Record<string, string>;
+  reservationAvailable?: string;
+  walkinOnly?: string;
+}
 
 interface Props {
   restaurant: RestaurantListItem;
   locale: string;
+  cardLabels?: RestaurantCardLabels;
   initialIsWishlisted?: boolean;
   badges?: BadgeKey[];
 }
 
-export function RestaurantCard({ restaurant, locale, initialIsWishlisted = false, badges }: Props) {
+export function RestaurantCard({ restaurant, locale, cardLabels, initialIsWishlisted = false, badges }: Props) {
+  const typeLabels = cardLabels?.typeLabels ?? TYPE_LABELS_DEFAULT;
   const name = locale === "ar" && restaurant.arabicName
     ? restaurant.arabicName
     : restaurant.name;
@@ -54,7 +62,7 @@ export function RestaurantCard({ restaurant, locale, initialIsWishlisted = false
           )}
           <span className="absolute top-2 left-2 bg-white/90 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
             <IoRestaurant className="h-3 w-3" />
-            {TYPE_LABELS[restaurant.type] ?? restaurant.type}
+            {typeLabels[restaurant.type] ?? restaurant.type}
           </span>
           <div className="absolute top-2 right-2">
             <WishlistButton
@@ -85,7 +93,9 @@ export function RestaurantCard({ restaurant, locale, initialIsWishlisted = false
 
           <div className="flex items-center justify-between mt-auto pt-2.5 border-t border-gray-100 mt-3">
             <span className="text-xs text-gray-500">
-              {restaurant.reservationsEnabled ? "Reservations available" : "Walk-in only"}
+              {restaurant.reservationsEnabled
+                ? (cardLabels?.reservationAvailable ?? "Reservations available")
+                : (cardLabels?.walkinOnly ?? "Walk-in only")}
             </span>
             {restaurant.note && parseFloat(restaurant.note) > 0 && (
               <div className="flex items-center gap-0.5 text-xs text-gray-700">

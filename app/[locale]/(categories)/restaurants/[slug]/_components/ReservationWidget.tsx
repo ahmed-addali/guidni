@@ -6,19 +6,22 @@ import { Users, CheckCircle } from "lucide-react";
 import { Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { DatePickerInput } from "@/components/shared/DatePickerInput";
+import { PhoneInput } from "@/components/shared/PhoneInput";
 import { createReservation } from "@/lib/actions/restaurant-reservations";
 
 interface Props {
   restaurantId: string;
   restaurantName: string;
   maxGuests: number | null;
-  locale: string;
   labels: {
     title: string;
     date: string;
     time: string;
     guests: string;
     maxGuests: string;
+    guestName: string;
+    guestNamePlaceholder: string;
+    phone: string;
     notes: string;
     notesPlaceholder: string;
     submit: string;
@@ -33,26 +36,29 @@ export function ReservationWidget({
   restaurantId,
   restaurantName,
   maxGuests,
-  locale,
   labels,
 }: Props) {
   const today = new Date();
-  const [date,    setDate]    = useState<Date | undefined>(today);
-  const [time,    setTime]    = useState("");
-  const [guests,  setGuests]  = useState(2);
-  const [notes,   setNotes]   = useState("");
-  const [done,    setDone]    = useState(false);
-  const [pending, start]      = useTransition();
+  const [date,      setDate]      = useState<Date | undefined>(today);
+  const [time,      setTime]      = useState("");
+  const [guests,    setGuests]    = useState(2);
+  const [guestName, setGuestName] = useState("");
+  const [phone,     setPhone]     = useState("");
+  const [notes,     setNotes]     = useState("");
+  const [done,      setDone]      = useState(false);
+  const [pending,   start]        = useTransition();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!date) return;
+    if (!date || !guestName.trim()) return;
     start(async () => {
       const result = await createReservation({
         restaurantId,
         date: date.toISOString().split("T")[0],
         time,
         guests,
+        guestName: guestName.trim(),
+        phone: phone || undefined,
         notes: notes || undefined,
       });
       if (result.success) {
@@ -88,7 +94,6 @@ export function ReservationWidget({
             onDateChange={setDate}
             minDate={today}
             placeholder={labels.date}
-            locale={locale}
           />
         </div>
 
@@ -134,6 +139,25 @@ export function ReservationWidget({
           )}
         </div>
 
+        {/* Guest name */}
+        <div>
+          <label className="text-xs font-medium text-gray-500 mb-1 block">{labels.guestName} *</label>
+          <input
+            type="text"
+            required
+            value={guestName}
+            onChange={(e) => setGuestName(e.target.value)}
+            placeholder={labels.guestNamePlaceholder}
+            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+        </div>
+
+        {/* Phone */}
+        <div>
+          <label className="text-xs font-medium text-gray-500 mb-1 block">{labels.phone}</label>
+          <PhoneInput value={phone} onChange={setPhone} />
+        </div>
+
         {/* Notes */}
         <div>
           <label className="text-xs font-medium text-gray-500 mb-1 block">{labels.notes}</label>
@@ -148,7 +172,7 @@ export function ReservationWidget({
 
         <Button
           type="submit"
-          disabled={pending || !date}
+          disabled={pending || !date || !guestName.trim()}
           className="w-full bg-primary text-white rounded-xl py-5 disabled:opacity-60"
         >
           {pending ? labels.submitting : labels.submit}

@@ -36,9 +36,9 @@ export default async function AdminDestinationsPage({ params }: { params: Params
           >
             {/* Cover */}
             <div className="relative h-36 bg-gradient-to-br from-primary/20 to-blue-100">
-              {dest.coverImage ? (
+              {dest.images?.[0]?.url ? (
                 <Image
-                  src={dest.coverImage}
+                  src={dest.images[0].url}
                   alt={dest.city}
                   fill
                   className="object-cover"

@@ -25,7 +25,7 @@ function normalizeActivities(
   rows: Awaited<ReturnType<typeof fetchActivities>>
 ): PlanItem[] {
   return rows.map((a) => {
-    const categoryTags = ACTIVITY_CATEGORY_TO_INTERESTS[a.category?.toLowerCase() ?? ""] ?? [];
+    const categoryTags = ACTIVITY_CATEGORY_TO_INTERESTS[a.categories?.[0]?.toLowerCase() ?? ""] ?? [];
     return {
       id: a.id,
       type: "ACTIVITY" as const,
@@ -200,9 +200,10 @@ function normalizeShops(
 function fetchActivities(destinationId: string) {
   return prisma.activity.findMany({
     where: { destinationId },
+    take: 100,
     select: {
       id: true, slug: true, title: true, arabicTitle: true,
-      category: true, price: true, duration: true,
+      categories: true, price: true, duration: true,
       durationMinutes: true, bestTimeOfDay: true,
       intensity: true, tags: true,
       location: true, note: true, nbReviews: true,
@@ -214,6 +215,7 @@ function fetchActivities(destinationId: string) {
 function fetchAttractions(destinationId: string) {
   return prisma.attraction.findMany({
     where: { destinationId },
+    take: 100,
     select: {
       id: true, slug: true, title: true, category: true,
       hasFee: true, feeAmount: true, location: true,
@@ -225,6 +227,7 @@ function fetchAttractions(destinationId: string) {
 function fetchRestaurants(destinationId: string) {
   return prisma.restaurant.findMany({
     where: { destinationId },
+    take: 100,
     select: {
       id: true, slug: true, name: true, arabicName: true,
       type: true, meals: true, foodTypes: true, dietTypes: true,
@@ -244,6 +247,7 @@ function fetchRestaurants(destinationId: string) {
 function fetchTransfers(destinationId: string) {
   return prisma.transfer.findMany({
     where: { destinationId },
+    take: 50,
     select: {
       id: true, slug: true, title: true, arabicTitle: true,
       type: true, capacity: true,
@@ -258,6 +262,7 @@ function fetchTransfers(destinationId: string) {
 function fetchRentals(destinationId: string) {
   return prisma.rental.findMany({
     where: { destinationId },
+    take: 50,
     select: {
       id: true, slug: true, title: true, arabicTitle: true,
       type: true, pricePerDay: true, capacity: true,
@@ -269,6 +274,7 @@ function fetchRentals(destinationId: string) {
 function fetchShops(destinationId: string) {
   return prisma.shop.findMany({
     where: { destinationId },
+    take: 50,
     select: {
       id: true, slug: true, name: true, category: true,
       coverPhoto: true, city: true,
@@ -301,6 +307,40 @@ function parseActivityDuration(duration: string | null | undefined): number {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Stays — internal fetch for engine auto-selection
+// ─────────────────────────────────────────────────────────────
+
+async function fetchStays(destinationId: string) {
+  return prisma.stay.findMany({
+    where: { destinationId, approvalStatus: "APPROVED" },
+    take: 40,
+    orderBy: { averageRating: "desc" },
+    select: {
+      id: true, slug: true, title: true, price: true,
+      city: true, category: true,
+      images: { select: { url: true }, take: 1 },
+    },
+  });
+}
+
+function normalizeStays(
+  rows: Awaited<ReturnType<typeof fetchStays>>
+): PlanItem[] {
+  return rows.map((s) => ({
+    id:         s.id,
+    type:       "STAY" as const,
+    slug:       s.slug,
+    name:       s.title,
+    imageUrl:   s.images[0]?.url,
+    location:   s.city ?? undefined,
+    price:      s.price,
+    priceLabel: "per night",
+    tags:       [s.category],
+    idealTime:  "any" as const,
+  }));
+}
+
+// ─────────────────────────────────────────────────────────────
 // Main export — cached per destination per request
 // ─────────────────────────────────────────────────────────────
 
@@ -312,6 +352,7 @@ export const getPlannerData = cache(
       restaurantRows,
       transferRows,
       rentalRows,
+      stayRows,
       shopRows,
     ] = await Promise.all([
       fetchActivities(destinationId),
@@ -319,6 +360,7 @@ export const getPlannerData = cache(
       fetchRestaurants(destinationId),
       fetchTransfers(destinationId),
       fetchRentals(destinationId).catch(() => []),
+      fetchStays(destinationId).catch(() => []),
       fetchShops(destinationId),
     ]);
 
@@ -328,6 +370,7 @@ export const getPlannerData = cache(
       restaurants: normalizeRestaurants(restaurantRows),
       transfers:   normalizeTransfers(transferRows),
       rentals:     normalizeRentals(rentalRows),
+      stays:       normalizeStays(stayRows),
       shops:       normalizeShops(shopRows),
     };
   }

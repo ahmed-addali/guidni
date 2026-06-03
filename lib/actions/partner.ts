@@ -209,6 +209,7 @@ export const getPartnerRecentBookings = cache(async (limit = 5) => {
       id: b.id,
       bookingRef: b.bookingRef,
       title: b.activity.title,
+      slug: b.activity.slug,
       date: b.date.toISOString(),
       amount: Number(b.totalPrice),
       status: b.status,
@@ -220,6 +221,7 @@ export const getPartnerRecentBookings = cache(async (limit = 5) => {
       id: b.id,
       bookingRef: b.bookingRef,
       title: b.stay.title,
+      slug: b.stay.slug,
       date: b.checkIn.toISOString(),
       checkOut: b.checkOut?.toISOString(),
       nights: b.nights,
@@ -284,6 +286,7 @@ export const getPartnerAllBookings = cache(
         select: {
           id: true,
           bookingRef: true,
+          activityId: true,
           totalPrice: true,
           status: true,
           createdAt: true,
@@ -303,6 +306,7 @@ export const getPartnerAllBookings = cache(
         select: {
           id: true,
           bookingRef: true,
+          stayId: true,
           totalPrice: true,
           status: true,
           createdAt: true,
@@ -324,6 +328,7 @@ export const getPartnerAllBookings = cache(
         select: {
           id: true,
           bookingRef: true,
+          restaurantId: true,
           status: true,
           createdAt: true,
           date: true,
@@ -343,6 +348,7 @@ export const getPartnerAllBookings = cache(
         select: {
           id: true,
           bookingRef: true,
+          rentalId: true,
           totalPrice: true,
           status: true,
           createdAt: true,
@@ -361,6 +367,7 @@ export const getPartnerAllBookings = cache(
         id: b.id,
         bookingRef: b.bookingRef,
         title: b.activity.title,
+        listingId: b.activityId,
         date: b.date.toISOString(),
         amount: Number(b.totalPrice),
         status: b.status,
@@ -372,6 +379,7 @@ export const getPartnerAllBookings = cache(
         id: b.id,
         bookingRef: b.bookingRef,
         title: b.stay.title,
+        listingId: b.stayId,
         date: b.checkIn.toISOString(),
         checkOut: b.checkOut?.toISOString(),
         nights: b.nights,
@@ -385,6 +393,7 @@ export const getPartnerAllBookings = cache(
         id: b.id,
         bookingRef: b.bookingRef,
         title: b.restaurant.name,
+        listingId: b.restaurantId,
         date: b.date.toISOString(),
         amount: 0,
         status: b.status,
@@ -397,6 +406,7 @@ export const getPartnerAllBookings = cache(
         id: b.id,
         bookingRef: b.bookingRef,
         title: b.rental.title,
+        listingId: b.rentalId,
         date: b.startDate.toISOString(),
         checkOut: b.endDate.toISOString(),
         nights: b.days,
@@ -448,44 +458,122 @@ export const getPartnerReviews = cache(async () => {
   });
 });
 
-export const getPartnerActivities = cache(async () => {
+const PARTNER_ACTIVITIES_PER_PAGE = 20;
+
+export const getPartnerActivities = cache(async (page = 1) => {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) return [];
+  if (!session?.user) return { activities: [], total: 0, totalPages: 0 };
 
   const profile = await prisma.businessProfile.findUnique({
     where: { userId: session.user.id },
     select: { id: true },
   });
-  if (!profile) return [];
+  if (!profile) return { activities: [], total: 0, totalPages: 0 };
 
-  return prisma.activity.findMany({
-    where: { profileId: profile.id },
-    include: {
-      images: { select: { id: true, url: true }, take: 1 },
-      _count: { select: { reservations: true } },
-    },
-    orderBy: { title: "asc" },
-  });
+  const where = { profileId: profile.id };
+  const [activities, total] = await Promise.all([
+    prisma.activity.findMany({
+      where,
+      include: {
+        images: { select: { id: true, url: true }, take: 1 },
+        _count: { select: { reservations: true } },
+      },
+      orderBy: { title: "asc" },
+      skip:  (page - 1) * PARTNER_ACTIVITIES_PER_PAGE,
+      take:  PARTNER_ACTIVITIES_PER_PAGE,
+    }),
+    prisma.activity.count({ where }),
+  ]);
+
+  const activityIds = activities.map((a) => a.id);
+  const badges = activityIds.length
+    ? await prisma.listingBadge.findMany({
+        where: { relationType: "ACTIVITY", relationId: { in: activityIds } },
+        select: { relationId: true, badgeKey: true },
+      })
+    : [];
+
+  const badgeMap = new Map<string, string[]>();
+  for (const b of badges) {
+    const keys = badgeMap.get(b.relationId) ?? [];
+    keys.push(b.badgeKey);
+    badgeMap.set(b.relationId, keys);
+  }
+
+  return {
+    activities: activities.map((a) => ({
+      ...a,
+      badges: (badgeMap.get(a.id) ?? []).map((key) => ({ badgeKey: key })),
+    })),
+    total,
+    totalPages: Math.ceil(total / PARTNER_ACTIVITIES_PER_PAGE),
+    page,
+  };
 });
 
-export const getPartnerStays = cache(async () => {
+const PARTNER_STAYS_PER_PAGE = 12;
+
+export const getPartnerStays = cache(async (page = 1) => {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) return [];
+  if (!session?.user) return { stays: [], total: 0, totalPages: 0 };
 
   const profile = await prisma.businessProfile.findUnique({
     where: { userId: session.user.id },
     select: { id: true },
   });
-  if (!profile) return [];
+  if (!profile) return { stays: [], total: 0, totalPages: 0 };
 
-  return prisma.stay.findMany({
-    where: { profileId: profile.id },
-    include: {
-      images: { select: { id: true, url: true }, take: 1 },
-      _count: { select: { reservations: true } },
-    },
-    orderBy: { title: "asc" },
-  });
+  const where = { profileId: profile.id };
+  const [stayRows, total] = await Promise.all([
+    prisma.stay.findMany({
+      where,
+      select: {
+        id:            true,
+        slug:          true,
+        title:         true,
+        propertyType:  true,
+        category:      true,
+        price:         true,
+        guestCount:    true,
+        bedroomCount:  true,
+        region:        true,
+        approvalStatus: true,
+        nbReviews:     true,
+        averageRating: true,
+        images:        { select: { id: true, url: true }, take: 1 },
+        _count:        { select: { reservations: true } },
+      },
+      orderBy: { title: "asc" },
+      skip:  (page - 1) * PARTNER_STAYS_PER_PAGE,
+      take:  PARTNER_STAYS_PER_PAGE,
+    }),
+    prisma.stay.count({ where }),
+  ]);
+
+  const stayIds = stayRows.map((s) => s.id);
+  const badges = stayIds.length
+    ? await prisma.listingBadge.findMany({
+        where: { relationType: "STAY", relationId: { in: stayIds } },
+        select: { relationId: true, badgeKey: true },
+      })
+    : [];
+
+  const badgeMap = new Map<string, string[]>();
+  for (const b of badges) {
+    const keys = badgeMap.get(b.relationId) ?? [];
+    keys.push(b.badgeKey);
+    badgeMap.set(b.relationId, keys);
+  }
+
+  return {
+    stays: stayRows.map((s) => ({
+      ...s,
+      badges: (badgeMap.get(s.id) ?? []).map((key) => ({ badgeKey: key })),
+    })),
+    total,
+    totalPages: Math.ceil(total / PARTNER_STAYS_PER_PAGE),
+    page,
+  };
 });
 
 export async function updateBookingStatus(
@@ -615,6 +703,38 @@ export async function updateProfileImage(imageUrl: string) {
   }
 }
 
+export async function getActivityReviews(activityId: string) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return { reviews: [], guidniReview: null };
+
+  const [reviews, guidniReview] = await Promise.all([
+    prisma.review.findMany({
+      where: { relationType: "ACTIVITY", relationId: activityId },
+      include: { user: { select: { name: true, image: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.guidniReview.findUnique({
+      where: { relationType_relationId: { relationType: "ACTIVITY", relationId: activityId } },
+      select: {
+        id: true,
+        status: true,
+        reviewerName: true,
+        visitedAt: true,
+        summaryQuote: true,
+        fullReview: true,
+        whatWeLoved: true,
+        worthKnowing: true,
+        bestFor: true,
+        scoreTotal: true,
+        publishedAt: true,
+        images: { select: { url: true }, take: 3 },
+      },
+    }),
+  ]);
+
+  return { reviews, guidniReview };
+}
+
 // ─── Activity CRUD ────────────────────────────────────────────────────────────
 
 export async function createActivity(rawData: unknown) {
@@ -632,16 +752,26 @@ export async function createActivity(rawData: unknown) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Validation error" };
   }
 
+  // Validate destinationId exists if provided
+  if (parsed.data.destinationId) {
+    const dest = await prisma.destination.findUnique({ where: { id: parsed.data.destinationId }, select: { id: true } });
+    if (!dest) return { success: false, error: "Invalid destination" };
+  }
+
   try {
     const slug = uniqueSlug(parsed.data.title);
-    const { destinationId, ...rest } = parsed.data;
-    await prisma.activity.create({
+    const { destinationId, categories, availableTimes, ...rest } = parsed.data;
+    const created = await prisma.activity.create({
       data: {
         ...rest,
+        availableTimes: availableTimes.join(","),
+        categories,
         slug,
         profileId: profile.id,
         ...(destinationId ? { destinationId } : {}),
+        timeSlots: { create: availableTimes.map((time) => ({ time })) },
       },
+      select: { id: true, slug: true },
     });
     revalidatePath("/");
 
@@ -649,10 +779,10 @@ export async function createActivity(rawData: unknown) {
     const { triggerReferralFirstListing } = await import("@/lib/utils/agent-referral-milestones");
     triggerReferralFirstListing(profile.id).catch(() => null);
 
-    return { success: true };
+    return { success: true as const, data: created };
   } catch (error) {
     console.error("createActivity error:", error);
-    return { success: false, error: "Failed to create activity." };
+    return { success: false as const, error: "Failed to create activity." };
   }
 }
 
@@ -679,10 +809,25 @@ export async function updateActivity(activityId: string, rawData: unknown) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Validation error" };
   }
 
+  // Validate destinationId exists if provided
+  if (parsed.data.destinationId) {
+    const dest = await prisma.destination.findUnique({ where: { id: parsed.data.destinationId }, select: { id: true } });
+    if (!dest) return { success: false, error: "Invalid destination" };
+  }
+
   try {
+    const { categories, availableTimes, ...rest } = parsed.data;
     await prisma.activity.update({
       where: { id: activityId },
-      data: parsed.data,
+      data: {
+        ...rest,
+        availableTimes: availableTimes.join(","),
+        categories,
+        timeSlots: {
+          deleteMany: {},
+          createMany: { data: availableTimes.map((time) => ({ time })) },
+        },
+      },
     });
     revalidatePath("/");
     return { success: true };
@@ -720,6 +865,117 @@ export async function deleteActivity(activityId: string) {
   }
 }
 
+export async function updateActivityStatus(
+  activityId: string,
+  status: "DRAFT" | "ACTIVE" | "SUSPENDED"
+) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return { success: false, error: "Not authenticated" };
+
+  const profile = await prisma.businessProfile.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true },
+  });
+  if (!profile) return { success: false, error: "No business profile" };
+
+  const activity = await prisma.activity.findUnique({
+    where: { id: activityId },
+    select: { profileId: true },
+  });
+  if (!activity || activity.profileId !== profile.id) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    await prisma.activity.update({
+      where: { id: activityId },
+      data: {
+        status,
+        ...(status === "ACTIVE" ? { publishedAt: new Date() } : {}),
+      },
+    });
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    console.error("updateActivityStatus error:", error);
+    return { success: false, error: "Failed to update status." };
+  }
+}
+
+export async function setActivityImageAsCover(imageId: string, activityId: string) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return { success: false as const, error: "Not authenticated" };
+
+  const profile = await prisma.businessProfile.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true },
+  });
+  if (!profile) return { success: false as const, error: "No business profile" };
+
+  const activity = await prisma.activity.findUnique({
+    where: { id: activityId },
+    select: { profileId: true },
+  });
+  if (!activity || activity.profileId !== profile.id) {
+    return { success: false as const, error: "Unauthorized" };
+  }
+
+  const images = await prisma.images.findMany({
+    where: { activityId },
+    orderBy: { createdAt: "asc" },
+    select: { id: true },
+  });
+
+  // Move target image to position 0, renumber the rest
+  const reordered = [
+    { id: imageId },
+    ...images.filter((img) => img.id !== imageId),
+  ];
+
+  try {
+    await prisma.$transaction(
+      reordered.map((img, i) =>
+        prisma.images.update({ where: { id: img.id }, data: { order: i } })
+      )
+    );
+    revalidatePath("/");
+    return { success: true as const };
+  } catch (error) {
+    console.error("setActivityImageAsCover error:", error);
+    return { success: false as const, error: "Failed to set cover image." };
+  }
+}
+
+export async function reorderActivityImages(activityId: string, orderedIds: string[]) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return { success: false as const, error: "Not authenticated" };
+
+  const profile = await prisma.businessProfile.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true },
+  });
+  if (!profile) return { success: false as const, error: "No business profile" };
+
+  const activity = await prisma.activity.findUnique({
+    where: { id: activityId },
+    select: { profileId: true },
+  });
+  if (!activity || activity.profileId !== profile.id) {
+    return { success: false as const, error: "Unauthorized" };
+  }
+
+  try {
+    await prisma.$transaction(
+      orderedIds.map((id, i) => prisma.images.update({ where: { id }, data: { order: i } }))
+    );
+    revalidatePath("/");
+    return { success: true as const };
+  } catch (error) {
+    console.error("reorderActivityImages error:", error);
+    return { success: false as const, error: "Failed to reorder images." };
+  }
+}
+
 // ─── Stay CRUD ────────────────────────────────────────────────────────────────
 
 export async function createStay(rawData: unknown) {
@@ -740,7 +996,7 @@ export async function createStay(rawData: unknown) {
   try {
     const slug = uniqueSlug(parsed.data.title);
     const { destinationId, ...rest } = parsed.data;
-    await prisma.stay.create({
+    const created = await prisma.stay.create({
       data: {
         ...rest,
         slug,
@@ -750,10 +1006,10 @@ export async function createStay(rawData: unknown) {
       },
     });
     revalidatePath("/");
-    return { success: true };
+    return { success: true as const, data: created };
   } catch (error) {
     console.error("createStay error:", error);
-    return { success: false, error: "Failed to create stay." };
+    return { success: false as const, error: "Failed to create stay." };
   }
 }
 
@@ -769,7 +1025,7 @@ export async function updateStay(stayId: string, rawData: unknown) {
 
   const stay = await prisma.stay.findUnique({
     where: { id: stayId },
-    select: { profileId: true },
+    select: { profileId: true, slug: true },
   });
   if (!stay || stay.profileId !== profile.id) {
     return { success: false, error: "Unauthorized" };
@@ -783,9 +1039,14 @@ export async function updateStay(stayId: string, rawData: unknown) {
   try {
     await prisma.stay.update({
       where: { id: stayId },
-      data: parsed.data,
+      data: {
+        ...parsed.data,
+        arabicTitle:       parsed.data.arabicTitle       || null,
+        arabicDescription: parsed.data.arabicDescription || null,
+      },
     });
     revalidatePath("/");
+    revalidatePath(`/stays/${stay.slug}`);
     return { success: true };
   } catch (error) {
     console.error("updateStay error:", error);
@@ -805,7 +1066,7 @@ export async function deleteStay(stayId: string) {
 
   const stay = await prisma.stay.findUnique({
     where: { id: stayId },
-    select: { profileId: true },
+    select: { profileId: true, slug: true },
   });
   if (!stay || stay.profileId !== profile.id) {
     return { success: false, error: "Unauthorized" };
@@ -814,11 +1075,74 @@ export async function deleteStay(stayId: string) {
   try {
     await prisma.stay.delete({ where: { id: stayId } });
     revalidatePath("/");
+    revalidatePath(`/stays/${stay.slug}`);
     return { success: true };
   } catch (error) {
     console.error("deleteStay error:", error);
     return { success: false, error: "Failed to delete stay." };
   }
+}
+
+export async function reorderStayImages(stayId: string, orderedIds: string[]) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return { success: false as const, error: "Not authenticated" };
+
+  const profile = await prisma.businessProfile.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true },
+  });
+  if (!profile) return { success: false as const, error: "No business profile" };
+
+  const stay = await prisma.stay.findUnique({
+    where: { id: stayId },
+    select: { profileId: true },
+  });
+  if (!stay || stay.profileId !== profile.id) {
+    return { success: false as const, error: "Unauthorized" };
+  }
+
+  try {
+    await prisma.$transaction(
+      orderedIds.map((id, i) => prisma.images.update({ where: { id }, data: { order: i } }))
+    );
+    revalidatePath("/");
+    return { success: true as const };
+  } catch (error) {
+    console.error("reorderStayImages error:", error);
+    return { success: false as const, error: "Failed to reorder images." };
+  }
+}
+
+export async function getStayReviews(stayId: string) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return { reviews: [], guidniReview: null };
+
+  const [reviews, guidniReview] = await Promise.all([
+    prisma.review.findMany({
+      where: { relationType: "STAY", relationId: stayId },
+      include: { user: { select: { name: true, image: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.guidniReview.findUnique({
+      where: { relationType_relationId: { relationType: "STAY", relationId: stayId } },
+      select: {
+        id: true,
+        status: true,
+        reviewerName: true,
+        visitedAt: true,
+        summaryQuote: true,
+        fullReview: true,
+        whatWeLoved: true,
+        worthKnowing: true,
+        bestFor: true,
+        scoreTotal: true,
+        publishedAt: true,
+        images: { select: { url: true }, take: 3 },
+      },
+    }),
+  ]);
+
+  return { reviews, guidniReview };
 }
 
 // ─── Image management ─────────────────────────────────────────────────────────
@@ -885,4 +1209,94 @@ export async function removeListingImage(imageId: string) {
   } catch (error) {
     return { success: false, error: "Failed to remove image." };
   }
+}
+
+// ── Stay blocked dates ────────────────────────────────────────────────────────
+
+async function verifyStayOwnership(stayId: string, userId: string) {
+  const profile = await prisma.businessProfile.findUnique({
+    where: { userId },
+    select: { id: true },
+  });
+  if (!profile) return null;
+  const stay = await prisma.stay.findUnique({
+    where: { id: stayId },
+    select: { profileId: true },
+  });
+  if (!stay || stay.profileId !== profile.id) return null;
+  return profile;
+}
+
+export async function getBlockedDates(stayId: string): Promise<string[]> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return [];
+  const profile = await verifyStayOwnership(stayId, session.user.id);
+  if (!profile) return [];
+
+  const dates = await prisma.stayBlockedDate.findMany({
+    where: { stayId },
+    select: { date: true },
+    orderBy: { date: "asc" },
+  });
+  return dates.map((d) => d.date.toISOString().slice(0, 10));
+}
+
+export async function toggleBlockedDate(stayId: string, dateStr: string) {
+  "use server";
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return { success: false as const, error: "Not authenticated" };
+  const profile = await verifyStayOwnership(stayId, session.user.id);
+  if (!profile) return { success: false as const, error: "Unauthorized" };
+
+  const date = new Date(dateStr + "T00:00:00.000Z");
+
+  const existing = await prisma.stayBlockedDate.findUnique({
+    where: { stayId_date: { stayId, date } },
+  });
+
+  if (existing) {
+    await prisma.stayBlockedDate.delete({ where: { id: existing.id } });
+    return { success: true as const, blocked: false };
+  } else {
+    await prisma.stayBlockedDate.create({ data: { stayId, date } });
+    return { success: true as const, blocked: true };
+  }
+}
+
+export async function getAvailabilityData(stayId: string) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return { blocked: [] as string[], reservations: [] as { checkIn: string; checkOut: string; status: string; bookingRef: string }[] };
+
+  const profile = await verifyStayOwnership(stayId, session.user.id);
+  if (!profile) return { blocked: [] as string[], reservations: [] as { checkIn: string; checkOut: string; status: string; bookingRef: string }[] };
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const [blockedRows, reservations] = await Promise.all([
+    prisma.stayBlockedDate.findMany({
+      where: { stayId },
+      select: { date: true },
+      orderBy: { date: "asc" },
+    }),
+    prisma.staysReservation.findMany({
+      where: {
+        stayId,
+        status: { in: ["PENDING", "CONFIRMED"] },
+        checkOut: { gte: today },
+      },
+      select: { checkIn: true, checkOut: true, status: true, bookingRef: true },
+      orderBy: { checkIn: "asc" },
+    }),
+  ]);
+
+  return {
+    blocked: blockedRows.map((d) => d.date.toISOString().slice(0, 10)),
+    reservations: reservations.map((r) => ({
+      checkIn:    r.checkIn.toISOString().slice(0, 10),
+      checkOut:   r.checkOut.toISOString().slice(0, 10),
+      status:     r.status,
+      bookingRef: r.bookingRef,
+    })),
+  };
 }

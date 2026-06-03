@@ -207,9 +207,9 @@ function DestinationCard({
       )}
     >
       {/* Image / gradient background */}
-      {dest.coverImage ? (
+      {dest.images?.[0]?.url ? (
         <Image
-          src={dest.coverImage}
+          src={dest.images[0].url}
           alt={dest.city}
           fill
           sizes={hero

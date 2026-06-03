@@ -2,23 +2,39 @@
 
 import { useState, useTransition } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { FiCheck, FiChevronLeft, FiChevronRight, FiMapPin } from "react-icons/fi";
+import { FiCheck, FiChevronLeft, FiChevronRight, FiCamera } from "react-icons/fi";
 import { createStay } from "@/lib/actions/partner";
+import { ImageUploader } from "@/components/upload/ImageUploader";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger,
+} from "@/components/ui/select";
+import { PhoneInput } from "@/components/shared/PhoneInput";
+import { CounterInput } from "@/components/shared/CounterInput";
+import { TimePickerInput } from "@/components/shared/TimePickerInput";
+import {
+  PROPERTY_TYPES,
+  SPACE_CATEGORIES,
+  AMENITY_KEYS,
+  AMENITY_ICONS,
+  type AmenityKey,
+} from "@/lib/utils/stay-constants";
 
-const STEPS = ["Type", "Details", "Location", "Amenities", "Pricing", "Review"] as const;
+// ─── Constants ────────────────────────────────────────────────────────────────
+
 type Step = 0 | 1 | 2 | 3 | 4 | 5;
 
 type Destination = { id: string; label: string; city: string; country: string; region: string };
-
-const PROPERTY_TYPES = ["Apartment", "Villa", "House", "Riad", "Bungalow", "Hotel Room", "Other"];
-const CATEGORIES     = ["Entire place", "Private room", "Shared room"];
 
 type FormData = {
   propertyType:       string;
   category:           string;
   title:              string;
+  arabicTitle:        string;
   description:        string;
+  arabicDescription:  string;
   price:              number;
   guestCount:         number;
   bedroomCount:       number;
@@ -32,20 +48,30 @@ type FormData = {
   checkInTime:        string;
   checkOutTime:       string;
   minStayNights:      number;
-  hasWifi:            boolean;
-  hasPool:            boolean;
-  hasParking:         boolean;
-  hasKitchen:         boolean;
-  hasAirConditioning: boolean;
-  isPetFriendly:      boolean;
-  destinationId:      string;
+  hasWifi:              boolean;
+  hasPool:              boolean;
+  hasParking:           boolean;
+  hasKitchen:           boolean;
+  hasAirConditioning:   boolean;
+  isPetFriendly:        boolean;
+  hasHeating:           boolean;
+  hasGarden:            boolean;
+  hasBalcony:           boolean;
+  hasSecurity:          boolean;
+  hasConcierge:         boolean;
+  isSmokeFree:          boolean;
+  wheelchairAccessible: boolean;
+  elevatorAvailable:    boolean;
+  destinationId:        string;
 };
 
 const DEFAULTS: FormData = {
   propertyType:       PROPERTY_TYPES[0],
-  category:           CATEGORIES[0],
+  category:           SPACE_CATEGORIES[0],
   title:              "",
+  arabicTitle:        "",
   description:        "",
+  arabicDescription:  "",
   price:              0,
   guestCount:         2,
   bedroomCount:       1,
@@ -59,19 +85,29 @@ const DEFAULTS: FormData = {
   checkInTime:        "15:00",
   checkOutTime:       "11:00",
   minStayNights:      1,
-  hasWifi:            false,
-  hasPool:            false,
-  hasParking:         false,
-  hasKitchen:         false,
-  hasAirConditioning: false,
-  isPetFriendly:      false,
+  hasWifi:              false,
+  hasPool:              false,
+  hasParking:           false,
+  hasKitchen:           false,
+  hasAirConditioning:   false,
+  isPetFriendly:        false,
+  hasHeating:           false,
+  hasGarden:            false,
+  hasBalcony:           false,
+  hasSecurity:          false,
+  hasConcierge:         false,
+  isSmokeFree:          true,
+  wheelchairAccessible: false,
+  elevatorAvailable:    false,
   destinationId:      "",
 };
 
-function StepProgress({ current }: { current: Step }) {
+// ─── Step progress bar ────────────────────────────────────────────────────────
+
+function StepProgress({ current, labels }: { current: Step; labels: string[] }) {
   return (
     <div className="flex items-center gap-0 mb-8 overflow-x-auto pb-1">
-      {STEPS.map((label, i) => {
+      {labels.map((label, i) => {
         const done   = i < current;
         const active = i === current;
         return (
@@ -87,7 +123,7 @@ function StepProgress({ current }: { current: Step }) {
                 {label}
               </span>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < labels.length - 1 && (
               <div className={`flex-1 h-0.5 mx-2 mb-5 min-w-[16px] ${done ? "bg-primary" : "bg-gray-200"}`} />
             )}
           </div>
@@ -97,19 +133,22 @@ function StepProgress({ current }: { current: Step }) {
   );
 }
 
-const inputCls = "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary";
-const selectCls = `${inputCls} bg-white`;
+// ─── Input styles ─────────────────────────────────────────────────────────────
 
-const AMENITIES: { key: keyof FormData; label: string }[] = [
-  { key: "hasWifi",            label: "WiFi" },
-  { key: "hasPool",            label: "Pool" },
-  { key: "hasParking",         label: "Parking" },
-  { key: "hasKitchen",         label: "Kitchen" },
-  { key: "hasAirConditioning", label: "Air conditioning" },
-  { key: "isPetFriendly",      label: "Pet friendly" },
-];
+const inputCls    = "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary";
+const inputErrCls = "w-full border border-red-400 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400";
 
-export function CreateStayWizard({ profileCountry, profileRegion, profilePhone, destinations }: {
+// ─── Amenity keys ─────────────────────────────────────────────────────────────
+
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
+export function CreateStayWizard({
+  profileCountry,
+  profileRegion,
+  profilePhone,
+  destinations,
+}: {
   profileCountry?: string;
   profileRegion?:  string;
   profilePhone?:   string;
@@ -118,46 +157,51 @@ export function CreateStayWizard({ profileCountry, profileRegion, profilePhone, 
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
-  const [step, setStep]   = useState<Step>(0);
-  const [form, setForm]   = useState<FormData>({
+  const t      = useTranslations("PartnerDashboard.newStay.wizard");
+
+  const [step, setStep]             = useState<Step>(0);
+  const [showArabic, setShowArabic] = useState(false);
+  const [createdId, setCreatedId]   = useState<string | null>(null);
+  const [form, setForm]             = useState<FormData>({
     ...DEFAULTS,
     country: profileCountry ?? "",
     region:  profileRegion  ?? "",
     phone:   profilePhone   ?? "",
   });
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
-  const [pending, start]    = useTransition();
+  const [errors, setErrors]     = useState<Partial<Record<keyof FormData, string>>>({});
+  const [pending, start]        = useTransition();
 
-  const set  = (key: keyof FormData, value: string | number) => setForm((p) => ({ ...p, [key]: value }));
-  const setB = (key: keyof FormData, value: boolean)          => setForm((p) => ({ ...p, [key]: value }));
+  const set      = (key: keyof FormData, value: string | number) => setForm((p) => ({ ...p, [key]: value }));
+  const setB     = (key: keyof FormData, value: boolean)          => setForm((p) => ({ ...p, [key]: value }));
+  const clearErr = (key: keyof FormData)                          => setErrors((e) => { const n = { ...e }; delete n[key]; return n; });
 
+  // ── Validation ──────────────────────────────────────────────────────────────
   function validate(): boolean {
     const e: Partial<Record<keyof FormData, string>> = {};
     if (step === 0) {
-      if (!form.propertyType) e.propertyType = "Select a type";
-      if (!form.category)     e.category     = "Select a category";
+      if (!form.propertyType) e.propertyType = t("validation.propertyTypeRequired");
+      if (!form.category)     e.category     = t("validation.categoryRequired");
     }
     if (step === 1) {
-      if (!form.title.trim())              e.title       = "Title is required";
-      if (form.title.length < 3)           e.title       = "At least 3 characters";
-      if (!form.description.trim())        e.description = "Description is required";
-      if (form.description.length < 20)    e.description = "At least 20 characters";
+      if (!form.title.trim())           e.title       = t("validation.titleRequired");
+      if (form.title.trim().length < 3) e.title       = t("validation.titleMin");
+      if (!form.description.trim())     e.description = t("validation.descriptionRequired");
+      if (form.description.trim().length < 20) e.description = t("validation.descriptionMin");
     }
     if (step === 2) {
-      if (!form.destinationId)             e.destinationId = "Select a destination";
-      if (!form.country.trim())            e.country       = "Country is required";
-      if (!form.region.trim())             e.region        = "Region is required";
+      if (!form.destinationId)    e.destinationId = t("validation.destinationRequired");
+      if (!form.phone.trim())     e.phone         = t("validation.phoneRequired");
     }
     if (step === 4) {
-      if (!form.price || form.price <= 0)  e.price       = "Price must be positive";
-      if (form.guestCount < 1)             e.guestCount  = "At least 1 guest";
+      if (!form.price || form.price <= 0) e.price      = t("validation.priceRequired");
+      if (form.guestCount < 1)            e.guestCount = t("validation.guestCountRequired");
     }
     setErrors(e);
     return Object.keys(e).length === 0;
   }
 
-  function handleNext() { if (validate()) setStep((s) => (s + 1) as Step); }
-  function handleBack() { setStep((s) => (s - 1) as Step); }
+  function handleNext()   { if (validate()) setStep((s) => (s + 1) as Step); }
+  function handleBack()   { setStep((s) => (s - 1) as Step); }
 
   const selectedDestLabel = destinations.find((d) => d.id === form.destinationId)?.label ?? "";
 
@@ -165,235 +209,421 @@ export function CreateStayWizard({ profileCountry, profileRegion, profilePhone, 
     start(async () => {
       const res = await createStay({
         ...form,
-        destinationId: form.destinationId || undefined,
+        arabicTitle:       form.arabicTitle       || undefined,
+        arabicDescription: form.arabicDescription || undefined,
+        destinationId:     form.destinationId     || undefined,
       });
       if (res.success) {
-        toast.success("Stay created!");
-        router.push(`/${locale}/partner/stays`);
+        setCreatedId(res.data.id);
       } else {
-        toast.error(res.error ?? "Failed to create stay");
+        toast.error(res.error ?? t("createFailed"));
       }
     });
   }
 
+  const stepLabels = [
+    t("steps.type"), t("steps.details"), t("steps.location"),
+    t("steps.amenities"), t("steps.pricing"), t("steps.review"),
+  ];
+
+  // ── Post-creation photos screen ─────────────────────────────────────────────
+  if (createdId) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 space-y-6">
+          <div className="flex items-start gap-3">
+            <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+              <FiCheck className="h-5 w-5 text-green-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">{t("photos.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-0.5">{t("photos.subheading")}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+            <FiCamera className="h-4 w-4 text-amber-600 shrink-0" />
+            <p className="text-xs text-amber-700">{t("photos.hint")}</p>
+          </div>
+
+          <ImageUploader entity="stay" entityId={createdId} images={[]} />
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="button"
+              onClick={() => router.push(`/${locale}/partner/stays`)}
+              className="flex items-center gap-1.5 text-sm bg-primary text-white rounded-xl px-5 py-2 hover:bg-primary/90 transition-colors font-medium"
+            >
+              <FiCheck className="h-4 w-4" />
+              {t("nav.done")}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
-      <StepProgress current={step} />
+      <StepProgress current={step} labels={stepLabels} />
 
       <div className="bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 space-y-6">
 
-        {/* Step 0 — Type */}
+        {/* ── Step 0 — Type ──────────────────────────────────────────────── */}
         {step === 0 && (
-          <div className="space-y-5">
+          <div className="space-y-6">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">What type of property?</h2>
-              <p className="text-sm text-gray-400 mt-1">Choose the property type that best matches your listing.</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("type.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("type.subheading")}</p>
             </div>
+
+            {/* Property type grid */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700">Property type *</label>
+              <label className="text-sm font-medium text-gray-700">{t("type.propertyTypeLabel")}</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {PROPERTY_TYPES.map((t) => (
-                  <button key={t} type="button" onClick={() => set("propertyType", t)}
-                    className={`text-sm px-4 py-3 rounded-xl border font-medium text-left transition-all ${
-                      form.propertyType === t
-                        ? "bg-primary/10 text-primary border-primary/30 ring-2 ring-primary/20"
-                        : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
-                    }`}>
-                    {form.propertyType === t && <FiCheck className="h-3.5 w-3.5 inline mr-1.5 mb-0.5" />}
-                    {t}
-                  </button>
-                ))}
+                {PROPERTY_TYPES.map((type) => {
+                  const active = form.propertyType === type;
+                  return (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => { set("propertyType", type); clearErr("propertyType"); }}
+                      className={`relative text-sm px-4 py-3 rounded-xl border font-medium text-left transition-all ${
+                        active
+                          ? "bg-primary/10 text-primary border-primary/30 ring-2 ring-primary/20"
+                          : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
+                      }`}
+                    >
+                      {active && <FiCheck className="h-3.5 w-3.5 inline mr-1.5 mb-0.5" />}
+                      {t(`type.types.${type.replace(" ", "") as "Apartment"}`)}
+                    </button>
+                  );
+                })}
               </div>
               {errors.propertyType && <p className="text-xs text-red-500">{errors.propertyType}</p>}
             </div>
+
+            {/* Space category */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700">Space category *</label>
-              <div className="flex flex-wrap gap-3">
-                {CATEGORIES.map((c) => (
-                  <button key={c} type="button" onClick={() => set("category", c)}
-                    className={`text-sm px-4 py-2.5 rounded-xl border font-medium transition-all ${
-                      form.category === c
-                        ? "bg-primary/10 text-primary border-primary/30"
-                        : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
-                    }`}>
-                    {c}
-                  </button>
-                ))}
+              <label className="text-sm font-medium text-gray-700">{t("type.spaceCategoryLabel")}</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {SPACE_CATEGORIES.map((cat) => {
+                  const key = cat.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join("") as "EntirePlace";
+                  const active = form.category === cat;
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => { set("category", cat); clearErr("category"); }}
+                      className={`flex flex-col gap-1 px-4 py-3 rounded-xl border font-medium text-left transition-all ${
+                        active
+                          ? "bg-primary/10 text-primary border-primary/30 ring-2 ring-primary/20"
+                          : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
+                      }`}
+                    >
+                      <span className="text-sm">{t(`type.categories.${key}`)}</span>
+                      <span className="text-xs font-normal text-gray-500 leading-snug">
+                        {t(`type.categoryHints.${key}`)}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
+              {errors.category && <p className="text-xs text-red-500">{errors.category}</p>}
             </div>
           </div>
         )}
 
-        {/* Step 1 — Details */}
+        {/* ── Step 1 — Details ───────────────────────────────────────────── */}
         {step === 1 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Listing details</h2>
-              <p className="text-sm text-gray-400 mt-1">Help guests understand what you're offering.</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("details.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("details.subheading")}</p>
             </div>
+
+            {/* Title */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700">Title *</label>
-              <input value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="e.g. Charming riad with sea view" className={inputCls} />
+              <label className="text-sm font-medium text-gray-700">{t("details.titleLabel")}</label>
+              <input
+                value={form.title}
+                onChange={(e) => { set("title", e.target.value); clearErr("title"); }}
+                placeholder={t("details.titlePlaceholder")}
+                className={errors.title ? inputErrCls : inputCls}
+              />
               {errors.title && <p className="text-xs text-red-500">{errors.title}</p>}
             </div>
+
+            {/* Description */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700">Description *</label>
-              <textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={5}
-                placeholder="Describe your space, unique features, nearby attractions..." className={`${inputCls} resize-none`} />
-              {errors.description && <p className="text-xs text-red-500">{errors.description}</p>}
+              <label className="text-sm font-medium text-gray-700">{t("details.descriptionLabel")}</label>
+              <textarea
+                value={form.description}
+                onChange={(e) => { set("description", e.target.value); clearErr("description"); }}
+                rows={5}
+                placeholder={t("details.descriptionPlaceholder")}
+                className={`${errors.description ? inputErrCls : inputCls} resize-none`}
+              />
+              <div className="flex justify-between items-center">
+                {errors.description
+                  ? <p className="text-xs text-red-500">{errors.description}</p>
+                  : <span />}
+                <span className={`text-xs tabular-nums ${form.description.length > 2900 ? "text-red-400" : "text-gray-400"}`}>
+                  {form.description.length} / 3000
+                </span>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              {([ ["guestCount","Max guests"], ["bedroomCount","Bedrooms"], ["bedCount","Beds"], ["bathroomCount","Bathrooms"] ] as [keyof FormData, string][]).map(([key, label]) => (
-                <div key={key} className="space-y-1.5">
+
+            {/* Arabic toggle */}
+            <div>
+              <div
+                className="flex items-center justify-between gap-3 p-3.5 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer"
+                onClick={() => setShowArabic((v) => !v)}
+              >
+                <div>
+                  <p className="text-sm font-medium text-gray-700">{t("details.arabicToggleLabel")}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{t("details.arabicToggleHint")}</p>
+                </div>
+                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                <span onClick={(e) => e.stopPropagation()}>
+                  <Switch checked={showArabic} onCheckedChange={setShowArabic} />
+                </span>
+              </div>
+
+              {showArabic && (
+                <div className="mt-4 space-y-4 border-t border-gray-100 pt-4">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">{t("details.arabicTitleLabel")}</label>
+                    <p className="text-xs text-gray-400">{t("details.arabicTitleHint")}</p>
+                    <input
+                      value={form.arabicTitle}
+                      onChange={(e) => set("arabicTitle", e.target.value)}
+                      dir="rtl"
+                      className={inputCls}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700">{t("details.arabicDescriptionLabel")}</label>
+                    <textarea
+                      value={form.arabicDescription}
+                      onChange={(e) => set("arabicDescription", e.target.value)}
+                      rows={4}
+                      dir="rtl"
+                      className={`${inputCls} resize-none`}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Room counts */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {([
+                ["guestCount",    t("details.guestCountLabel"),    1, 30],
+                ["bedroomCount",  t("details.bedroomCountLabel"),  1, 20],
+                ["bedCount",      t("details.bedCountLabel"),      1, 30],
+                ["bathroomCount", t("details.bathroomCountLabel"), 1, 15],
+              ] as [keyof FormData, string, number, number][]).map(([key, label, min, max]) => (
+                <div key={key} className="flex items-center justify-between gap-4 py-2 border-b border-gray-100 last:border-0">
                   <label className="text-sm font-medium text-gray-700">{label}</label>
-                  <input type="number" min={1} value={form[key] as number} onChange={(e) => set(key, parseInt(e.target.value) || 1)} className={inputCls} />
+                  <CounterInput
+                    value={form[key] as number}
+                    onChange={(v) => set(key, v)}
+                    min={min}
+                    max={max}
+                  />
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Step 2 — Location */}
+        {/* ── Step 2 — Location ──────────────────────────────────────────── */}
         {step === 2 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Location</h2>
-              <p className="text-sm text-gray-400 mt-1">Where is your property located?</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("location.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("location.subheading")}</p>
             </div>
 
-            {/* Destination selector */}
+            {/* Destination */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700">Destination *</label>
-              <div className="relative">
-                <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                <select
-                  value={form.destinationId}
-                  onChange={(e) => {
-                    const dest = destinations.find((d) => d.id === e.target.value);
-                    setForm((p) => ({
-                      ...p,
-                      destinationId: e.target.value,
-                      ...(dest ? { country: dest.country, city: dest.city, region: dest.region } : {}),
-                    }));
-                  }}
-                  className={`${selectCls} pl-9`}
-                >
-                  <option value="">Select a destination…</option>
+              <label className="text-sm font-medium text-gray-700">{t("location.destinationLabel")}</label>
+              <p className="text-xs text-gray-400">{t("location.destinationHint")}</p>
+              <Select
+                value={form.destinationId}
+                onValueChange={(id) => {
+                  const dest = destinations.find((d) => d.id === (id ?? ""));
+                  setForm((p) => ({
+                    ...p,
+                    destinationId: id ?? "",
+                    country: dest?.country ?? p.country,
+                    region:  dest?.region  ?? p.region,
+                    city:    dest?.city    ?? p.city,
+                  }));
+                  clearErr("destinationId");
+                }}
+              >
+                <SelectTrigger className={errors.destinationId ? "border-red-400 ring-2 ring-red-200" : undefined}>
+                  <span className={form.destinationId ? "text-gray-800" : "text-gray-400"}>
+                    {destinations.find((d) => d.id === form.destinationId)?.label ?? t("location.destinationPlaceholder")}
+                  </span>
+                </SelectTrigger>
+                <SelectContent>
                   {destinations.map((d) => (
-                    <option key={d.id} value={d.id}>{d.label}</option>
+                    <SelectItem key={d.id} value={d.id}>{d.label}</SelectItem>
                   ))}
-                </select>
-              </div>
-              <p className="text-xs text-gray-400">This determines where your stay appears in listings.</p>
+                </SelectContent>
+              </Select>
               {errors.destinationId && <p className="text-xs text-red-500">{errors.destinationId}</p>}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Country *</label>
-                <input value={form.country} onChange={(e) => set("country", e.target.value)} className={inputCls} />
-                {errors.country && <p className="text-xs text-red-500">{errors.country}</p>}
+            {form.destinationId && (
+              <div className="flex flex-wrap items-center gap-2 p-3.5 bg-gray-50 rounded-xl border border-gray-100">
+                <span className="text-xs text-gray-400 font-medium w-full mb-0.5">{t("location.locationDetails")}</span>
+                {[
+                  { label: t("location.countryLabel"), value: form.country },
+                  { label: t("location.regionLabel"),  value: form.region  },
+                  { label: t("location.cityLabel"),    value: form.city    },
+                ].filter((f) => f.value).map((f) => (
+                  <span key={f.label} className="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-2.5 py-1 text-xs text-gray-700">
+                    <span className="text-gray-400">{f.label}:</span> {f.value}
+                  </span>
+                ))}
               </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Region *</label>
-                <input value={form.region} onChange={(e) => set("region", e.target.value)} className={inputCls} />
-                {errors.region && <p className="text-xs text-red-500">{errors.region}</p>}
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">City</label>
-                <input value={form.city} onChange={(e) => set("city", e.target.value)} className={inputCls} />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Phone</label>
-                <input value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+216..." className={inputCls} />
-              </div>
-            </div>
+            )}
+
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700">Address</label>
+              <label className="text-sm font-medium text-gray-700">{t("location.addressLabel")}</label>
               <input value={form.address} onChange={(e) => set("address", e.target.value)} className={inputCls} />
+            </div>
+
+            {/* Phone */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">{t("location.phoneLabel")}</label>
+              <PhoneInput
+                value={form.phone}
+                onChange={(v) => { set("phone", v); if (v.trim()) clearErr("phone"); }}
+                error={errors.phone}
+              />
             </div>
           </div>
         )}
 
-        {/* Step 3 — Amenities */}
+        {/* ── Step 3 — Amenities ─────────────────────────────────────────── */}
         {step === 3 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Amenities</h2>
-              <p className="text-sm text-gray-400 mt-1">What does your property offer?</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("amenities.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("amenities.subheading")}</p>
             </div>
-            <div className="flex flex-wrap gap-3">
-              {AMENITIES.map(({ key, label }) => (
-                <button key={key} type="button" onClick={() => setB(key, !(form[key] as boolean))}
-                  className={`text-sm px-4 py-2.5 rounded-xl border font-medium transition-all ${
-                    form[key]
-                      ? "bg-primary/10 text-primary border-primary/30"
-                      : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
-                  }`}>
-                  {form[key] && <FiCheck className="h-3.5 w-3.5 inline mr-1.5 mb-0.5" />}
-                  {label}
-                </button>
-              ))}
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              {AMENITY_KEYS.map((key) => {
+                const Icon = AMENITY_ICONS[key];
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setB(key, !(form[key] as boolean))}
+                    className={`flex items-center gap-2.5 px-3.5 py-3 rounded-xl border font-medium text-sm transition-all text-left ${
+                      form[key]
+                        ? "bg-primary/10 text-primary border-primary/30"
+                        : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    {t(`amenities.labels.${key}` as any)}
+                  </button>
+                );
+              })}
             </div>
+
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Check-in time</label>
-                <input type="time" value={form.checkInTime} onChange={(e) => set("checkInTime", e.target.value)} className={inputCls} />
+                <label className="text-sm font-medium text-gray-700">{t("amenities.checkInLabel")}</label>
+                <div className={`${inputCls} flex items-center`}>
+                  <TimePickerInput
+                    value={form.checkInTime}
+                    onChange={(v) => set("checkInTime", v)}
+                    placeholder="00:00"
+                  />
+                </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Check-out time</label>
-                <input type="time" value={form.checkOutTime} onChange={(e) => set("checkOutTime", e.target.value)} className={inputCls} />
+                <label className="text-sm font-medium text-gray-700">{t("amenities.checkOutLabel")}</label>
+                <div className={`${inputCls} flex items-center`}>
+                  <TimePickerInput
+                    value={form.checkOutTime}
+                    onChange={(v) => set("checkOutTime", v)}
+                    placeholder="00:00"
+                  />
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Min stay (nights)</label>
-                <input type="number" min={1} value={form.minStayNights} onChange={(e) => set("minStayNights", parseInt(e.target.value) || 1)} className={inputCls} />
+              <div className="flex items-center justify-between gap-4 py-2">
+                <label className="text-sm font-medium text-gray-700">{t("amenities.minStayLabel")}</label>
+                <CounterInput
+                  value={form.minStayNights}
+                  onChange={(v) => set("minStayNights", v)}
+                  min={1}
+                  max={365}
+                />
               </div>
             </div>
           </div>
         )}
 
-        {/* Step 4 — Pricing */}
+        {/* ── Step 4 — Pricing ───────────────────────────────────────────── */}
         {step === 4 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Pricing</h2>
-              <p className="text-sm text-gray-400 mt-1">Set your nightly rate.</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("pricing.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("pricing.subheading")}</p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Price per night (TND) *</label>
-                <input type="number" min={0} value={form.price} onChange={(e) => set("price", parseInt(e.target.value) || 0)} className={inputCls} />
+                <label className="text-sm font-medium text-gray-700">{t("pricing.priceLabel")}</label>
+                <input type="number" min={0} value={form.price}
+                  onChange={(e) => { set("price", parseInt(e.target.value) || 0); clearErr("price"); }}
+                  className={errors.price ? inputErrCls : inputCls} />
                 {errors.price && <p className="text-xs text-red-500">{errors.price}</p>}
               </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">Max guests *</label>
-                <input type="number" min={1} value={form.guestCount} onChange={(e) => set("guestCount", parseInt(e.target.value) || 1)} className={inputCls} />
-                {errors.guestCount && <p className="text-xs text-red-500">{errors.guestCount}</p>}
+              <div className="flex items-center justify-between gap-4 py-3 border-t border-gray-100">
+                <div>
+                  <label className="text-sm font-medium text-gray-700">{t("pricing.guestCountLabel")}</label>
+                  {errors.guestCount && <p className="text-xs text-red-500 mt-0.5">{errors.guestCount}</p>}
+                </div>
+                <CounterInput
+                  value={form.guestCount}
+                  onChange={(v) => { set("guestCount", v); clearErr("guestCount"); }}
+                  min={1}
+                  max={30}
+                />
               </div>
             </div>
           </div>
         )}
 
-        {/* Step 5 — Review */}
+        {/* ── Step 5 — Review ────────────────────────────────────────────── */}
         {step === 5 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Review & publish</h2>
-              <p className="text-sm text-gray-400 mt-1">Check your listing before creating it.</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("review.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("review.subheading")}</p>
             </div>
             <div className="bg-gray-50 rounded-xl border border-gray-200 divide-y divide-gray-200">
               {([
-                ["Destination", selectedDestLabel || "—"],
-                ["Type",       `${form.propertyType} · ${form.category}`],
-                ["Title",      form.title],
-                ["Description",form.description.slice(0, 100) + (form.description.length > 100 ? "…" : "")],
-                ["Guests",     `${form.guestCount} max`],
-                ["Bedrooms",   `${form.bedroomCount} rooms · ${form.bedCount} beds · ${form.bathroomCount} bathrooms`],
-                ["Country",    form.country],
-                ["Region",     form.region],
-                ["Price",      `${form.price} TND/night`],
-                ["Min stay",   `${form.minStayNights} night${form.minStayNights > 1 ? "s" : ""}`],
-                ["Check-in",   `${form.checkInTime} · out ${form.checkOutTime}`],
+                [t("review.labels.destination"), selectedDestLabel || "—"],
+                [t("review.labels.type"),        `${form.propertyType} · ${form.category}`],
+                [t("review.labels.title"),       form.title],
+                [t("review.labels.description"), form.description.slice(0, 100) + (form.description.length > 100 ? "…" : "")],
+                [t("review.labels.guests"),      t("review.values.guestsMax", { count: form.guestCount })],
+                [t("review.labels.rooms"),       t("review.values.roomsSummary", { bedrooms: form.bedroomCount, beds: form.bedCount, bathrooms: form.bathroomCount })],
+                [t("review.labels.country"),     form.country],
+                [t("review.labels.region"),      form.region],
+                [t("review.labels.price"),       t("review.values.pricePerNight", { price: form.price })],
+                [t("review.labels.minStay"),     form.minStayNights === 1 ? t("review.values.minNight", { count: 1 }) : t("review.values.minNights", { count: form.minStayNights })],
+                [t("review.labels.checkIn"),     t("review.values.checkInOut", { checkIn: form.checkInTime, checkOut: form.checkOutTime })],
               ] as [string, string][]).map(([label, value]) => (
                 <div key={label} className="flex gap-4 px-4 py-3">
                   <span className="text-xs font-semibold text-gray-500 w-28 shrink-0">{label}</span>
@@ -402,29 +632,31 @@ export function CreateStayWizard({ profileCountry, profileRegion, profilePhone, 
               ))}
             </div>
             <p className="text-xs text-gray-400 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3">
-              You can add photos after creating the stay from the edit page.
+              {t("review.photosNote")}
             </p>
           </div>
         )}
 
-        {/* Navigation */}
+        {/* ── Navigation ─────────────────────────────────────────────────── */}
         <div className={`flex pt-2 ${step === 0 ? "justify-end" : "justify-between"}`}>
           {step > 0 && (
             <button type="button" onClick={handleBack}
               className="flex items-center gap-1.5 text-sm text-gray-600 border border-gray-200 rounded-xl px-4 py-2 hover:border-gray-400 transition-colors">
-              <FiChevronLeft className="h-4 w-4" /> Back
+              <FiChevronLeft className="h-4 w-4" />
+              {t("nav.back")}
             </button>
           )}
           {step < 5 ? (
             <button type="button" onClick={handleNext}
               className="flex items-center gap-1.5 text-sm bg-primary text-white rounded-xl px-5 py-2 hover:bg-primary/90 transition-colors font-medium">
-              Next <FiChevronRight className="h-4 w-4" />
+              {t("nav.next")}
+              <FiChevronRight className="h-4 w-4" />
             </button>
           ) : (
             <button type="button" disabled={pending} onClick={handleSubmit}
               className="flex items-center gap-2 text-sm bg-primary text-white rounded-xl px-6 py-2 hover:bg-primary/90 transition-colors font-medium disabled:opacity-50">
               <FiCheck className="h-4 w-4" />
-              {pending ? "Creating…" : "Create stay"}
+              {pending ? t("nav.creating") : t("nav.create")}
             </button>
           )}
         </div>

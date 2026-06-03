@@ -7,9 +7,7 @@ import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { getDestinations } from "@/lib/actions/destinations";
 import { getDestinationSlug } from "@/lib/actions/destination-cookie";
-import { getPlannerData } from "@/lib/actions/planner";
 import { PlannerWizard } from "../_components/PlannerWizard";
-import { GeneratingSkeleton } from "../_components/GeneratingSkeleton";
 import { FaRobot } from "react-icons/fa6";
 import { ArrowLeft } from "lucide-react";
 
@@ -25,7 +23,6 @@ type Props = {
 export default async function AIPlannerPage({ params }: Props) {
   const { locale } = await params;
 
-  // Auth guard — redirect to login with callbackUrl
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) {
     redirect(`/${locale}/login?callbackUrl=/${locale}/planner/ai`);
@@ -41,10 +38,6 @@ export default async function AIPlannerPage({ params }: Props) {
   const currentDest =
     destinations.find((d) => d.slug === destinationSlug) ?? destinations[0];
 
-  const plannerData = currentDest
-    ? await getPlannerData(currentDest.id)
-    : { activities: [], attractions: [], restaurants: [], transfers: [], rentals: [], shops: [] };
-
   const destinationOptions = destinations.map((d) => ({
     id:      d.id,
     slug:    d.slug,
@@ -53,7 +46,7 @@ export default async function AIPlannerPage({ params }: Props) {
   }));
 
   return (
-    <div className="max-w-screen-lg mx-auto px-4 py-10">
+    <div className="max-w-2xl mx-auto px-4 py-10">
 
       {/* Back link */}
       <Link
@@ -71,20 +64,16 @@ export default async function AIPlannerPage({ params }: Props) {
         </div>
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
-            {t("title")}{" "}
-            <span className="text-blue-600">
-              {currentDest?.city ?? t("defaultCity")}
-            </span>
+            {t("title")}
           </h1>
           <p className="text-sm text-gray-400 mt-0.5">{t("subtitle")}</p>
         </div>
       </div>
 
       {/* Wizard */}
-      <Suspense fallback={<GeneratingSkeleton />}>
+      <Suspense fallback={null}>
         <PlannerWizard
           destinations={destinationOptions}
-          plannerData={plannerData}
           locale={locale}
           defaultDestinationId={currentDest?.id}
           defaultDestinationName={currentDest ? `${currentDest.city}, ${currentDest.country}` : ""}

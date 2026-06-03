@@ -8,6 +8,8 @@ import {
   FiHome,
   FiArrowRight,
   FiTrendingUp,
+  FiPlus,
+  FiExternalLink,
 } from "react-icons/fi";
 import {
   getPartnerDashboardStats,
@@ -159,6 +161,31 @@ export default async function PartnerOverviewPage({ params }: { params: Params }
         ))}
       </div>
 
+      {/* Quick actions */}
+      <div className="flex flex-wrap gap-3">
+        <Link
+          href={`${base}/activities/new`}
+          className="inline-flex items-center gap-2 text-sm font-medium bg-primary text-white px-4 py-2 rounded-xl hover:bg-primary/90 transition-colors"
+        >
+          <FiPlus className="h-4 w-4" />
+          Add activity
+        </Link>
+        <Link
+          href={`${base}/bookings`}
+          className="inline-flex items-center gap-2 text-sm font-medium border border-gray-200 text-gray-700 px-4 py-2 rounded-xl hover:border-gray-400 transition-colors"
+        >
+          <FiCalendar className="h-4 w-4" />
+          View bookings
+        </Link>
+        <Link
+          href={`${base}/reviews`}
+          className="inline-flex items-center gap-2 text-sm font-medium border border-gray-200 text-gray-700 px-4 py-2 rounded-xl hover:border-gray-400 transition-colors"
+        >
+          <FiStar className="h-4 w-4" />
+          View reviews
+        </Link>
+      </div>
+
       {/* Bottom section: bookings + reviews */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -181,7 +208,18 @@ export default async function PartnerOverviewPage({ params }: { params: Params }
               {recentBookings.map((b) => (
                 <li key={b.id} className="flex items-center justify-between px-6 py-3.5 hover:bg-gray-50 transition-colors">
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-800 truncate">{b.title}</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-medium text-gray-800 truncate">{b.title}</p>
+                      <a
+                        href={`/${locale}/${b.type === "activity" ? "activities" : "stays"}/${b.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="View listing"
+                        className="text-gray-400 hover:text-blue-600 transition-colors shrink-0"
+                      >
+                        <FiExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    </div>
                     <p className="text-xs text-gray-400 mt-0.5">
                       {b.customer} · {new Date(b.date).toLocaleDateString()}
                     </p>

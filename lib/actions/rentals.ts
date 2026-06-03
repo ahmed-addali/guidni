@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 export const getRentals = cache(async (destinationSlug?: string, type?: string) => {
   return prisma.rental.findMany({
     where: {
+      status: "ACTIVE",
       ...(destinationSlug ? { destination: { slug: destinationSlug } } : {}),
       ...(type ? { type: type as never } : {}),
     },
@@ -31,6 +32,7 @@ export const getRentalsPaginated = cache(
     perPage?: number;
   }) => {
     const where = {
+      status: "ACTIVE" as const,
       ...(destinationSlug ? { destination: { slug: destinationSlug } } : {}),
       ...(type ? { type: type as never } : {}),
       ...(search
@@ -53,7 +55,7 @@ export const getRentalsPaginated = cache(
 
 export const getRentalBySlug = cache(async (slug: string) => {
   return prisma.rental.findUnique({
-    where: { slug },
+    where: { slug, status: "ACTIVE" },
     include: {
       images: { select: { id: true, url: true } },
       businessProfile: { select: { name: true, country: true, isVerified: true, createdAt: true, profileImage: true } },
@@ -66,6 +68,7 @@ export const getRelatedRentals = cache(
   async (rentalId: string, destinationId: string, limit = 6) => {
     return prisma.rental.findMany({
       where: {
+        status: "ACTIVE",
         destinationId,
         id: { not: rentalId },
       },
@@ -81,6 +84,7 @@ export const getRelatedRentals = cache(
 export const getFeaturedRentals = cache(async (destinationSlug?: string) => {
   return prisma.rental.findMany({
     where: {
+      status: "ACTIVE",
       featuredInHome: true,
       ...(destinationSlug ? { destination: { slug: destinationSlug } } : {}),
     },
@@ -88,3 +92,40 @@ export const getFeaturedRentals = cache(async (destinationSlug?: string) => {
     take: 6,
   });
 });
+
+export const getPublicRentalUnavailableDates = cache(
+  async (rentalId: string): Promise<string[]> => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const [blockedRows, reservations] = await Promise.all([
+      prisma.rentalBlockedDate.findMany({
+        where: { rentalId },
+        select: { date: true },
+      }),
+      prisma.rentalReservation.findMany({
+        where: {
+          rentalId,
+          status: { in: ["PENDING", "CONFIRMED"] },
+          endDate: { gte: today },
+        },
+        select: { startDate: true, endDate: true },
+      }),
+    ]);
+
+    const blocked = blockedRows.map((d) => d.date.toISOString().slice(0, 10));
+
+    const reserved: string[] = [];
+    for (const r of reservations) {
+      const start = new Date(r.startDate);
+      const end   = new Date(r.endDate);
+      const cur   = new Date(start);
+      while (cur <= end) {
+        reserved.push(cur.toISOString().slice(0, 10));
+        cur.setDate(cur.getDate() + 1);
+      }
+    }
+
+    return [...new Set([...blocked, ...reserved])];
+  }
+);

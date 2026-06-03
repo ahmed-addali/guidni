@@ -4,14 +4,18 @@ import { TbCar } from "react-icons/tb";
 import { FiUsers, FiMapPin } from "react-icons/fi";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 
-type RentalType = "CAR" | "BIKE" | "SCOOTER" | "BOAT" | "OTHER";
+type RentalType = "CAR" | "MOTORBIKE" | "SCOOTER" | "BICYCLE" | "BOAT" | "QUAD" | "BUGGY" | "JET_SKI" | "OTHER";
 
 const TYPE_LABELS: Record<RentalType, string> = {
-  CAR:     "Car",
-  BIKE:    "Bike",
-  SCOOTER: "Scooter",
-  BOAT:    "Boat",
-  OTHER:   "Vehicle",
+  CAR:       "Car",
+  MOTORBIKE: "Motorbike",
+  SCOOTER:   "Scooter",
+  BICYCLE:   "Bicycle",
+  BOAT:      "Boat",
+  QUAD:      "Quad",
+  BUGGY:     "Buggy",
+  JET_SKI:   "Jet Ski",
+  OTHER:     "Vehicle",
 };
 
 interface Props {

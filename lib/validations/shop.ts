@@ -18,8 +18,9 @@ export const ShopSchema = z.object({
   instagram:         z.string().optional(),
   facebook:          z.string().optional(),
   deliveryMethods:   z.array(
-    z.enum(["PICKUP", "LOCAL_DELIVERY", "NATIONWIDE", "INTERNATIONAL"])
+    z.enum(["PICKUP", "DELIVERY"])
   ).min(1, "At least one delivery method is required"),
+  deliveryFee:       z.coerce.number().int().min(0).optional().nullable(),
   freeShippingAbove: z.coerce.number().int().positive().optional().nullable(),
   minOrderAmount:    z.coerce.number().int().positive().optional().nullable(),
   isOpen:            z.boolean().default(true),
@@ -58,7 +59,7 @@ export const ProductOrderSchema = z.object({
       unitPrice: z.coerce.number().int().min(0),
     })
   ).min(1, "Cart is empty"),
-  deliveryMethod:  z.enum(["PICKUP", "LOCAL_DELIVERY", "NATIONWIDE", "INTERNATIONAL"]),
+  deliveryMethod:  z.enum(["PICKUP", "DELIVERY"]),
   deliveryAddress: z.string().optional(),
   deliveryCity:    z.string().optional(),
   deliveryCountry: z.string().optional(),

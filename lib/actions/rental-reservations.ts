@@ -1,6 +1,7 @@
 "use server";
 
 import { cache } from "react";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -33,6 +34,7 @@ export async function createRentalReservation(input: {
       userId:      session.user.id,
       rentalId:    input.rentalId,
     },
+    select: { id: true, bookingRef: true },
   });
 
   return { success: true as const, data: reservation };
@@ -80,6 +82,8 @@ export async function updateRentalReservationStatus(reservationId: string, statu
     where: { id: reservationId },
     data: { status },
   });
+
+  revalidatePath("/partner/rentals");
 
   return { success: true as const, data: updated };
 }

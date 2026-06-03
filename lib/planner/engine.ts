@@ -6,10 +6,11 @@ import {
   TIME_SLOT_RANGES,
 } from "./category-map";
 import type {
+  PlanBlock,
   PlanDay,
   PlanItem,
+  PlanItinerary,
   PlannerData,
-  PlanSlot,
   TimeSlot,
   UserPreferences,
 } from "./types";
@@ -165,7 +166,7 @@ const DAY_THEMES: Record<number, string[]> = {
 export function getDayTheme(
   dayNumber: number,
   totalDays: number,
-  slots: PlanSlot[]
+  slots: PlanBlock[]
 ): string {
   // Last day
   if (dayNumber === totalDays && totalDays > 2) {
@@ -174,11 +175,11 @@ export function getDayTheme(
   const themes = DAY_THEMES[Math.min(dayNumber, 6)] ?? DAY_THEMES[5];
   // Vary by slot types
   const hasBeach = slots.some((s) =>
-    s.item.tags.some((t) => ["beach", "water_sports", "sea"].includes(t))
+    s.item.tags.some((t: string) => ["beach", "water_sports", "sea"].includes(t))
   );
   if (hasBeach && dayNumber > 1) return "Beach & Adventure";
   const hasCulture = slots.some((s) =>
-    s.item.tags.some((t) =>
+    s.item.tags.some((t: string) =>
       ["culture", "history", "traditional", "museum", "religious"].includes(t)
     )
   );
@@ -232,7 +233,7 @@ function nextSlotId(): string {
 }
 
 interface SlotResult {
-  slot: PlanSlot;
+  slot: PlanBlock;
   usedId: string;
 }
 
@@ -245,7 +246,7 @@ function buildSlot(
     slot: {
       id: nextSlotId(),
       slotType,
-      time: customTime ?? TIME_SLOT_RANGES[slotType],
+      time: customTime ?? TIME_SLOT_RANGES[slotType as keyof typeof TIME_SLOT_RANGES] ?? { start: "09:00", end: "12:00" },
       item,
     },
     usedId: item.id,
@@ -256,14 +257,14 @@ function buildSlot(
 // Day builder
 // ─────────────────────────────────────────────────────────────
 
-function buildDay(
+export function buildDay(
   dayNumber: number,
   totalDays: number,
   data: PlannerData,
   prefs: UserPreferences,
   used: Set<string>
 ): PlanDay {
-  const slots: PlanSlot[] = [];
+  const blocks: PlanBlock[] = [];
 
   const pick = (
     pool: PlanItem[],
@@ -326,20 +327,20 @@ function buildDay(
   const morningItem = morningPool[0] ?? null;
   if (morningItem) {
     used.add(morningItem.id);
-    slots.push(buildSlot(morningItem, "morning").slot);
+    blocks.push(buildSlot(morningItem, "morning").slot);
   }
 
   // ── LUNCH: restaurant ─────────────────────────────────────────
-  if (slots.length < maxItems) {
+  if (blocks.length < maxItems) {
     const lunch = availableRestaurantsForLunch.find((r) => !used.has(r.id));
     if (lunch) {
       used.add(lunch.id);
-      slots.push(buildSlot(lunch, "lunch").slot);
+      blocks.push(buildSlot(lunch, "lunch").slot);
     }
   }
 
   // ── AFTERNOON: activity ───────────────────────────────────────
-  if (slots.length < maxItems) {
+  if (blocks.length < maxItems) {
     const afternoonPool = scoredActivities.filter((a) => {
       if (used.has(a.id)) return false;
       if (prefs.travelStyle === "relaxed" && a.intensity === "high") return false;
@@ -348,33 +349,33 @@ function buildDay(
     const afternoon = afternoonPool[0] ?? null;
     if (afternoon) {
       used.add(afternoon.id);
-      slots.push(buildSlot(afternoon, "afternoon").slot);
+      blocks.push(buildSlot(afternoon, "afternoon").slot);
     }
   }
 
   // ── EVENING: restaurant ───────────────────────────────────────
-  if (slots.length < maxItems) {
+  if (blocks.length < maxItems) {
     const dinner = availableRestaurantsForEvening.find((r) => !used.has(r.id));
     if (dinner) {
       used.add(dinner.id);
-      slots.push(buildSlot(dinner, "evening").slot);
+      blocks.push(buildSlot(dinner, "evening").slot);
     }
   }
 
   // ── EXTRA: active travelers get a 5th slot ────────────────────
-  if (prefs.travelStyle === "active" && slots.length < 5) {
+  if (prefs.travelStyle === "active" && blocks.length < 5) {
     const extra = scoredActivities.find(
       (a) => !used.has(a.id) && a.intensity !== "low"
     );
     if (extra) {
       used.add(extra.id);
-      slots.push(
+      blocks.push(
         buildSlot(extra, "afternoon", { start: "17:30", end: "19:00" }).slot
       );
     }
   }
 
-  const theme = getDayTheme(dayNumber, totalDays, slots);
+  const theme = getDayTheme(dayNumber, totalDays, blocks);
   const notes = getDayNotes(dayNumber, totalDays, prefs);
 
   return {
@@ -384,7 +385,7 @@ function buildDay(
       : undefined,
     theme,
     notes,
-    slots,
+    blocks,
   };
 }
 
@@ -394,13 +395,13 @@ function buildDay(
 
 /**
  * Build a full itinerary from live PlannerData + UserPreferences.
- * Returns PlanDay[] WITHOUT logistics or shopping blocks —
+ * Returns PlanItinerary WITHOUT logistics or shopping blocks —
  * those are injected by logistics.ts after this call.
  */
 export function buildItinerary(
   data: PlannerData,
   prefs: UserPreferences
-): PlanDay[] {
+): PlanItinerary {
   slotIdCounter = 0; // reset per generation
   const used = new Set<string>();
   const days: PlanDay[] = [];
@@ -409,5 +410,48 @@ export function buildItinerary(
     days.push(buildDay(day, prefs.duration, data, prefs, used));
   }
 
-  return days;
+  return { days, stays: [], rentals: [] };
+}
+
+// ─────────────────────────────────────────────────────────────
+// Thin-destination warnings
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Inspect finished days (after logistics injection) and return
+ * human-readable warning strings for any data gaps.
+ */
+export function computeWarnings(
+  days: PlanDay[],
+  data: PlannerData,
+  destinationName: string
+): string[] {
+  const warnings: string[] = [];
+
+  // Count days where we have fewer than 2 activity/attraction slots
+  const thinDays = days.filter(
+    (d) => d.blocks.filter((s: PlanBlock) => s.item.type === "ACTIVITY" || s.item.type === "ATTRACTION").length < 2
+  );
+  if (thinDays.length > 0) {
+    warnings.push(
+      `${destinationName} has limited activity data — some days may feel light. We've filled gaps with the best available options.`
+    );
+  }
+
+  // No restaurants in the data at all
+  if (data.restaurants.length === 0) {
+    warnings.push(
+      `We don't have restaurant listings for ${destinationName} yet. Your plan doesn't include dining suggestions.`
+    );
+  }
+
+  // Very few total items
+  const totalItems = data.activities.length + data.attractions.length;
+  if (totalItems < 5) {
+    warnings.push(
+      `Content for ${destinationName} is still growing. Your plan is built from everything we have — check back soon for more options.`
+    );
+  }
+
+  return warnings;
 }

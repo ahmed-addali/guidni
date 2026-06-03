@@ -2,64 +2,79 @@
 
 import { useState, useTransition } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { FiCheck, FiChevronLeft, FiChevronRight, FiMapPin } from "react-icons/fi";
+import {
+  FiCheck, FiChevronLeft, FiChevronRight, FiCamera,
+} from "react-icons/fi";
 import { createActivity } from "@/lib/actions/partner";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger,
+} from "@/components/ui/select";
+import { TimeSlotPicker } from "@/components/partner/TimeSlotPicker";
+import { ImageUploader } from "@/components/upload/ImageUploader";
+import { CategoryMultiSelect } from "@/components/partner/CategoryMultiSelect";
+import { DurationPicker } from "@/components/partner/DurationPicker";
+import { Switch } from "@/components/ui/switch";
+import { PhoneInput } from "@/components/shared/PhoneInput";
 
-const STEPS = ["Category", "Details", "Location", "Pricing", "Review"] as const;
-type Step = 0 | 1 | 2 | 3 | 4;
+// ─── Steps ────────────────────────────────────────────────────────────────────
+type Step = 0 | 1 | 2;
 
-const CATEGORIES = [
-  "Water Sports", "Desert", "Culture & History", "Food & Drink",
-  "Adventure", "Wellness & Spa", "Nature & Wildlife", "Night Life", "Other",
-];
-
+// ─── Types ────────────────────────────────────────────────────────────────────
 type Destination = { id: string; label: string; city: string; country: string; region: string };
 
 type FormData = {
-  category:        string;
-  title:           string;
-  description:     string;
-  phone:           string;
-  duration:        string;
-  availableTimes:  string;
-  price:           number;
-  capacity:        number;
-  cancelation:     boolean;
-  paynow:          boolean;
-  country:         string;
-  region:          string;
-  city:            string;
-  address:         string;
-  destinationId:   string;
+  categories:        string[];
+  title:             string;
+  arabicTitle:       string;
+  description:       string;
+  arabicDescription: string;
+  phone:             string;
+  duration:          string;
+  durationMinutes:   number;
+  availableTimes:    string[];
+  price:             number;
+  capacity:          number;
+  cancelation:       boolean;
+  paynow:            boolean;
+  country:           string;
+  region:            string;
+  city:              string;
+  address:           string;
+  destinationId:     string;
 };
 
 const DEFAULTS: FormData = {
-  category:       "",
-  title:          "",
-  description:    "",
-  phone:          "",
-  duration:       "",
-  availableTimes: "",
-  price:          0,
-  capacity:       1,
-  cancelation:    true,
-  paynow:         false,
-  country:        "",
-  region:         "",
-  city:           "",
-  address:        "",
-  destinationId:  "",
+  categories:        [],
+  title:             "",
+  arabicTitle:       "",
+  description:       "",
+  arabicDescription: "",
+  phone:             "",
+  duration:          "",
+  durationMinutes:   0,
+  availableTimes:    [],
+  price:             0,
+  capacity:          1,
+  cancelation:       true,
+  paynow:            false,
+  country:           "",
+  region:            "",
+  city:              "",
+  address:           "",
+  destinationId:     "",
 };
 
-function StepProgress({ current }: { current: Step }) {
+// ─── Step Progress Bar ────────────────────────────────────────────────────────
+function StepProgress({ current, steps }: { current: Step; steps: string[] }) {
   return (
-    <div className="flex items-center gap-0 mb-8">
-      {STEPS.map((label, i) => {
-        const done    = i < current;
-        const active  = i === current;
+    <div className="flex items-center mb-8">
+      {steps.map((label, i) => {
+        const done   = i < current;
+        const active = i === current;
         return (
-          <div key={label} className="flex items-center flex-1 last:flex-none">
+          <div key={i} className="flex items-center flex-1 last:flex-none">
             <div className="flex flex-col items-center">
               <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors
                 ${done   ? "bg-primary text-white"
@@ -71,7 +86,7 @@ function StepProgress({ current }: { current: Step }) {
                 {label}
               </span>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <div className={`flex-1 h-0.5 mx-2 mb-5 ${done ? "bg-primary" : "bg-gray-200"}`} />
             )}
           </div>
@@ -81,18 +96,42 @@ function StepProgress({ current }: { current: Step }) {
   );
 }
 
-function FieldGroup({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+// ─── Field Group ──────────────────────────────────────────────────────────────
+function FieldGroup({
+  label, hint, error, children,
+}: { label: string; hint?: string; error?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
       <label className="block text-sm font-medium text-gray-700">{label}</label>
       {children}
+      {hint && !error && <p className="text-xs text-gray-400">{hint}</p>}
       {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }
 
-const inputCls = "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary";
+// ─── Policy Toggle Row ─────────────────────────────────────────────────────────
+function PolicyToggle({
+  label, hint, checked, onCheckedChange,
+}: { label: string; hint: string; checked: boolean; onCheckedChange: (v: boolean) => void }) {
+  return (
+    <div
+      className="flex items-center justify-between gap-3 p-3.5 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer"
+      onClick={() => onCheckedChange(!checked)}
+    >
+      <div>
+        <p className="text-sm font-medium text-gray-700">{label}</p>
+        <p className="text-xs text-gray-400 mt-0.5">{hint}</p>
+      </div>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} />
+    </div>
+  );
+}
 
+const inputCls    = "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary";
+const inputErrCls = "w-full border border-red-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400";
+
+// ─── Wizard ───────────────────────────────────────────────────────────────────
 export function CreateActivityWizard({
   profileCountry,
   profileRegion,
@@ -104,40 +143,67 @@ export function CreateActivityWizard({
   profilePhone?:    string;
   destinations:     Destination[];
 }) {
-  const router   = useRouter();
-  const params   = useParams();
-  const locale   = params.locale as string;
-  const [step, setStep] = useState<Step>(0);
-  const [form, setForm] = useState<FormData>({
+  const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string;
+  const t      = useTranslations("PartnerDashboard.newActivity.wizard");
+
+  const stepLabels = [t("steps.basics"), t("steps.location"), t("steps.pricing")];
+
+  const [step, setStep]       = useState<Step>(0);
+  const [form, setForm]       = useState<FormData>({
     ...DEFAULTS,
     country: profileCountry ?? "",
     region:  profileRegion  ?? "",
     phone:   profilePhone   ?? "",
   });
-  const [errors, setErrors]  = useState<Partial<Record<keyof FormData, string>>>({});
-  const [pending, start]     = useTransition();
+  const [errors, setErrors]   = useState<Partial<Record<keyof FormData, string>>>({});
+  const [pending, start]      = useTransition();
+  const [createdId, setCreatedId] = useState<string | null>(null);
 
-  const set = (key: keyof FormData, value: string | number | boolean) =>
+  // Arabic section visibility (Basics step)
+  const [showArabic, setShowArabic] = useState(false);
+
+  const set = (key: keyof FormData, value: string | number | boolean | string[]) =>
     setForm((p) => ({ ...p, [key]: value }));
+
+  function clearError(key: keyof FormData) {
+    setErrors((e) => { const n = { ...e }; delete n[key]; return n; });
+  }
+
+  function blurValidate(key: keyof FormData) {
+    const e: Partial<Record<keyof FormData, string>> = {};
+    if (key === "title") {
+      if (!form.title.trim())                e.title       = t("validation.titleRequired");
+      else if (form.title.trim().length < 3) e.title       = t("validation.titleMin");
+    }
+    if (key === "description") {
+      if (!form.description.trim())                 e.description = t("validation.descriptionRequired");
+      else if (form.description.trim().length < 20) e.description = t("validation.descriptionMin");
+    }
+    if (key === "price")    { if (!form.price || form.price <= 0)      e.price    = t("validation.priceRequired"); }
+    if (key === "capacity") { if (!form.capacity || form.capacity < 1) e.capacity = t("validation.capacityRequired"); }
+    if (Object.keys(e).length) setErrors((prev) => ({ ...prev, ...e }));
+    else clearError(key);
+  }
 
   function validate(): boolean {
     const e: Partial<Record<keyof FormData, string>> = {};
-    if (step === 0 && !form.category)                e.category        = "Select a category";
+    if (step === 0) {
+      if (form.categories.length === 0) e.categories  = t("validation.categoriesRequired");
+      if (!form.title.trim())           e.title        = t("validation.titleRequired");
+      if (form.title.trim().length < 3) e.title        = t("validation.titleMin");
+      if (!form.description.trim())     e.description  = t("validation.descriptionRequired");
+      if (form.description.trim().length < 20) e.description = t("validation.descriptionMin");
+      if (!form.phone.trim())           e.phone        = t("validation.phoneRequired");
+    }
     if (step === 1) {
-      if (!form.title.trim())                        e.title           = "Title is required";
-      if (form.title.trim().length < 3)              e.title           = "At least 3 characters";
-      if (!form.description.trim())                  e.description     = "Description is required";
-      if (form.description.trim().length < 20)       e.description     = "At least 20 characters";
+      if (!form.destinationId)  e.destinationId = t("validation.destinationRequired");
     }
     if (step === 2) {
-      if (!form.destinationId)                       e.destinationId   = "Select a destination";
-      if (!form.country.trim())                      e.country         = "Country is required";
-      if (!form.region.trim())                       e.region          = "Region is required";
-    }
-    if (step === 3) {
-      if (!form.price || form.price <= 0)            e.price           = "Price must be positive";
-      if (!form.capacity || form.capacity < 1)       e.capacity        = "Capacity must be at least 1";
-      if (!form.availableTimes.trim())               e.availableTimes  = "Add at least one time slot";
+      if (!form.price || form.price <= 0)           e.price          = t("validation.priceRequired");
+      if (!form.capacity || form.capacity < 1)      e.capacity       = t("validation.capacityRequired");
+      if (form.availableTimes.length === 0)         e.availableTimes = t("validation.timesRequired");
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -151,247 +217,295 @@ export function CreateActivityWizard({
     setStep((s) => (s - 1) as Step);
   }
 
-  function handleSubmit() {
+  function handleCreate() {
+    if (!validate()) return;
     start(async () => {
       const res = await createActivity({
         ...form,
-        destinationId: form.destinationId || undefined,
+        arabicTitle:       form.arabicTitle       || undefined,
+        arabicDescription: form.arabicDescription || undefined,
+        availableTimes:    form.availableTimes,
+        destinationId:     form.destinationId     || undefined,
       });
       if (res.success) {
-        toast.success("Activity created!");
-        router.push(`/${locale}/partner/activities`);
+        toast.success(t("photos.heading"));
+        setCreatedId(res.data.id);
       } else {
-        toast.error(res.error ?? "Failed to create activity");
+        toast.error(res.error ?? t("createFailed"));
       }
     });
   }
 
-  const selectedDestLabel = destinations.find((d) => d.id === form.destinationId)?.label ?? "";
+  // ─── Post-creation photos screen ──────────────────────────────────────────
+  if (createdId) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 space-y-6">
+          <div className="flex items-start gap-3">
+            <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+              <FiCheck className="h-5 w-5 text-green-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">{t("photos.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-0.5">
+                {t("photos.subheading")}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+            <FiCamera className="h-4 w-4 text-amber-600 shrink-0" />
+            <p className="text-xs text-amber-700">
+              {t("photos.hint")}
+            </p>
+          </div>
+
+          <ImageUploader entity="activity" entityId={createdId} images={[]} />
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="button"
+              onClick={() => router.push(`/${locale}/partner/activities`)}
+              className="flex items-center gap-1.5 text-sm bg-primary text-white rounded-xl px-5 py-2 hover:bg-primary/90 transition-colors font-medium"
+            >
+              <FiCheck className="h-4 w-4" />
+              {t("nav.done")}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const selectedDest = destinations.find((d) => d.id === form.destinationId);
 
   return (
     <div className="max-w-2xl mx-auto">
-      <StepProgress current={step} />
+      <StepProgress current={step} steps={stepLabels} />
 
       <div className="bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 space-y-6">
 
-        {/* Step 0 — Category */}
+        {/* ── Step 0 — Basics ─────────────────────────────────────────────── */}
         {step === 0 && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Choose a category</h2>
-              <p className="text-sm text-gray-400 mt-1">Select the type that best describes your activity.</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("basics.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("basics.subheading")}</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => set("category", cat)}
-                  className={`text-sm px-4 py-3 rounded-xl border font-medium text-left transition-all ${
-                    form.category === cat
-                      ? "bg-primary/10 text-primary border-primary/30 ring-2 ring-primary/20"
-                      : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
-                  }`}
+
+            {/* Categories */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">{t("basics.categoriesLabel")}</label>
+              <CategoryMultiSelect
+                value={form.categories}
+                onChange={(cats) => { setForm((p) => ({ ...p, categories: cats })); clearError("categories"); }}
+                error={errors.categories}
+              />
+            </div>
+
+            <div className="border-t border-gray-100 pt-5 space-y-5">
+              {/* Title */}
+              <FieldGroup label={t("basics.titleLabel")} error={errors.title}>
+                <input
+                  value={form.title}
+                  onChange={(e) => { set("title", e.target.value); clearError("title"); }}
+                  onBlur={() => blurValidate("title")}
+                  placeholder={t("basics.titlePlaceholder")}
+                  className={errors.title ? inputErrCls : inputCls}
+                />
+              </FieldGroup>
+
+              {/* Description */}
+              <FieldGroup label={t("basics.descriptionLabel")} error={errors.description}>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => { set("description", e.target.value); clearError("description"); }}
+                  onBlur={() => blurValidate("description")}
+                  rows={4}
+                  placeholder={t("basics.descriptionPlaceholder")}
+                  className={`${errors.description ? inputErrCls : inputCls} resize-none`}
+                />
+              </FieldGroup>
+
+              {/* Arabic toggle */}
+              <div>
+                <div
+                  className="flex items-center justify-between gap-3 p-3.5 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer"
+                  onClick={() => setShowArabic((v) => !v)}
                 >
-                  {form.category === cat && <FiCheck className="h-3.5 w-3.5 inline mr-1.5 mb-0.5" />}
-                  {cat}
-                </button>
-              ))}
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">{t("basics.arabicToggleLabel")}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{t("basics.arabicToggleHint")}</p>
+                  </div>
+                  {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                  <span onClick={(e) => e.stopPropagation()}>
+                    <Switch checked={showArabic} onCheckedChange={setShowArabic} />
+                  </span>
+                </div>
+
+                {showArabic && (
+                  <div className="mt-4 space-y-4 border-t border-gray-100 pt-4">
+                    <FieldGroup label={t("basics.arabicTitleLabel")} hint={t("basics.arabicTitleHint")}>
+                      <input
+                        value={form.arabicTitle}
+                        onChange={(e) => set("arabicTitle", e.target.value)}
+                        placeholder="e.g. رحلة الجمال عند الشروق"
+                        dir="rtl"
+                        className={inputCls}
+                      />
+                    </FieldGroup>
+                    <FieldGroup label={t("basics.arabicDescriptionLabel")} hint={t("basics.arabicTitleHint")}>
+                      <textarea
+                        value={form.arabicDescription}
+                        onChange={(e) => set("arabicDescription", e.target.value)}
+                        rows={4}
+                        placeholder="وصف التجربة، ما هو مشمول، نقطة الالتقاء..."
+                        dir="rtl"
+                        className={`${inputCls} resize-none`}
+                      />
+                    </FieldGroup>
+                  </div>
+                )}
+              </div>
+
+              {/* Phone + Duration */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t("basics.phoneLabel")} *
+                  </label>
+                  <PhoneInput
+                    value={form.phone}
+                    onChange={(v) => set("phone", v)}
+                    error={errors.phone}
+                  />
+                </div>
+                <FieldGroup label={t("basics.durationLabel")}>
+                  <DurationPicker
+                    value={form.duration}
+                    onChange={(v, mins) => setForm((p) => ({ ...p, duration: v, durationMinutes: mins }))}
+                  />
+                </FieldGroup>
+              </div>
             </div>
-            {errors.category && <p className="text-xs text-red-500">{errors.category}</p>}
           </div>
         )}
 
-        {/* Step 1 — Details */}
+        {/* ── Step 1 — Location ───────────────────────────────────────────── */}
         {step === 1 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Activity details</h2>
-              <p className="text-sm text-gray-400 mt-1">Give travelers the information they need to book.</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("location.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("location.subheading")}</p>
             </div>
-            <FieldGroup label="Title *" error={errors.title}>
-              <input
-                value={form.title}
-                onChange={(e) => set("title", e.target.value)}
-                placeholder="e.g. Sunrise Camel Trek in the Sahara"
-                className={inputCls}
-              />
+
+            <FieldGroup label={t("location.destinationLabel")} error={errors.destinationId}
+              hint={t("location.destinationHint")}>
+              <Select
+                value={form.destinationId}
+                onValueChange={(id) => {
+                  const safeId = id ?? "";
+                  const dest   = destinations.find((d) => d.id === safeId);
+                  setForm((p) => ({
+                    ...p,
+                    destinationId: safeId,
+                    country:       dest?.country ?? p.country,
+                    region:        dest?.region  ?? p.region,
+                    city:          dest?.city    ?? p.city,
+                  }));
+                  clearError("destinationId");
+                }}
+              >
+                <SelectTrigger className={errors.destinationId ? "border-red-300 ring-2 ring-red-200" : ""}>
+                  <span className={form.destinationId ? "text-gray-800" : "text-gray-400"}>
+                    {destinations.find((d) => d.id === form.destinationId)?.label ?? t("location.destinationPlaceholder")}
+                  </span>
+                </SelectTrigger>
+                <SelectContent>
+                  {destinations.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>{d.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </FieldGroup>
-            <FieldGroup label="Description *" error={errors.description}>
-              <textarea
-                value={form.description}
-                onChange={(e) => set("description", e.target.value)}
-                rows={5}
-                placeholder="Describe the experience, what's included, meeting point..."
-                className={`${inputCls} resize-none`}
-              />
-            </FieldGroup>
-            <div className="grid grid-cols-2 gap-4">
-              <FieldGroup label="Duration" error={errors.duration}>
-                <input
-                  value={form.duration}
-                  onChange={(e) => set("duration", e.target.value)}
-                  placeholder="e.g. 3 hours"
-                  className={inputCls}
-                />
-              </FieldGroup>
-              <FieldGroup label="Phone">
-                <input
-                  value={form.phone}
-                  onChange={(e) => set("phone", e.target.value)}
-                  placeholder="+216..."
-                  className={inputCls}
-                />
-              </FieldGroup>
-            </div>
+
+            {/* Derived location info — read-only when destination is set */}
+            {selectedDest && (
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2 p-3.5 bg-gray-50 rounded-xl border border-gray-100">
+                  <span className="text-xs text-gray-400 font-medium w-full mb-0.5">{t("location.locationDetails")}</span>
+                  {[
+                    { label: "Country", value: form.country },
+                    { label: "Region",  value: form.region  },
+                    { label: "City",    value: form.city    },
+                  ].filter((f) => f.value).map((f) => (
+                    <span key={f.label} className="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-2.5 py-1 text-xs text-gray-700">
+                      <span className="text-gray-400">{f.label}:</span> {f.value}
+                    </span>
+                  ))}
+                </div>
+                <FieldGroup label={t("location.addressLabel")}>
+                  <input value={form.address} onChange={(e) => set("address", e.target.value)} placeholder={t("location.addressPlaceholder")} className={inputCls} />
+                </FieldGroup>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Step 2 — Location */}
+        {/* ── Step 2 — Pricing & Availability ─────────────────────────────── */}
         {step === 2 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Location</h2>
-              <p className="text-sm text-gray-400 mt-1">Where does this activity take place?</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("pricing.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("pricing.subheading")}</p>
             </div>
 
-            {/* Destination selector */}
-            <FieldGroup label="Destination *" error={errors.destinationId}>
-              <div className="relative">
-                <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                <select
-                  value={form.destinationId}
-                  onChange={(e) => {
-                    const dest = destinations.find((d) => d.id === e.target.value);
-                    setForm((p) => ({
-                      ...p,
-                      destinationId: e.target.value,
-                      ...(dest ? { country: dest.country, city: dest.city, region: dest.region } : {}),
-                    }));
-                  }}
-                  className={`${inputCls} pl-9 appearance-none bg-white`}
-                >
-                  <option value="">Select a destination…</option>
-                  {destinations.map((d) => (
-                    <option key={d.id} value={d.id}>{d.label}</option>
-                  ))}
-                </select>
-              </div>
-              <p className="text-xs text-gray-400 mt-1">
-                This determines where your activity appears in listings.
-              </p>
-            </FieldGroup>
-
             <div className="grid grid-cols-2 gap-4">
-              <FieldGroup label="Country *" error={errors.country}>
-                <input value={form.country} onChange={(e) => set("country", e.target.value)} className={inputCls} />
-              </FieldGroup>
-              <FieldGroup label="Region *" error={errors.region}>
-                <input value={form.region} onChange={(e) => set("region", e.target.value)} className={inputCls} />
-              </FieldGroup>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <FieldGroup label="City">
-                <input value={form.city} onChange={(e) => set("city", e.target.value)} className={inputCls} />
-              </FieldGroup>
-              <FieldGroup label="Address">
-                <input value={form.address} onChange={(e) => set("address", e.target.value)} className={inputCls} />
-              </FieldGroup>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3 — Pricing */}
-        {step === 3 && (
-          <div className="space-y-5">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">Pricing & availability</h2>
-              <p className="text-sm text-gray-400 mt-1">Set your price and available time slots.</p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <FieldGroup label="Price per person (TND) *" error={errors.price}>
+              <FieldGroup label={t("pricing.priceLabel")} error={errors.price}>
                 <input
                   type="number" min={0}
                   value={form.price}
-                  onChange={(e) => set("price", parseInt(e.target.value) || 0)}
-                  className={inputCls}
+                  onChange={(e) => { set("price", parseInt(e.target.value) || 0); clearError("price"); }}
+                  onBlur={() => blurValidate("price")}
+                  className={errors.price ? inputErrCls : inputCls}
                 />
               </FieldGroup>
-              <FieldGroup label="Max capacity *" error={errors.capacity}>
+              <FieldGroup label={t("pricing.capacityLabel")} hint={t("pricing.capacityHint")} error={errors.capacity}>
                 <input
                   type="number" min={1}
                   value={form.capacity}
-                  onChange={(e) => set("capacity", parseInt(e.target.value) || 1)}
-                  className={inputCls}
+                  onChange={(e) => { set("capacity", parseInt(e.target.value) || 1); clearError("capacity"); }}
+                  onBlur={() => blurValidate("capacity")}
+                  className={errors.capacity ? inputErrCls : inputCls}
                 />
               </FieldGroup>
             </div>
-            <FieldGroup label="Available times * (comma-separated, e.g. 08:00,10:00,14:00)" error={errors.availableTimes}>
-              <input
+
+            <FieldGroup label={t("pricing.timesLabel")} error={errors.availableTimes}>
+              <TimeSlotPicker
                 value={form.availableTimes}
-                onChange={(e) => set("availableTimes", e.target.value)}
-                placeholder="08:00,10:00,14:00"
-                className={inputCls}
+                onChange={(slots) => { set("availableTimes", slots); clearError("availableTimes"); }}
               />
             </FieldGroup>
-            <div className="flex items-center gap-6 pt-1">
-              <label className="flex items-center gap-2.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.cancelation}
-                  onChange={(e) => set("cancelation", e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/30"
-                />
-                <span className="text-sm font-medium text-gray-700">Free cancellation</span>
-              </label>
-              <label className="flex items-center gap-2.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.paynow}
-                  onChange={(e) => set("paynow", e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/30"
-                />
-                <span className="text-sm font-medium text-gray-700">Require payment upfront</span>
-              </label>
+
+            <div className="space-y-3 pt-1">
+              <PolicyToggle
+                label={t("pricing.freeCancellationLabel")}
+                hint={t("pricing.freeCancellationHint")}
+                checked={form.cancelation}
+                onCheckedChange={(v) => set("cancelation", v)}
+              />
+              <PolicyToggle
+                label={t("pricing.payNowLabel")}
+                hint={t("pricing.payNowHint")}
+                checked={form.paynow}
+                onCheckedChange={(v) => set("paynow", v)}
+              />
             </div>
           </div>
         )}
 
-        {/* Step 4 — Review */}
-        {step === 4 && (
-          <div className="space-y-5">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">Review & publish</h2>
-              <p className="text-sm text-gray-400 mt-1">Check everything before creating your activity.</p>
-            </div>
-            <div className="bg-gray-50 rounded-xl border border-gray-200 divide-y divide-gray-200">
-              {[
-                ["Destination",    selectedDestLabel || "—"],
-                ["Category",       form.category],
-                ["Title",          form.title],
-                ["Description",    form.description.slice(0, 100) + (form.description.length > 100 ? "…" : "")],
-                ["Duration",       form.duration || "—"],
-                ["Country",        form.country],
-                ["Region",         form.region],
-                ["City",           form.city || "—"],
-                ["Price",          `${form.price} TND/person`],
-                ["Capacity",       `${form.capacity} people`],
-                ["Available times",form.availableTimes],
-                ["Cancellation",   form.cancelation ? "Free" : "Non-refundable"],
-              ].map(([label, value]) => (
-                <div key={label} className="flex gap-4 px-4 py-3">
-                  <span className="text-xs font-semibold text-gray-500 w-32 shrink-0">{label}</span>
-                  <span className="text-sm text-gray-800 break-words">{value}</span>
-                </div>
-              ))}
-            </div>
-            <p className="text-xs text-gray-400 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3">
-              You can add photos after creating the activity from the edit page.
-            </p>
-          </div>
-        )}
-
-        {/* Navigation */}
+        {/* ── Navigation ──────────────────────────────────────────────────── */}
         <div className={`flex pt-2 ${step === 0 ? "justify-end" : "justify-between"}`}>
           {step > 0 && (
             <button
@@ -399,26 +513,26 @@ export function CreateActivityWizard({
               onClick={handleBack}
               className="flex items-center gap-1.5 text-sm text-gray-600 border border-gray-200 rounded-xl px-4 py-2 hover:border-gray-400 transition-colors"
             >
-              <FiChevronLeft className="h-4 w-4" /> Back
+              <FiChevronLeft className="h-4 w-4" /> {t("nav.back")}
             </button>
           )}
-          {step < 4 ? (
+          {step < 2 ? (
             <button
               type="button"
               onClick={handleNext}
               className="flex items-center gap-1.5 text-sm bg-primary text-white rounded-xl px-5 py-2 hover:bg-primary/90 transition-colors font-medium"
             >
-              Next <FiChevronRight className="h-4 w-4" />
+              {t("nav.next")} <FiChevronRight className="h-4 w-4" />
             </button>
           ) : (
             <button
               type="button"
               disabled={pending}
-              onClick={handleSubmit}
+              onClick={handleCreate}
               className="flex items-center gap-2 text-sm bg-primary text-white rounded-xl px-6 py-2 hover:bg-primary/90 transition-colors font-medium disabled:opacity-50"
             >
               <FiCheck className="h-4 w-4" />
-              {pending ? "Creating…" : "Create activity"}
+              {pending ? t("nav.creating") : t("nav.create")}
             </button>
           )}
         </div>

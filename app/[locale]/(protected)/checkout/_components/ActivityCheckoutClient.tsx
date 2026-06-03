@@ -12,6 +12,7 @@ import { createActivityReservation } from "@/lib/actions/bookings";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { recTracker } from "@/lib/recommendation/tracker";
 import Link from "next/link";
 import type { ContactFormData } from "@/lib/validations/contact";
 import type { PaymentMethod, PaymentOption } from "@prisma/client";
@@ -135,6 +136,8 @@ export function ActivityCheckoutClient({
       setBookingRef(result.data.bookingRef);
       setStep(3);
       toast.success(labels.success);
+      // Track reservation for recommendation system
+      recTracker.trackReservation(activity.id, "ACTIVITY", computeActivityTotal(activity.price, adults, children));
     } else {
       setFailed(true);
       toast.error(result.error ?? labels.error);

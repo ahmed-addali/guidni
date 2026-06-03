@@ -14,11 +14,15 @@ import {
 import { cn } from "@/lib/utils";
 
 const VEHICLE_TYPES = [
-  { value: "CAR",     emoji: "🚗" },
-  { value: "BIKE",    emoji: "🚲" },
-  { value: "SCOOTER", emoji: "🛵" },
-  { value: "BOAT",    emoji: "⛵" },
-  { value: "OTHER",   emoji: "🔧" },
+  { value: "CAR",       emoji: "🚗" },
+  { value: "MOTORBIKE", emoji: "🏍️" },
+  { value: "SCOOTER",   emoji: "🛵" },
+  { value: "BICYCLE",   emoji: "🚲" },
+  { value: "BOAT",      emoji: "⛵" },
+  { value: "QUAD",      emoji: "🏎️" },
+  { value: "BUGGY",     emoji: "🪖" },
+  { value: "JET_SKI",   emoji: "🌊" },
+  { value: "OTHER",     emoji: "🔧" },
 ] as const;
 
 const TRANSFER_TYPES = [
@@ -61,9 +65,13 @@ export function TransportFilterSheet({ service }: Props) {
 
   const TYPE_LABEL: Record<string, string> = {
     CAR:              t("cars"),
-    BIKE:             t("bikes"),
+    MOTORBIKE:        t("motorbikes"),
     SCOOTER:          t("scooters"),
+    BICYCLE:          t("bicycles"),
     BOAT:             t("boats"),
+    QUAD:             t("quads"),
+    BUGGY:            t("buggies"),
+    JET_SKI:          t("jetSkis"),
     OTHER:            t("other"),
     AIRPORT_TRANSFER: t("airportTransfers"),
     TAXI:             t("cityTaxi"),

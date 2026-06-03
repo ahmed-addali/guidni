@@ -3,6 +3,7 @@
 import Autoplay from "embla-carousel-autoplay";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { ActivityCard } from "@/components/activities/ActivityCard";
+import { TrackedCard } from "@/components/shared/TrackedCard";
 import type { ActivityListItem } from "@/types/activity";
 import type { BadgeKey } from "@prisma/client";
 
@@ -22,7 +23,9 @@ export function ActivitiesCarousel({ activities, locale, badgesMap = {} }: Props
       <CarouselContent viewportClassName="overflow-visible sm:overflow-hidden">
         {activities.map((activity) => (
           <CarouselItem key={activity.id} className="basis-[85%] sm:basis-1/2 lg:basis-1/3">
-            <ActivityCard activity={activity} locale={locale} badges={badgesMap[activity.id]} />
+            <TrackedCard listingId={activity.id} listingType="ACTIVITY">
+              <ActivityCard activity={activity} locale={locale} badges={badgesMap[activity.id]} />
+            </TrackedCard>
           </CarouselItem>
         ))}
       </CarouselContent>

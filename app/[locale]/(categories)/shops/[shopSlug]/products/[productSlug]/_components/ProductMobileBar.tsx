@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { FiShoppingCart } from "react-icons/fi";
 import { toast } from "sonner";
+import { PLATFORM_CURRENCY } from "@/lib/utils/constants";
 
 interface Props {
   productId:   string;
@@ -15,9 +15,10 @@ interface Props {
   stock:       number;
   locale:      string;
   labels: {
-    addToCart: string;
-    added:     string;
+    addToCart:  string;
+    added:      string;
     outOfStock: string;
+    price:      string;
   };
 }
 
@@ -40,8 +41,8 @@ export function ProductMobileBar({
   return (
     <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-white border-t border-gray-100 px-4 py-3 flex items-center justify-between gap-4">
       <div>
-        <p className="text-xs text-gray-500">Price</p>
-        <p className="text-lg font-bold text-gray-900">{price} TND</p>
+        <p className="text-xs text-gray-500">{labels.price}</p>
+        <p className="text-lg font-bold text-gray-900">{price} {PLATFORM_CURRENCY}</p>
       </div>
       <button
         onClick={handleAdd}

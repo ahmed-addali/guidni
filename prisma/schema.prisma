@@ -74,6 +74,28 @@ enum PlanType {
   GUIDE_PAID
 }
 
+enum PlanModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CHANGES_REQUESTED
+}
+
+enum GuideVerificationStatus {
+  NOT_SUBMITTED
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum PaymentSessionStatus {
+  PENDING
+  PAID
+  CANCELLED
+  EXPIRED
+  FAILED
+}
+
 enum TransferType {
   AIRPORT_TRANSFER
   TAXI
@@ -93,16 +115,36 @@ enum OrderStatus {
 
 enum DeliveryMethod {
   PICKUP
-  LOCAL_DELIVERY
-  NATIONWIDE
-  INTERNATIONAL
+  DELIVERY
+}
+
+enum ShopStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+}
+
+enum TransferStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+}
+
+enum RentalStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
 }
 
 enum RentalType {
   CAR
-  BIKE
+  MOTORBIKE
   SCOOTER
+  BICYCLE
   BOAT
+  QUAD
+  BUGGY
+  JET_SKI
   OTHER
 }
 
@@ -130,6 +172,13 @@ enum GuidniReviewStatus {
 enum PassActivityType {
   FIXED
   OPTIONAL
+}
+
+enum ActivityStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
 }
 
 // ─────────────────────────────────────────
@@ -173,6 +222,10 @@ model User {
   guideProfile          GuideProfile?
   agentProfile          AgentProfile?
   planPurchases         PlanPurchase[]
+  paymentSessions       PaymentSession[]
+  planConversations     PlanConversation[]
+  sentPlanMessages      PlanMessage[]
+  planRequests          PlanRequest[]
 }
 
 model Session {
@@ -225,8 +278,6 @@ model Destination {
   region            String?
   description       String?   @db.Text
   arabicDescription String?   @db.Text
-  coverImage        String?
-  gallery           String[]
   active            Boolean   @default(true)
   featured          Boolean   @default(false)
   createdAt         DateTime  @default(now())
@@ -237,6 +288,7 @@ model Destination {
   longitude         Float?
   timezone          String?
 
+  images            Images[]
   activities        Activity[]
   stays             Stay[]
   restaurants       Restaurant[]
@@ -315,7 +367,7 @@ model Activity {
   arabicTitle       String?
   description       String   @db.Text
   arabicDescription String?  @db.Text
-  category          String
+  categories        String[] @default([])
   price             Int
   phone             String?
   country           String
@@ -333,8 +385,10 @@ model Activity {
   cancelation       Boolean?
   paynow            Boolean?
   guide             String?
+  latitude          Float?
+  longitude         Float?
   capacity          Int
-  availableTimes    String
+  availableTimes    String    @default("")   // legacy — use timeSlots relation
   featuredInHome    Boolean  @default(false)
 
   // Planner fields
@@ -342,6 +396,10 @@ model Activity {
   intensity         String?
   durationMinutes   Int?
   bestTimeOfDay     String?
+
+  // Status & lifecycle
+  status            ActivityStatus @default(DRAFT)
+  publishedAt       DateTime?
 
   // Agent commission
   agentCommissionEnabled Boolean @default(false)
@@ -353,6 +411,7 @@ model Activity {
   destinationId     String?
   destination       Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
 
+  timeSlots         ActivityTimeSlot[]
   images            Images[]
   reservations      ActivityReservation[]
   fixedInPasses     Pass[]        @relation("FixedActivities")
@@ -360,7 +419,17 @@ model Activity {
   attractions       Attraction[]
 
   @@index([slug])
-  @@index([destinationId, category])
+  @@index([destinationId])
+  @@index([status])
+}
+
+model ActivityTimeSlot {
+  id         String   @id @default(cuid())
+  time       String
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@index([activityId])
 }
 
 model ActivityReservation {
@@ -487,6 +556,7 @@ model Stay {
 
   images               Images[]
   reservations         StaysReservation[]
+  blockedDates         StayBlockedDate[]
 
   @@index([country])
   @@index([region])
@@ -551,6 +621,17 @@ model StaysReservation {
   @@index([status])
 }
 
+model StayBlockedDate {
+  id      String   @id @default(cuid())
+  stayId  String
+  stay    Stay     @relation(fields: [stayId], references: [id], onDelete: Cascade)
+  date    DateTime @db.Date
+  reason  String?
+
+  @@unique([stayId, date])
+  @@index([stayId])
+}
+
 model Coupon {
   id           String             @id @default(cuid())
   code         String             @unique
@@ -566,6 +647,7 @@ model Coupon {
 model Restaurant {
   id                  String             @id @default(cuid())
   slug                String             @unique
+  approvalStatus      String             @default("DRAFT")
   name                String
   arabicName          String?
   description         String
@@ -767,16 +849,17 @@ model Plan {
   createdAt   DateTime  @default(now())
 
   // Guide marketplace fields
-  planType      PlanType  @default(USER_SAVED)
-  price         Int       @default(0)
-  isPaidPlan    Boolean   @default(false)
-  purchaseCount Int       @default(0)
-  summary       String?   @db.Text
-  previewDays   Int       @default(1)
-  tags          String[]  @default([])
-  difficulty    String?
-  suitableFor   String[]  @default([])
-  season        String?
+  planType           PlanType              @default(USER_SAVED)
+  moderationStatus   PlanModerationStatus  @default(PENDING)
+  price              Int                   @default(0)
+  isPaidPlan         Boolean               @default(false)
+  purchaseCount      Int                   @default(0)
+  summary            String?               @db.Text
+  previewDays        Int                   @default(1)
+  tags               String[]              @default([])
+  difficulty         String?
+  suitableFor        String[]              @default([])
+  season             String[]              @default([])
 
   userId        String?
   user          User?        @relation(fields: [userId], references: [id])
@@ -788,6 +871,8 @@ model Plan {
   guide         GuideProfile? @relation(fields: [guideId], references: [id], onDelete: SetNull)
 
   purchases     PlanPurchase[]
+  conversations PlanConversation[]
+  requests      PlanRequest[]
 
   @@index([id])
   @@index([userId, createdAt])
@@ -824,9 +909,11 @@ model GuideProfile {
   planCount       Int      @default(0)
   totalSales      Int      @default(0)
 
-  isVerified      Boolean  @default(false)
-  isFeatured      Boolean  @default(false)
-  isActive        Boolean  @default(true)
+  isVerified          Boolean                  @default(false)
+  isFeatured          Boolean                  @default(false)
+  isActive            Boolean                  @default(true)
+  chatEnabled         Boolean                  @default(true)
+  verificationStatus  GuideVerificationStatus  @default(NOT_SUBMITTED)
 
   website         String?
   instagram       String?
@@ -839,6 +926,8 @@ model GuideProfile {
   user            User     @relation(fields: [userId], references: [id])
 
   plans           Plan[]
+  conversations   PlanConversation[]
+  requests        PlanRequest[]
 
   @@index([destinationId, isActive])
   @@index([isFeatured, isActive])
@@ -891,6 +980,7 @@ model Images {
   id        String   @id @default(cuid())
   url       String
   alt       String   @default("")
+  order     Int      @default(0)
   createdAt DateTime @default(now())
 
   activityId   String?
@@ -928,6 +1018,9 @@ model Images {
 
   guidniReviewId String?
   guidniReview   GuidniReview? @relation(fields: [guidniReviewId], references: [id], onDelete: Cascade)
+
+  destinationId  String?
+  destination    Destination?  @relation(fields: [destinationId], references: [id], onDelete: Cascade)
 }
 
 model Wishlist {
@@ -994,6 +1087,114 @@ model Payment {
 }
 
 // ─────────────────────────────────────────
+// CUSTOM PLAN REQUESTS (Phase 26C)
+// ─────────────────────────────────────────
+
+enum PlanRequestStatus {
+  PENDING
+  QUOTE_SENT
+  CONFIRMED
+  IN_PROGRESS
+  DELIVERED
+  CHANGES_REQUESTED
+  COMPLETED
+  DECLINED
+  CANCELLED
+}
+
+model PlanRequest {
+  id          String            @id @default(cuid())
+  requestRef  String            @unique
+  message     String            @db.Text
+  duration    Int
+  budget      Int
+  groupSize   Int
+  interests   String[]
+  startDate   String?
+  status      PlanRequestStatus @default(PENDING)
+  quotePrice       Int?
+  quoteNote        String?   @db.Text
+  estimatedBudget  Int?
+  declineNote      String?
+  changesNote      String?   @db.Text
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  guideId      String
+  guide        GuideProfile @relation(fields: [guideId], references: [id])
+  resultPlanId String?
+  resultPlan   Plan?        @relation(fields: [resultPlanId], references: [id])
+
+  @@index([guideId, status])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────
+// GUIDE MESSAGING (post-purchase conversations)
+// ─────────────────────────────────────────
+
+model PlanConversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  planId    String
+  plan      Plan         @relation(fields: [planId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  guideId   String
+  guide     GuideProfile @relation(fields: [guideId], references: [id])
+
+  messages  PlanMessage[]
+
+  @@unique([planId, userId])
+  @@index([guideId])
+  @@index([userId])
+}
+
+model PlanMessage {
+  id             String           @id @default(cuid())
+  content        String           @db.Text
+  readAt         DateTime?
+  createdAt      DateTime         @default(now())
+
+  conversationId String
+  conversation   PlanConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User             @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+}
+
+// ─────────────────────────────────────────
+// PAYMENT SESSIONS (simulation + future gateway)
+// ─────────────────────────────────────────
+
+model PaymentSession {
+  id          String               @id @default(cuid())
+  // Amount in smallest currency unit: millimes for TND (1 TND = 1000), cents for USD/EUR
+  amount      Int
+  currency    String               @default("TND")
+  description String
+  status      PaymentSessionStatus @default(PENDING)
+  // Arbitrary key-value metadata: { type, planId, userId, purchaseRef, ... }
+  metadata    Json                 @default("{}")
+  successUrl  String               @db.Text
+  cancelUrl   String               @db.Text
+  paidAt      DateTime?
+  expiresAt   DateTime
+  createdAt   DateTime             @default(now())
+
+  userId      String?
+  user        User?                @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status, expiresAt])
+}
+
+// ─────────────────────────────────────────
 // RENTALS
 // ─────────────────────────────────────────
 
@@ -1019,13 +1220,18 @@ model Rental {
   hasGPS           Boolean    @default(false)
   hasInsurance     Boolean    @default(false)
   requiresLicense  Boolean    @default(true)
+  freeCancellation Boolean    @default(false)
+  deposit          Int?
   country          String
   region           String
   city             String?
   address          String?
   phone            String?
   featuredInHome   Boolean    @default(false)
+  status           RentalStatus @default(DRAFT)
+  note             String?
   nbReviews        Int        @default(0)
+  createdAt        DateTime   @default(now())
 
   profileId        String
   businessProfile  BusinessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
@@ -1035,8 +1241,20 @@ model Rental {
 
   images           Images[]
   reservations     RentalReservation[]
+  blockedDates     RentalBlockedDate[]
 
   @@index([slug])
+}
+
+model RentalBlockedDate {
+  id       String   @id @default(cuid())
+  rentalId String
+  rental   Rental   @relation(fields: [rentalId], references: [id], onDelete: Cascade)
+  date     DateTime @db.Date
+  reason   String?
+
+  @@unique([rentalId, date])
+  @@index([rentalId])
 }
 
 model RentalReservation {
@@ -1092,6 +1310,7 @@ model Transfer {
   isAC              Boolean      @default(true)
   isMeetGreet       Boolean      @default(false)
   isChildSeat       Boolean      @default(false)
+  freeCancellation  Boolean      @default(false)
   languages         String?      // driver languages (comma-separated)
   phone             String?
 
@@ -1103,6 +1322,7 @@ model Transfer {
 
   note              String?      // aggregated rating string e.g. "4.5"
   nbReviews         Int          @default(0)
+  status            TransferStatus @default(DRAFT)
   featuredInHome    Boolean      @default(false)
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
@@ -1115,9 +1335,21 @@ model Transfer {
 
   images            Images[]
   reservations      TransferReservation[]
+  blockedDates      TransferBlockedDate[]
 
   @@index([slug])
   @@index([type])
+}
+
+model TransferBlockedDate {
+  id         String   @id @default(cuid())
+  transferId String
+  transfer   Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  date       DateTime @db.Date
+  reason     String?
+
+  @@unique([transferId, date])
+  @@index([transferId])
 }
 
 model TransferReservation {
@@ -1180,9 +1412,11 @@ model Shop {
   facebook          String?
   note              String?
   nbReviews         Int              @default(0)
+  status            ShopStatus       @default(DRAFT)
   isOpen            Boolean          @default(true)
   featuredInHome    Boolean          @default(false)
   deliveryMethods   DeliveryMethod[]
+  deliveryFee       Int?             // null = free delivery; amount in millimes
   freeShippingAbove Int?
   minOrderAmount    Int?
   createdAt         DateTime         @default(now())
@@ -1196,8 +1430,21 @@ model Shop {
   products          Product[]
   images            Images[]
   orders            ProductOrder[]
+  hours             ShopHours[]
 
   @@index([slug])
+}
+
+model ShopHours {
+  id               String  @id @default(cuid())
+  day              String
+  opening          String?
+  closing          String?
+  isClosed         Boolean @default(false)
+  isFullDayOpening Boolean @default(false)
+
+  shopId           String
+  shop             Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
 }
 
 model Product {
@@ -1543,4 +1790,153 @@ enum RedemptionStatus {
   PROCESSING
   PAID
   REJECTED
+}
+
+// ─────────────────────────────────────────
+// RECOMMENDATION SYSTEM (MAB Thompson Sampling)
+// ─────────────────────────────────────────
+
+model RecommendationEvent {
+  id          String   @id @default(cuid())
+  eventType   String   // "impression" | "click" | "dwell_time" | "gallery_swipe" | "wishlist" | "reservation"
+  listingId   String
+  listingType String   // "ACTIVITY" | "STAY" | "RESTAURANT" | "RENTAL" | "TRANSFER"
+  userId      String?  // null for anonymous
+  sessionId   String   // browser sessionStorage ID
+  segment     String   // context segment key
+  reward      Float    // computed alpha delta
+  price       Float?   // for reservation events
+  metadata    Json?    // { position, page, dwellMs, swipeCount }
+  createdAt   DateTime @default(now())
+
+  @@index([listingId, listingType])
+  @@index([segment])
+  @@index([eventType])
+  @@index([createdAt])
+}
+
+model BanditArm {
+  id           String   @id @default(cuid())
+  listingId    String
+  listingType  String
+  segment      String   // context segment key
+  alpha        Float    @default(1.0)  // successes (prior=1)
+  beta         Float    @default(1.0)  // failures (prior=1)
+  impressions  Int      @default(0)
+  clicks       Int      @default(0)
+  wishlists    Int      @default(0)
+  conversions  Int      @default(0)
+  totalRevenue Float    @default(0.0)
+  updatedAt    DateTime @updatedAt
+
+  @@unique([listingId, listingType, segment])
+  @@index([segment])
+  @@index([listingType, segment])
+}
+// ─────────────────────────────────────────
+// RECOMMENDATION SYSTEM (Hybrid LinUCB)
+// ─────────────────────────────────────────
+
+model BanditArmUCB {
+  id             String   @id @default(cuid())
+  listingId      String   @map("listing_id")
+  listingType    String   @map("listing_type") // "STAY" | "ACTIVITY" | "RESTAURANT" | "RENTAL" | "TRANSFER"
+  locationZone   String   @map("location_zone") // city or region name (replaces old "segment")
+  tags           Json     @default("[]") // list[str] from fixed TAG_VOCAB
+  tagSource      String   @default("llm") @map("tag_source") // "llm" | "manual" | "default"
+  commissionRate Float    @default(0.10) @map("commission_rate")
+  impressions    Int      @default(0)
+  clicks         Int      @default(0)
+  wishlists      Int      @default(0)
+  conversions    Int      @default(0)
+  totalRevenue   Float    @default(0.0) @map("total_revenue")
+  nUpdates       Int      @default(0) @map("n_updates")
+  isUnderexposed Boolean  @default(true) @map("is_underexposed") // true if impressions < 50
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@unique([listingId, listingType, locationZone])
+  @@index([locationZone])
+  @@index([listingType])
+}
+
+model LinUCBGlobal {
+  id         String   @id @default("global")
+  aMatrix    Json     @map("a_matrix") // list[list[float]] shape 306×306, stored row-major
+  bVector    Json     @map("b_vector") // list[float] shape 306
+  d          Int      // must equal 306 always
+  vocabHash  String   @map("vocab_hash") // sha256 of sorted TAG_VOCAB, used for deploy safety
+  nUpdates   Int      @default(0) @map("n_updates")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  // CONSTRAINT: only one row ever (id always = "global") — enforced via CHECK in SQL
+}
+
+model SystemConfig {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt @map("updated_at")
+  // Seed rows: vocab_hash="", d="306", schema_version="1"
+}
+
+model ListingTag {
+  id             String   @id @default(cuid())
+  listingId      String   @map("listing_id")
+  listingType    String   @map("listing_type")
+  tags           Json     @default("[]")
+  rawDescription String?  @map("raw_description")
+  confidence     Float    @default(1.0)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@unique([listingId, listingType])
+}
+
+model RecoUserProfile {
+  userId           String   @id @map("user_id")
+  tagAffinity      Json     @default("{}") @map("tag_affinity") // {"pool": 0.82, "family": 0.6, ...}
+  avgBookingPrice  Float    @default(0.0) @map("avg_booking_price")
+  priceStdDev      Float    @default(0.0) @map("price_std_dev")
+  dominantTripType String   @default("unknown") @map("dominant_trip_type") // "family" | "couple" | "solo" | "unknown"
+  totalBookings    Int      @default(0) @map("total_bookings")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("UserProfile")
+}
+
+model UserSession {
+  id               String   @id @default(cuid())
+  sessionId        String   @unique @map("session_id")
+  userId           String?  @map("user_id") // null for anonymous
+  locationLat      Float?   @map("location_lat")
+  locationLon      Float?   @map("location_lon")
+  deviceType       String   @default("mobile") @map("device_type")
+  entryHour        Int      @map("entry_hour")
+  entryMonth       Int      @map("entry_month")
+  scrollDepthMax   Float    @default(0.0) @map("scroll_depth_max")
+  dwellSeconds     Int      @default(0) @map("dwell_seconds")
+  clickSequence    Json     @default("[]") @map("click_sequence")
+  priceRangeViewed Json     @default("{\"min\":0,\"max\":0}") @map("price_range_viewed")
+  budgetSegment    String   @default("unknown") @map("budget_segment") // "budget" | "mid" | "premium" | "luxury"
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+}
+
+model RecommendationEventUCB {
+  id           String   @id @default(cuid())
+  eventType    String   @map("event_type")
+  listingId    String   @map("listing_id")
+  listingType  String   @map("listing_type")
+  userId       String?  @map("user_id")
+  sessionId    String   @map("session_id")
+  locationZone String   @map("location_zone")
+  reward       Float
+  rankShown    Int?     @map("rank_shown") // 1-based position shown to user (for IPS correction)
+  price        Float?
+  metadata     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([listingId])
+  @@index([eventType])
+  @@index([createdAt])
 }

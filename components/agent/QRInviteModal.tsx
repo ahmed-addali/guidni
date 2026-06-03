@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { QRCodeSVG } from "react-qr-code";
+import QRCode from "react-qr-code";
 import { FiX, FiDownload } from "react-icons/fi";
 
 interface Props {
@@ -61,7 +61,7 @@ export function QRInviteModal({ url, activityTitle, expiresLabel }: Props) {
             </div>
 
             <div className="flex justify-center p-4 bg-white border border-gray-100 rounded-xl">
-              <QRCodeSVG
+              <QRCode
                 id="qr-invite-svg"
                 value={url}
                 size={200}

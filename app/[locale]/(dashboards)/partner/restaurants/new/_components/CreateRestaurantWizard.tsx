@@ -3,20 +3,18 @@
 import { useState, useTransition } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
-import { FiCheck, FiChevronLeft, FiChevronRight, FiMapPin } from "react-icons/fi";
+import { useTranslations } from "next-intl";
+import { FiCheck, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { PhoneInput } from "@/components/shared/PhoneInput";
+import { CounterInput } from "@/components/shared/CounterInput";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { createRestaurant } from "@/lib/actions/partner-restaurants";
 import { RESTAURANT_CUISINES, FOOD_TYPES, DIET_TYPES, RESTAURANT_ATTRIBUTES, ATTRIBUTE_GROUPS } from "@/lib/utils/restaurant-cuisines";
 
-const STEPS = ["Type", "Details", "Location", "Capacity", "Review"] as const;
+const MEAL_KEYS = ["Breakfast", "Lunch", "Dinner", "Brunch", "All day"] as const;
+
 type Step = 0 | 1 | 2 | 3 | 4;
-
-const RESTAURANT_TYPES = [
-  { value: "RESTAURANT",  label: "Restaurant",          desc: "Full-service dining" },
-  { value: "CAFEE_SHOP",  label: "Café / Coffee Shop",  desc: "Coffee, drinks & light food" },
-  { value: "BOTH",        label: "Restaurant & Café",   desc: "Dining + coffee experience" },
-] as const;
-
-const MEALS = ["Breakfast", "Lunch", "Dinner", "Brunch", "All day"];
 
 type Destination = { id: string; label: string; city: string; country: string; region: string };
 
@@ -66,10 +64,12 @@ const DEFAULTS: FormData = {
   destinationId:       "",
 };
 
-function StepProgress({ current }: { current: Step }) {
+const inputCls = "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary";
+
+function StepProgress({ current, steps }: { current: Step; steps: string[] }) {
   return (
     <div className="flex items-center gap-0 mb-8">
-      {STEPS.map((label, i) => {
+      {steps.map((label, i) => {
         const done   = i < current;
         const active = i === current;
         return (
@@ -85,7 +85,7 @@ function StepProgress({ current }: { current: Step }) {
                 {label}
               </span>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <div className={`flex-1 h-0.5 mx-2 mb-5 ${done ? "bg-primary" : "bg-gray-200"}`} />
             )}
           </div>
@@ -105,8 +105,6 @@ function FieldGroup({ label, error, children }: { label: string; error?: string;
   );
 }
 
-const inputCls = "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary";
-
 export function CreateRestaurantWizard({
   profileCountry,
   profileCity,
@@ -118,9 +116,13 @@ export function CreateRestaurantWizard({
   profilePhone?:   string;
   destinations:    Destination[];
 }) {
+  const t = useTranslations("PartnerDashboard.newRestaurant.wizard");
+  const tDetails = useTranslations("PartnerDashboard.editRestaurant.details");
+
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
+
   const [step, setStep]   = useState<Step>(0);
   const [form, setForm]   = useState<FormData>({
     ...DEFAULTS,
@@ -130,6 +132,26 @@ export function CreateRestaurantWizard({
   });
   const [errors, setErrors]  = useState<Partial<Record<keyof FormData, string>>>({});
   const [pending, start]     = useTransition();
+
+  const STEPS = [
+    t("steps.type"),
+    t("steps.details"),
+    t("steps.location"),
+    t("steps.capacity"),
+    t("steps.review"),
+  ];
+
+  const TYPE_OPTIONS = [
+    { value: "RESTAURANT" as const, label: t("step0.typeOptions.RESTAURANT.label"), desc: t("step0.typeOptions.RESTAURANT.desc") },
+    { value: "CAFEE_SHOP" as const, label: t("step0.typeOptions.CAFEE_SHOP.label"), desc: t("step0.typeOptions.CAFEE_SHOP.desc") },
+    { value: "BOTH"       as const, label: t("step0.typeOptions.BOTH.label"),       desc: t("step0.typeOptions.BOTH.desc") },
+  ];
+
+  const typeLabel: Record<string, string> = {
+    RESTAURANT: t("step0.typeOptions.RESTAURANT.label"),
+    CAFEE_SHOP: t("step0.typeOptions.CAFEE_SHOP.label"),
+    BOTH:       t("step0.typeOptions.BOTH.label"),
+  };
 
   const set = (key: keyof FormData, value: string | number | boolean | string[]) =>
     setForm((p) => ({ ...p, [key]: value }));
@@ -143,17 +165,15 @@ export function CreateRestaurantWizard({
 
   function validate(): boolean {
     const e: Partial<Record<keyof FormData, string>> = {};
-    if (step === 0 && !form.type) e.type = "Select a type";
+    if (step === 0 && !form.type) e.type = t("step0.errorRequired");
     if (step === 1) {
-      if (!form.name.trim())        e.name        = "Name is required";
-      if (form.name.trim().length < 2) e.name    = "At least 2 characters";
-      if (!form.description.trim()) e.description = "Description is required";
-      if (form.description.trim().length < 10) e.description = "At least 10 characters";
+      if (!form.name.trim())               e.name        = t("step1.nameRequired");
+      if (form.name.trim().length < 2)     e.name        = t("step1.nameMin");
+      if (!form.description.trim())        e.description = t("step1.descriptionRequired");
+      if (form.description.trim().length < 10) e.description = t("step1.descriptionMin");
     }
     if (step === 2) {
-      if (!form.destinationId)  e.destinationId = "Select a destination";
-      if (!form.country.trim()) e.country = "Country is required";
-      if (!form.city.trim())    e.city    = "City is required";
+      if (!form.destinationId) e.destinationId = t("step2.destinationRequired");
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -167,7 +187,7 @@ export function CreateRestaurantWizard({
     setStep((s) => (s - 1) as Step);
   }
 
-  const selectedDestLabel = destinations.find((d) => d.id === form.destinationId)?.label ?? "";
+  const selectedDestLabel = destinations.find((d) => d.id === form.destinationId)?.label ?? "—";
 
   function handleSubmit() {
     start(async () => {
@@ -184,23 +204,17 @@ export function CreateRestaurantWizard({
       };
       const res = await createRestaurant(payload);
       if (res.success) {
-        toast.success("Restaurant created!");
+        toast.success(t("createSuccess"));
         router.push(`/${locale}/partner/restaurants`);
       } else {
-        toast.error(res.error ?? "Failed to create restaurant");
+        toast.error(res.error ?? t("createFailed"));
       }
     });
   }
 
-  const typeLabel: Record<string, string> = {
-    RESTAURANT: "Restaurant",
-    CAFEE_SHOP: "Café / Coffee Shop",
-    BOTH:       "Restaurant & Café",
-  };
-
   return (
     <div className="max-w-2xl mx-auto">
-      <StepProgress current={step} />
+      <StepProgress current={step} steps={STEPS} />
 
       <div className="bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 space-y-6">
 
@@ -208,11 +222,11 @@ export function CreateRestaurantWizard({
         {step === 0 && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Type of establishment</h2>
-              <p className="text-sm text-gray-400 mt-1">What kind of place are you listing?</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("step0.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("step0.subheading")}</p>
             </div>
             <div className="space-y-3">
-              {RESTAURANT_TYPES.map(({ value, label, desc }) => (
+              {TYPE_OPTIONS.map(({ value, label, desc }) => (
                 <button
                   key={value}
                   type="button"
@@ -241,70 +255,60 @@ export function CreateRestaurantWizard({
         {step === 1 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Restaurant details</h2>
-              <p className="text-sm text-gray-400 mt-1">Tell guests about your establishment.</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("step1.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("step1.subheading")}</p>
             </div>
-            <FieldGroup label="Name *" error={errors.name}>
+            <FieldGroup label={t("step1.nameLabel")} error={errors.name}>
               <input
                 value={form.name}
                 onChange={(e) => set("name", e.target.value)}
-                placeholder="e.g. La Sirène de Djerba"
+                placeholder={t("step1.namePlaceholder")}
                 className={inputCls}
               />
             </FieldGroup>
-            <FieldGroup label="Description *" error={errors.description}>
+            <FieldGroup label={t("step1.descriptionLabel")} error={errors.description}>
               <textarea
                 value={form.description}
                 onChange={(e) => set("description", e.target.value)}
                 rows={4}
-                placeholder="Describe the ambiance, cuisine, and what makes your place special..."
+                placeholder={t("step1.descriptionPlaceholder")}
                 className={`${inputCls} resize-none`}
               />
             </FieldGroup>
-            <FieldGroup label="Phone">
-              <input
+            <FieldGroup label={t("step1.phoneLabel")}>
+              <PhoneInput
                 value={form.phone}
-                onChange={(e) => set("phone", e.target.value)}
-                placeholder="+216..."
-                className={inputCls}
+                onChange={(v) => set("phone", v)}
               />
             </FieldGroup>
             {form.type !== "CAFEE_SHOP" && (
               <>
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Cuisine</label>
+                  <label className="block text-sm font-medium text-gray-700">{t("step1.cuisineLabel")}</label>
                   <div className="flex flex-wrap gap-2">
                     {RESTAURANT_CUISINES.map((c) => (
-                      <button
-                        key={c.value}
-                        type="button"
-                        onClick={() => toggleArrayItem("category", c.value)}
+                      <button key={c.value} type="button" onClick={() => toggleArrayItem("category", c.value)}
                         className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
                           form.category.includes(c.value)
                             ? "bg-primary/10 text-primary border-primary/30"
                             : "bg-gray-50 text-gray-600 border-gray-200 hover:border-gray-400"
-                        }`}
-                      >
+                        }`}>
                         {form.category.includes(c.value) && "✓ "}{c.label}
                       </button>
                     ))}
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Meals served</label>
+                  <label className="block text-sm font-medium text-gray-700">{t("step1.mealsLabel")}</label>
                   <div className="flex flex-wrap gap-2">
-                    {MEALS.map((m) => (
-                      <button
-                        key={m}
-                        type="button"
-                        onClick={() => toggleArrayItem("meals", m)}
+                    {MEAL_KEYS.map((m) => (
+                      <button key={m} type="button" onClick={() => toggleArrayItem("meals", m)}
                         className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
                           form.meals.includes(m)
                             ? "bg-primary/10 text-primary border-primary/30"
                             : "bg-gray-50 text-gray-600 border-gray-200 hover:border-gray-400"
-                        }`}
-                      >
-                        {form.meals.includes(m) && "✓ "}{m}
+                        }`}>
+                        {form.meals.includes(m) && "✓ "}{tDetails(`meals.${m}` as any)}
                       </button>
                     ))}
                   </div>
@@ -312,45 +316,37 @@ export function CreateRestaurantWizard({
               </>
             )}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Food types</label>
+              <label className="block text-sm font-medium text-gray-700">{t("step1.foodTypesLabel")}</label>
               <div className="flex flex-wrap gap-2">
                 {FOOD_TYPES.map((ft) => (
-                  <button
-                    key={ft.value}
-                    type="button"
-                    onClick={() => toggleArrayItem("foodTypes", ft.value)}
+                  <button key={ft.value} type="button" onClick={() => toggleArrayItem("foodTypes", ft.value)}
                     className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
                       form.foodTypes.includes(ft.value)
                         ? "bg-primary/10 text-primary border-primary/30"
                         : "bg-gray-50 text-gray-600 border-gray-200 hover:border-gray-400"
-                    }`}
-                  >
+                    }`}>
                     {form.foodTypes.includes(ft.value) && "✓ "}{ft.label}
                   </button>
                 ))}
               </div>
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Dietary options</label>
+              <label className="block text-sm font-medium text-gray-700">{t("step1.dietaryLabel")}</label>
               <div className="flex flex-wrap gap-2">
                 {DIET_TYPES.map((dt) => (
-                  <button
-                    key={dt.value}
-                    type="button"
-                    onClick={() => toggleArrayItem("dietTypes", dt.value)}
+                  <button key={dt.value} type="button" onClick={() => toggleArrayItem("dietTypes", dt.value)}
                     className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
                       form.dietTypes.includes(dt.value)
                         ? "bg-primary/10 text-primary border-primary/30"
                         : "bg-gray-50 text-gray-600 border-gray-200 hover:border-gray-400"
-                    }`}
-                  >
+                    }`}>
                     {form.dietTypes.includes(dt.value) && "✓ "}{dt.label}
                   </button>
                 ))}
               </div>
             </div>
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">Ambiance & features</label>
+              <label className="block text-sm font-medium text-gray-700">{t("step1.attributesLabel")}</label>
               {ATTRIBUTE_GROUPS.map((group) => {
                 const groupItems = RESTAURANT_ATTRIBUTES.filter((a) =>
                   (group.values as readonly string[]).includes(a.value)
@@ -360,16 +356,12 @@ export function CreateRestaurantWizard({
                     <p className="text-xs text-gray-400 mb-1.5">{group.label}</p>
                     <div className="flex flex-wrap gap-2">
                       {groupItems.map((a) => (
-                        <button
-                          key={a.value}
-                          type="button"
-                          onClick={() => toggleArrayItem("attributes", a.value)}
+                        <button key={a.value} type="button" onClick={() => toggleArrayItem("attributes", a.value)}
                           className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
                             form.attributes.includes(a.value)
                               ? "bg-primary/10 text-primary border-primary/30"
                               : "bg-gray-50 text-gray-600 border-gray-200 hover:border-gray-400"
-                          }`}
-                        >
+                          }`}>
                           {form.attributes.includes(a.value) && "✓ "}{a.label}
                         </button>
                       ))}
@@ -385,66 +377,72 @@ export function CreateRestaurantWizard({
         {step === 2 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Location</h2>
-              <p className="text-sm text-gray-400 mt-1">Where is your restaurant located?</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("step2.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("step2.subheading")}</p>
             </div>
 
-            {/* Destination selector */}
-            <FieldGroup label="Destination *" error={errors.destinationId}>
-              <div className="relative">
-                <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                <select
-                  value={form.destinationId}
-                  onChange={(e) => {
-                    const dest = destinations.find((d) => d.id === e.target.value);
-                    setForm((p) => ({
-                      ...p,
-                      destinationId: e.target.value,
-                      ...(dest ? { country: dest.country, city: dest.city } : {}),
-                    }));
-                  }}
-                  className={`${inputCls} pl-9 appearance-none bg-white`}
-                >
-                  <option value="">Select a destination…</option>
+            <FieldGroup label={t("step2.destinationLabel")} error={errors.destinationId}>
+              <Select
+                value={form.destinationId}
+                onValueChange={(id) => {
+                  const safeId = id ?? "";
+                  const dest   = destinations.find((d) => d.id === safeId);
+                  setForm((p) => ({
+                    ...p,
+                    destinationId: safeId,
+                    country:       dest?.country ?? p.country,
+                    city:          dest?.city    ?? p.city,
+                  }));
+                }}
+              >
+                <SelectTrigger className={errors.destinationId ? "border-red-400 ring-2 ring-red-200" : undefined}>
+                  <span className={form.destinationId ? "text-gray-800" : "text-gray-400"}>
+                    {destinations.find((d) => d.id === form.destinationId)?.label ?? t("step2.destinationPlaceholder")}
+                  </span>
+                </SelectTrigger>
+                <SelectContent>
                   {destinations.map((d) => (
-                    <option key={d.id} value={d.id}>{d.label}</option>
+                    <SelectItem key={d.id} value={d.id}>{d.label}</SelectItem>
                   ))}
-                </select>
-              </div>
-              <p className="text-xs text-gray-400 mt-1">
-                This determines where your restaurant appears in listings.
-              </p>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-400 mt-1">{t("step2.destinationHint")}</p>
             </FieldGroup>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FieldGroup label="Country *" error={errors.country}>
-                <input value={form.country} onChange={(e) => set("country", e.target.value)} className={inputCls} />
-              </FieldGroup>
-              <FieldGroup label="City *" error={errors.city}>
-                <input value={form.city} onChange={(e) => set("city", e.target.value)} className={inputCls} />
-              </FieldGroup>
-            </div>
-            <FieldGroup label="Address">
+            {form.destinationId && (
+              <div className="flex flex-wrap items-center gap-2 p-3.5 bg-gray-50 rounded-xl border border-gray-100">
+                <span className="text-xs text-gray-400 font-medium w-full mb-0.5">{t("step2.locationDetails")}</span>
+                {[
+                  { label: t("step2.countryLabel"), value: form.country },
+                  { label: t("step2.cityLabel"),    value: form.city    },
+                ].filter((f) => f.value).map((f) => (
+                  <span key={f.label} className="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-2.5 py-1 text-xs text-gray-700">
+                    <span className="text-gray-400">{f.label}:</span> {f.value}
+                  </span>
+                ))}
+              </div>
+            )}
+            <FieldGroup label={t("step2.addressLabel")}>
               <input
                 value={form.address}
                 onChange={(e) => set("address", e.target.value)}
-                placeholder="Street address"
+                placeholder={t("step2.addressPlaceholder")}
                 className={inputCls}
               />
             </FieldGroup>
-            <FieldGroup label="Google Maps link">
+            <FieldGroup label={t("step2.mapsLabel")}>
               <input
                 value={form.location}
                 onChange={(e) => set("location", e.target.value)}
-                placeholder="https://maps.google.com/..."
+                placeholder={t("step2.mapsPlaceholder")}
                 className={inputCls}
               />
             </FieldGroup>
             <div className="pt-1 space-y-3">
-              <label className="block text-sm font-medium text-gray-700">Social & web links (optional)</label>
-              <input value={form.website}   onChange={(e) => set("website", e.target.value)}   placeholder="Website"   className={inputCls} />
-              <input value={form.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="Instagram" className={inputCls} />
-              <input value={form.facebook}  onChange={(e) => set("facebook", e.target.value)}  placeholder="Facebook"  className={inputCls} />
+              <label className="block text-sm font-medium text-gray-700">{t("step2.socialLabel")}</label>
+              <input value={form.website}   onChange={(e) => set("website", e.target.value)}   placeholder={t("step2.websitePlaceholder")}   className={inputCls} />
+              <input value={form.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder={t("step2.instagramPlaceholder")} className={inputCls} />
+              <input value={form.facebook}  onChange={(e) => set("facebook", e.target.value)}  placeholder={t("step2.facebookPlaceholder")}  className={inputCls} />
             </div>
           </div>
         )}
@@ -453,41 +451,37 @@ export function CreateRestaurantWizard({
         {step === 3 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Capacity & reservations</h2>
-              <p className="text-sm text-gray-400 mt-1">Configure seating and reservation settings.</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("step3.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("step3.subheading")}</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <FieldGroup label="Max guests">
-                <input
-                  type="number"
-                  min={1}
+              <FieldGroup label={t("step3.maxGuestsLabel")}>
+                <CounterInput
                   value={form.maxGuests}
-                  onChange={(e) => set("maxGuests", parseInt(e.target.value) || 1)}
-                  className={inputCls}
+                  onChange={(v) => set("maxGuests", v)}
+                  min={1}
+                  max={500}
                 />
               </FieldGroup>
-              <FieldGroup label="Number of tables">
-                <input
-                  type="number"
-                  min={1}
+              <FieldGroup label={t("step3.tablesLabel")}>
+                <CounterInput
                   value={form.tables}
-                  onChange={(e) => set("tables", parseInt(e.target.value) || 1)}
-                  className={inputCls}
+                  onChange={(v) => set("tables", v)}
+                  min={1}
+                  max={500}
                 />
               </FieldGroup>
             </div>
-            <label className="flex items-start gap-3 cursor-pointer p-4 border border-gray-200 rounded-xl hover:border-gray-300 transition-colors">
-              <input
-                type="checkbox"
-                checked={form.reservationsEnabled}
-                onChange={(e) => set("reservationsEnabled", e.target.checked)}
-                className="h-4 w-4 mt-0.5 rounded border-gray-300 text-primary focus:ring-primary/30"
-              />
+            <div className="flex items-start justify-between gap-4 p-4 border border-gray-200 rounded-xl">
               <div>
-                <p className="text-sm font-medium text-gray-700">Enable reservations</p>
-                <p className="text-xs text-gray-400 mt-0.5">Allow guests to book a table through Guidni.</p>
+                <p className="text-sm font-medium text-gray-700">{t("step3.reservationsLabel")}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{t("step3.reservationsHint")}</p>
               </div>
-            </label>
+              <Switch
+                checked={form.reservationsEnabled}
+                onCheckedChange={(v) => set("reservationsEnabled", v)}
+              />
+            </div>
           </div>
         )}
 
@@ -495,26 +489,26 @@ export function CreateRestaurantWizard({
         {step === 4 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Review & publish</h2>
-              <p className="text-sm text-gray-400 mt-1">Check everything before creating your restaurant.</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("step4.heading")}</h2>
+              <p className="text-sm text-gray-400 mt-1">{t("step4.subheading")}</p>
             </div>
             <div className="bg-gray-50 rounded-xl border border-gray-200 divide-y divide-gray-200">
               {[
-                ["Destination",  selectedDestLabel || "—"],
-                ["Type",         typeLabel[form.type]],
-                ["Name",         form.name],
-                ["Description",  form.description.slice(0, 100) + (form.description.length > 100 ? "…" : "")],
-                ["Country",      form.country],
-                ["City",         form.city],
-                ["Address",      form.address || "—"],
-                ["Categories",   form.category.join(", ") || "—"],
-                ["Meals",        form.meals.join(", ") || "—"],
-                ["Food types",   form.foodTypes.join(", ") || "—"],
-                ["Diet options", form.dietTypes.join(", ") || "—"],
-                ["Features",     form.attributes.join(", ") || "—"],
-                ["Max guests",   String(form.maxGuests)],
-                ["Tables",       String(form.tables)],
-                ["Reservations", form.reservationsEnabled ? "Enabled" : "Disabled"],
+                [t("step4.fieldDestination"),  selectedDestLabel],
+                [t("step4.fieldType"),         typeLabel[form.type]],
+                [t("step4.fieldName"),         form.name],
+                [t("step4.fieldDescription"),  form.description.slice(0, 100) + (form.description.length > 100 ? "…" : "")],
+                [t("step4.fieldCountry"),      form.country],
+                [t("step4.fieldCity"),         form.city],
+                [t("step4.fieldAddress"),      form.address || "—"],
+                [t("step4.fieldCategories"),   form.category.join(", ") || "—"],
+                [t("step4.fieldMeals"),        form.meals.join(", ") || "—"],
+                [t("step4.fieldFoodTypes"),    form.foodTypes.join(", ") || "—"],
+                [t("step4.fieldDiet"),         form.dietTypes.join(", ") || "—"],
+                [t("step4.fieldFeatures"),     form.attributes.join(", ") || "—"],
+                [t("step4.fieldMaxGuests"),    String(form.maxGuests)],
+                [t("step4.fieldTables"),       String(form.tables)],
+                [t("step4.fieldReservations"), form.reservationsEnabled ? t("step4.reservationsEnabled") : t("step4.reservationsDisabled")],
               ].map(([label, value]) => (
                 <div key={label} className="flex gap-4 px-4 py-3">
                   <span className="text-xs font-semibold text-gray-500 w-28 shrink-0">{label}</span>
@@ -523,7 +517,7 @@ export function CreateRestaurantWizard({
               ))}
             </div>
             <p className="text-xs text-gray-400 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3">
-              You can add photos and menu items from the edit page after creating.
+              {t("step4.photosHint")}
             </p>
           </div>
         )}
@@ -536,7 +530,7 @@ export function CreateRestaurantWizard({
               onClick={handleBack}
               className="flex items-center gap-1.5 text-sm text-gray-600 border border-gray-200 rounded-xl px-4 py-2 hover:border-gray-400 transition-colors"
             >
-              <FiChevronLeft className="h-4 w-4" /> Back
+              <FiChevronLeft className="h-4 w-4" /> {t("back")}
             </button>
           )}
           {step < 4 ? (
@@ -545,7 +539,7 @@ export function CreateRestaurantWizard({
               onClick={handleNext}
               className="flex items-center gap-1.5 text-sm bg-primary text-white rounded-xl px-5 py-2 hover:bg-primary/90 transition-colors font-medium"
             >
-              Next <FiChevronRight className="h-4 w-4" />
+              {t("next")} <FiChevronRight className="h-4 w-4" />
             </button>
           ) : (
             <button
@@ -555,7 +549,7 @@ export function CreateRestaurantWizard({
               className="flex items-center gap-2 text-sm bg-primary text-white rounded-xl px-6 py-2 hover:bg-primary/90 transition-colors font-medium disabled:opacity-50"
             >
               <FiCheck className="h-4 w-4" />
-              {pending ? "Creating…" : "Create restaurant"}
+              {pending ? t("creating") : t("createRestaurant")}
             </button>
           )}
         </div>

@@ -20,7 +20,7 @@ export const getAdminShops = cache(async () => {
   await requireAdmin();
 
   return prisma.shop.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: { id: "desc" },
     select: {
       id:             true,
       name:           true,
@@ -28,6 +28,7 @@ export const getAdminShops = cache(async () => {
       category:       true,
       country:        true,
       city:           true,
+      status:         true,
       isOpen:         true,
       featuredInHome: true,
       createdAt:      true,
@@ -38,11 +39,37 @@ export const getAdminShops = cache(async () => {
   });
 });
 
+export async function adminUpdateShopStatus(
+  shopId: string,
+  status: "DRAFT" | "ACTIVE" | "SUSPENDED"
+) {
+  await requireAdmin();
+
+  const shop = await prisma.shop.findUnique({ where: { id: shopId }, select: { slug: true } });
+  if (!shop) return { success: false as const, error: "Shop not found" };
+
+  await prisma.shop.update({ where: { id: shopId }, data: { status } });
+
+  revalidatePath("/admin/shops");
+  revalidatePath("/shops");
+  revalidatePath("/");
+  revalidatePath(`/shops/${shop.slug}`);
+
+  return { success: true as const };
+}
+
 export async function toggleShopFeatured(shopId: string, featured: boolean) {
   await requireAdmin();
 
+  const shop = await prisma.shop.findUnique({ where: { id: shopId }, select: { slug: true } });
+  if (!shop) return { success: false as const, error: "Shop not found" };
+
   await prisma.shop.update({ where: { id: shopId }, data: { featuredInHome: featured } });
+
   revalidatePath("/admin/shops");
+  revalidatePath("/shops");
+  revalidatePath("/");
+
   return { success: true as const };
 }
 

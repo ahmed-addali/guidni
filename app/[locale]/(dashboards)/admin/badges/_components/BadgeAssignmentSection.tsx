@@ -5,8 +5,7 @@ import Image from "next/image";
 import { ShieldCheck, UserCheck, X, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { assignBadge, removeBadge } from "@/lib/actions/admin-badges";
-
-type RelationType = Parameters<typeof assignBadge>[1];
+import type { RelationType } from "@prisma/client";
 
 type Listing = {
   id: string;

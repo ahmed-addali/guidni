@@ -33,7 +33,7 @@ export function RelatedActivities({ activities, locale, title }: Props) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {activities.map((activity) => {
           const imageUrl = activity.images[0]?.url;
-          const gradient = ACTIVITY_GRADIENTS[activity.category?.toLowerCase() ?? ""] ?? "from-primary to-blue-600";
+          const gradient = ACTIVITY_GRADIENTS[activity.categories?.[0]?.toLowerCase() ?? ""] ?? "from-primary to-blue-600";
 
           return (
             <Link

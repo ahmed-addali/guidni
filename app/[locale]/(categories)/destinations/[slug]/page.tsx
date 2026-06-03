@@ -59,9 +59,9 @@ export default async function DestinationGuidePage({ params }: Props) {
     <div>
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <div className="relative h-80 sm:h-[500px] w-full overflow-hidden">
-        {destination.coverImage ? (
+        {destination.images?.[0]?.url ? (
           <img
-            src={destination.coverImage}
+            src={destination.images[0].url}
             alt={destination.city}
             className="absolute inset-0 w-full h-full object-cover"
           />

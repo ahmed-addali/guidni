@@ -1,3 +1,7 @@
+"use client";
+
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { FiCalendar } from "react-icons/fi";
 import { TbCar } from "react-icons/tb";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -22,6 +26,7 @@ interface RentalBookingCardProps {
 }
 
 export function RentalBookingCard({
+  id,
   rentalTitle,
   rentalType,
   coverImageUrl,
@@ -33,11 +38,16 @@ export function RentalBookingCard({
   bookingRef,
   labels,
 }: RentalBookingCardProps) {
+  const params = useParams();
+  const locale = params.locale as string;
   const fmt = (d: Date) =>
     d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 border border-gray-100 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+    <Link
+      href={`/${locale}/bookings/rentals/${id}`}
+      className="flex flex-col sm:flex-row gap-4 border border-gray-100 rounded-lg p-4 bg-white hover:shadow-md transition-shadow"
+    >
       {coverImageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -80,6 +90,6 @@ export function RentalBookingCard({
           <span className="text-xs text-blue-600">{labels.viewDetails} →</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

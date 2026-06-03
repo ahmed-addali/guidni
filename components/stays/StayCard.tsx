@@ -12,11 +12,13 @@ import type { BadgeKey } from "@prisma/client";
 interface StayCardProps {
   stay: StayListItem;
   locale: string;
+  perNight?: string;
+  currency?: string;
   initialIsWishlisted?: boolean;
   badges?: BadgeKey[];
 }
 
-export function StayCard({ stay, locale, initialIsWishlisted, badges }: StayCardProps) {
+export function StayCard({ stay, locale, perNight = "/ night", currency = "TND", initialIsWishlisted, badges }: StayCardProps) {
   const loc = (locale as "en" | "fr" | "ar") ?? "en";
   const title = loc === "ar" && stay.arabicTitle ? stay.arabicTitle : stay.title;
   const coverImage = stay.images[0]?.url ?? null;
@@ -87,8 +89,8 @@ export function StayCard({ stay, locale, initialIsWishlisted, badges }: StayCard
 
         <div className="flex items-center justify-between pt-1">
           <div>
-            <span className="font-bold text-gray-900">{stay.price} TND</span>
-            <span className="text-xs text-gray-400 ml-1">/night</span>
+            <span className="font-bold text-gray-900">{stay.price} {currency}</span>
+            <span className="text-xs text-gray-400 ml-1">{perNight}</span>
           </div>
           {stay.averageRating && stay.averageRating > 0 ? (
             <div className="flex items-center gap-1 text-xs text-gray-600">

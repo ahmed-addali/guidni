@@ -1,3 +1,7 @@
+"use client";
+
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { FiCalendar, FiMapPin } from "react-icons/fi";
 import { TbRoute } from "react-icons/tb";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -29,6 +33,7 @@ interface TransferBookingCardProps {
 }
 
 export function TransferBookingCard({
+  id,
   transferTitle,
   transferType,
   coverImageUrl,
@@ -41,11 +46,16 @@ export function TransferBookingCard({
   bookingRef,
   labels,
 }: TransferBookingCardProps) {
+  const params = useParams();
+  const locale = params.locale as string;
   const fmt = (d: Date) =>
     d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 border border-gray-100 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+    <Link
+      href={`/${locale}/bookings/transfers/${id}`}
+      className="flex flex-col sm:flex-row gap-4 border border-gray-100 rounded-lg p-4 bg-white hover:shadow-md transition-shadow"
+    >
       {coverImageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -88,8 +98,9 @@ export function TransferBookingCard({
               {labels.bookingRef} #{bookingRef}
             </span>
           </div>
+          <span className="text-xs text-blue-600">→</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

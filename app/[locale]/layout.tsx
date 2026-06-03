@@ -6,6 +6,7 @@ import { CategoriesNav } from "@/components/shared/CategoriesNav/CategoriesNav";
 import { Footer } from "@/components/shared/Footer/Footer";
 import { Toaster } from "sonner";
 import { getDestinations } from "@/lib/actions/destinations";
+import { RecTrackerProvider } from "@/components/shared/RecTrackerProvider";
 
 export default async function LocaleLayout({
   children,
@@ -33,6 +34,7 @@ export default async function LocaleLayout({
       </div>
       <main className="flex-1">{children}</main>
       <Footer />
+      <RecTrackerProvider />
       <Toaster richColors position="top-right" />
     </NextIntlClientProvider>
   );

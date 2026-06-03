@@ -9,6 +9,7 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import { TransferCard } from "@/components/transfers/TransferCard";
+import { TrackedCard } from "@/components/shared/TrackedCard";
 import type { BadgeKey } from "@prisma/client";
 
 type Transfer = {
@@ -41,21 +42,23 @@ export function TransfersCarousel({ transfers, locale, badgesMap = {} }: Props) 
       <CarouselContent className="-ml-4" viewportClassName="overflow-visible sm:overflow-hidden">
         {transfers.map((tr) => (
           <CarouselItem key={tr.id} className="pl-4 basis-[85%] sm:basis-1/2 lg:basis-1/3">
-            <TransferCard
-              id={tr.id}
-              slug={tr.slug}
-              title={tr.title}
-              type={tr.type}
-              pricePerTrip={tr.pricePerTrip}
-              pricePerHour={tr.pricePerHour}
-              pricePerPerson={tr.pricePerPerson}
-              capacity={tr.capacity}
-              city={tr.city}
-              country={tr.country}
-              coverImage={tr.images[0]?.url ?? null}
-              locale={locale}
-              badges={badgesMap[tr.id]}
-            />
+            <TrackedCard listingId={tr.id} listingType="TRANSFER">
+              <TransferCard
+                id={tr.id}
+                slug={tr.slug}
+                title={tr.title}
+                type={tr.type}
+                pricePerTrip={tr.pricePerTrip}
+                pricePerHour={tr.pricePerHour}
+                pricePerPerson={tr.pricePerPerson}
+                capacity={tr.capacity}
+                city={tr.city}
+                country={tr.country}
+                coverImage={tr.images[0]?.url ?? null}
+                locale={locale}
+                badges={badgesMap[tr.id]}
+              />
+            </TrackedCard>
           </CarouselItem>
         ))}
       </CarouselContent>

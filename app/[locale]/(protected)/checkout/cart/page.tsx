@@ -27,10 +27,8 @@ export default async function CartCheckoutPage({ params }: { params: Params }) {
           orderSummary:      t("orderSummary"),
           delivery:          t("delivery"),
           deliveryMethod:    {
-            PICKUP:         t("deliveryMethod.PICKUP"),
-            LOCAL_DELIVERY: t("deliveryMethod.LOCAL_DELIVERY"),
-            NATIONWIDE:     t("deliveryMethod.NATIONWIDE"),
-            INTERNATIONAL:  t("deliveryMethod.INTERNATIONAL"),
+            PICKUP:   t("deliveryMethod.PICKUP"),
+            DELIVERY: t("deliveryMethod.DELIVERY"),
           },
           deliveryAddress:   t("deliveryAddress"),
           deliveryCity:      t("deliveryCity"),

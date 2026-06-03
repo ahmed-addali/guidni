@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { BookingStatus } from "@prisma/client";
+import { generateBookingRef } from "@/lib/utils/booking-ref";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -40,15 +41,17 @@ export type PartnerReservationRow = {
 
 export async function createReservation(input: {
   restaurantId: string;
-  date: string;   // ISO date string "YYYY-MM-DD"
-  time: string;   // "HH:MM"
+  date: string;       // ISO date string "YYYY-MM-DD"
+  time: string;       // "HH:MM"
   guests: number;
+  guestName?: string;
+  phone?: string;
   notes?: string;
 }) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) return { success: false as const, error: "Please sign in to make a reservation." };
 
-  const { restaurantId, date, time, guests, notes } = input;
+  const { restaurantId, date, time, guests, guestName, phone, notes } = input;
 
   if (!date || !time || !guests) {
     return { success: false as const, error: "Date, time and guests are required." };
@@ -67,9 +70,12 @@ export async function createReservation(input: {
 
   const reservation = await prisma.restaurantReservation.create({
     data: {
+      bookingRef: generateBookingRef(),
       date: new Date(date),
       time,
       guests,
+      guestName: guestName?.trim() || null,
+      phone: phone?.trim() || null,
       notes: notes ?? null,
       userId: session.user.id,
       restaurantId,

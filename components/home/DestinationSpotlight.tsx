@@ -17,8 +17,7 @@ type Destination = {
   slug: string;
   city: string;
   country: string;
-  coverImage?: string | null;
-  gallery?: string[];
+  images?: { url: string }[];
   description?: string | null;
 };
 
@@ -29,14 +28,7 @@ export function DestinationSpotlight({ destinations }: { destinations: Destinati
 
   const current = destinations.find((d) => d.slug === destination.slug) ?? destinations[0];
 
-  const images = current
-    ? Array.from(
-        new Set([
-          ...(current.coverImage ? [current.coverImage] : []),
-          ...(current.gallery ?? []),
-        ])
-      ).filter(Boolean)
-    : [];
+  const images = (current?.images ?? []).map((img) => img.url);
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState<number | null>(null);

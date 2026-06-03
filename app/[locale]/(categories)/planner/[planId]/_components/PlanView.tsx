@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,14 +8,17 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
   MapPin, Clock, Users, Globe, Globe2,
-  Share2, Trash2, Edit2, Check, X, Loader2, ChevronLeft,
+  Share2, Trash2, Edit2, Loader2, ChevronLeft, ChevronRight,
   Tag, Star,
 } from "lucide-react";
 import { FaCheckCircle } from "react-icons/fa";
 import { ItineraryBoard } from "../../_components/itinerary/ItineraryBoard";
+import { BudgetBar } from "../../_components/itinerary/BudgetBar";
 import { ReviewsSection } from "@/components/activities/ReviewsSection";
+import { computeBudget } from "@/lib/planner/budget";
 import { updatePlan, deletePlan } from "@/lib/actions/planner";
-import type { PlanDay, PlanItem, PlanSlot, UserPreferences } from "@/lib/planner/types";
+import type { PlanDay, PlanItem, PlanBlock, UserPreferences } from "@/lib/planner/types";
+import { parsePlanItinerary } from "@/lib/planner/types";
 
 type GuideInfo = {
   slug: string;
@@ -59,20 +62,26 @@ type Props = {
   reviews?: ReviewItem[];
   canReview?: boolean;
   alreadyReviewed?: boolean;
+  chatSlot?: React.ReactNode;
 };
 
-export function PlanView({ plan, locale, isOwner, reviews = [], canReview, alreadyReviewed }: Props) {
+export function PlanView({ plan, locale, isOwner, reviews = [], canReview, alreadyReviewed, chatSlot }: Props) {
   const t = useTranslations("PlanView");
   const router = useRouter();
   const preferences = plan.preferences as UserPreferences;
-  const [days, setDays] = useState<PlanDay[]>(plan.itinerary as PlanDay[]);
-  const [title, setTitle] = useState(plan.title ?? "");
-  const [editingTitle, setEditingTitle] = useState(false);
+  const parsed = parsePlanItinerary(plan.itinerary);
+  const [days, setDays] = useState<PlanDay[]>(parsed.days);
+  const stays   = parsed.stays;
+  const rentals = parsed.rentals;
+  const [title] = useState(plan.title ?? "");
   const [isPublic, setIsPublic] = useState(plan.isPublic);
-  const [swapSlot, setSwapSlot] = useState<PlanSlot | null>(null);
+  const [swapSlot, setSwapSlot] = useState<PlanBlock | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isSavingTitle, setIsSavingTitle] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const budget = useMemo(
+    () => computeBudget({ days, stays, rentals }, preferences),
+    [days, stays, rentals, preferences]
+  );
 
   const isGuidePlan = !!plan.guide;
   const avgRating = reviews.length > 0
@@ -101,18 +110,18 @@ export function PlanView({ plan, locale, isOwner, reviews = [], canReview, alrea
       if (!isOwner) return;
       if (saveTimer.current) clearTimeout(saveTimer.current);
       saveTimer.current = setTimeout(async () => {
-        await updatePlan(plan.id, { itinerary: newDays });
+        await updatePlan(plan.id, { itinerary: { days: newDays, stays, rentals } });
       }, 1500);
     },
-    [plan.id, isOwner]
+    [plan.id, isOwner, stays, rentals]
   );
 
   const handleSwapSelect = useCallback(
-    (slot: PlanSlot, replacement: PlanItem) => {
+    (block: PlanBlock, replacement: PlanItem) => {
       const newDays = days.map((day) => ({
         ...day,
-        slots: day.slots.map((s) =>
-          s.id === slot.id ? { ...s, item: replacement } : s
+        blocks: day.blocks.map((b) =>
+          b.id === block.id ? { ...b, item: replacement } : b
         ),
       }));
       handleDaysChange(newDays);
@@ -133,17 +142,6 @@ export function PlanView({ plan, locale, isOwner, reviews = [], canReview, alrea
     }
   }, [isPublic, plan.id, t]);
 
-  const handleTitleSave = useCallback(async () => {
-    setIsSavingTitle(true);
-    const result = await updatePlan(plan.id, { title: title.trim() || undefined });
-    setIsSavingTitle(false);
-    if (result.success) {
-      setEditingTitle(false);
-    } else {
-      toast.error(t("errorSaveTitle"));
-    }
-  }, [plan.id, title, t]);
-
   const handleShare = useCallback(() => {
     navigator.clipboard.writeText(window.location.href);
     toast.success(t("linkCopied"));
@@ -154,7 +152,7 @@ export function PlanView({ plan, locale, isOwner, reviews = [], canReview, alrea
     setIsDeleting(true);
     const result = await deletePlan(plan.id);
     if (result.success) {
-      router.push(`/${locale}/planner`);
+      router.push(isOwner && !isGuidePlan ? `/${locale}/my-plans` : `/${locale}/planner`);
     } else {
       setIsDeleting(false);
       toast.error(result.error ?? t("errorDelete"));
@@ -167,13 +165,34 @@ export function PlanView({ plan, locale, isOwner, reviews = [], canReview, alrea
     <div className="max-w-screen-lg mx-auto px-4 py-8">
 
       {/* Back */}
-      <Link
-        href={`/${locale}/planner`}
-        className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors mb-6"
-      >
-        <ChevronLeft className="h-4 w-4" />
-        {t("backLink")}
-      </Link>
+      {isGuidePlan && plan.guide ? (
+        <Link
+          href={`/${locale}/planner/guides/${plan.guide.slug}`}
+          className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors mb-6"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          {t("backLink")}
+        </Link>
+      ) : (
+        <div className="flex items-center justify-between mb-6">
+          <Link
+            href={`/${locale}/planner`}
+            className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            {t("backToPlanner")}
+          </Link>
+          {isOwner && (
+            <Link
+              href={`/${locale}/my-plans`}
+              className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              {t("backToMyPlans")}
+              <ChevronRight className="h-4 w-4" />
+            </Link>
+          )}
+        </div>
+      )}
 
       {/* Guide attribution card */}
       {isGuidePlan && plan.guide && (
@@ -258,48 +277,17 @@ export function PlanView({ plan, locale, isOwner, reviews = [], canReview, alrea
         </div>
       )}
 
+      {/* Chat with guide — shown below guide card when user has access */}
+      {chatSlot && <div className="mb-4">{chatSlot}</div>}
+
       {/* Plan header card */}
       <div className="bg-white border border-gray-100 rounded-2xl px-6 py-5 mb-6">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            {/* Editable title */}
-            {editingTitle ? (
-              <div className="flex items-center gap-2 mb-2">
-                <input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="text-xl font-bold text-gray-900 border-b-2 border-primary outline-none flex-1 min-w-0 bg-transparent"
-                  placeholder={t("titlePlaceholder")}
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleTitleSave();
-                    if (e.key === "Escape") setEditingTitle(false);
-                  }}
-                />
-                <button type="button" onClick={handleTitleSave} disabled={isSavingTitle} className="p-1 text-primary hover:opacity-70">
-                  {isSavingTitle ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                </button>
-                <button type="button" onClick={() => setEditingTitle(false)} className="p-1 text-gray-400 hover:text-gray-600">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 mb-2">
-                <h1 className="text-xl font-bold text-gray-900 truncate">
-                  {title || defaultTitle}
-                </h1>
-                {isOwner && (
-                  <button
-                    type="button"
-                    onClick={() => setEditingTitle(true)}
-                    className="p-1 text-gray-300 hover:text-gray-500 transition-colors shrink-0"
-                    title={t("editTitle")}
-                  >
-                    <Edit2 className="h-3.5 w-3.5" />
-                  </button>
-                )}
-              </div>
-            )}
+            {/* Title */}
+            <h1 className="text-xl font-bold text-gray-900 truncate mb-2">
+              {title || defaultTitle}
+            </h1>
 
             {/* Meta chips */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400">
@@ -326,6 +314,15 @@ export function PlanView({ plan, locale, isOwner, reviews = [], canReview, alrea
           {/* Actions */}
           <div className="flex items-center gap-1.5 shrink-0">
             {isOwner && (
+              <Link
+                href={`/${locale}/planner/${plan.id}/edit`}
+                className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border border-primary/30 text-primary bg-primary/5 hover:bg-primary/10 transition-colors"
+              >
+                <Edit2 className="h-3.5 w-3.5" />
+                {t("editPlan")}
+              </Link>
+            )}
+            {isOwner && !isGuidePlan && (
               <button
                 type="button"
                 onClick={handlePublicToggle}
@@ -366,12 +363,136 @@ export function PlanView({ plan, locale, isOwner, reviews = [], canReview, alrea
         </div>
       </div>
 
+      {/* Budget bar */}
+      <BudgetBar
+        budget={budget}
+        duration={plan.duration}
+        budgetLevel={preferences.budget as 1 | 2 | 3 | undefined}
+        groupType={preferences.groupType}
+      />
+
+      {/* Accommodation */}
+      {stays.length > 0 && (
+        <div className="bg-white border border-gray-100 rounded-2xl px-5 py-4 mb-4">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            {t("staysTitle")}
+          </p>
+          <div className="space-y-3">
+            {stays.map((block) => {
+              const rangeLabel =
+                block.fromDay === 1 && block.toDay === plan.duration
+                  ? t("allDays", { count: plan.duration })
+                  : block.fromDay === block.toDay
+                  ? t("dayRangeSingle", { day: block.fromDay })
+                  : t("dayRangeMulti", { from: block.fromDay, to: block.toDay });
+              return (
+                <div key={block.id} className="flex items-center gap-3">
+                  {/* Image or fallback */}
+                  <div className="relative h-14 w-14 rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                    {block.item.imageUrl ? (
+                      <Image
+                        src={block.item.imageUrl}
+                        alt={block.item.name}
+                        fill
+                        className="object-cover"
+                        sizes="56px"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-xl">🏨</div>
+                    )}
+                  </div>
+                  {/* Info */}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{block.item.name}</p>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      {block.item.location && (
+                        <span className="text-xs text-gray-400 truncate">{block.item.location}</span>
+                      )}
+                      {block.item.price > 0 && (
+                        <span className="text-xs text-gray-500 font-medium">
+                          TND {block.item.price}{t("perNight")}
+                        </span>
+                      )}
+                    </div>
+                    {block.note && <p className="text-xs text-gray-400 mt-0.5 truncate">{block.note}</p>}
+                  </div>
+                  {/* Day range badge */}
+                  <span className="text-[11px] font-semibold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full shrink-0 whitespace-nowrap">
+                    {rangeLabel}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Rentals */}
+      {rentals.length > 0 && (
+        <div className="bg-white border border-gray-100 rounded-2xl px-5 py-4 mb-4">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            {t("rentalsTitle")}
+          </p>
+          <div className="space-y-3">
+            {rentals.map((block) => {
+              const rentalDays = block.toDay - block.fromDay + 1;
+              const rangeLabel =
+                block.fromDay === 1 && block.toDay === plan.duration
+                  ? t("allDays", { count: plan.duration })
+                  : block.fromDay === block.toDay
+                  ? t("dayRangeSingle", { day: block.fromDay })
+                  : t("dayRangeMulti", { from: block.fromDay, to: block.toDay });
+              return (
+                <div key={block.id} className="flex items-center gap-3">
+                  <div className="relative h-14 w-14 rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                    {block.item.imageUrl ? (
+                      <Image
+                        src={block.item.imageUrl}
+                        alt={block.item.name}
+                        fill
+                        className="object-cover"
+                        sizes="56px"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-xl">🚗</div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{block.item.name}</p>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      {block.item.location && (
+                        <span className="text-xs text-gray-400 truncate">{block.item.location}</span>
+                      )}
+                      {block.item.price > 0 && (
+                        <span className="text-xs text-gray-500 font-medium">
+                          TND {block.item.price}{t("rentalPerDay")}
+                        </span>
+                      )}
+                    </div>
+                    {block.note && <p className="text-xs text-gray-400 mt-0.5 truncate">{block.note}</p>}
+                  </div>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className="text-[11px] font-semibold px-2 py-0.5 bg-purple-50 text-purple-700 rounded-full whitespace-nowrap">
+                      {rangeLabel}
+                    </span>
+                    <span className="text-[11px] text-gray-400 whitespace-nowrap">
+                      {t("rentalNights", { count: rentalDays })}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Itinerary board */}
       <ItineraryBoard
         days={days}
         preferences={preferences}
         locale={locale}
         isOwner={isOwner}
+        hideBudgetBar
         swapSlot={swapSlot}
         onDaysChange={handleDaysChange}
         onSwapOpen={setSwapSlot}

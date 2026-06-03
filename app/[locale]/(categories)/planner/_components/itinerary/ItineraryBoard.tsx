@@ -9,58 +9,60 @@ import { computeBudget } from "@/lib/planner/budget";
 import type {
   PlanDay,
   PlanItem,
-  PlanSlot,
-  TimeSlot,
+  PlanBlock,
+  PlanMultiDayBlock,
   UserPreferences,
 } from "@/lib/planner/types";
 
-// Type enforcement: which item types can go in which slot
-const ALLOWED_TYPES: Record<TimeSlot, string[]> = {
-  morning:   ["ACTIVITY", "ATTRACTION"],
-  lunch:     ["RESTAURANT", "ACTIVITY", "ATTRACTION"],
-  afternoon: ["ACTIVITY", "ATTRACTION", "STAY"],
-  evening:   ["RESTAURANT", "ACTIVITY", "ATTRACTION"],
-};
-
-function parseDroppableId(id: string): { dayNumber: number; slotType: TimeSlot } | null {
-  const match = id.match(/^day-(\d+)-(\w+)$/);
+function parseDayDroppableId(id: string): number | null {
+  const match = id.match(/^day-(\d+)$/);
   if (!match) return null;
-  return {
-    dayNumber: parseInt(match[1], 10),
-    slotType:  match[2] as TimeSlot,
-  };
+  return parseInt(match[1], 10);
 }
 
 type Props = {
-  days: PlanDay[];
+  days:        PlanDay[];
+  stays?:      PlanMultiDayBlock[];
+  rentals?:    PlanMultiDayBlock[];
   preferences: UserPreferences;
-  locale: string;
-  isOwner?: boolean;
-  swapSlot: PlanSlot | null;
-  onDaysChange: (days: PlanDay[]) => void;
-  onSwapOpen: (slot: PlanSlot) => void;
-  onSwapClose: () => void;
-  onSwapSelect: (slot: PlanSlot, replacement: PlanItem) => void;
+  locale:      string;
+  isOwner?:    boolean;
+  hideBudgetBar?: boolean;
+  swapSlot:    PlanBlock | null;
+  onDaysChange:  (days: PlanDay[]) => void;
+  onSwapOpen:    (block: PlanBlock) => void;
+  onSwapClose:   () => void;
+  onSwapSelect:  (block: PlanBlock, replacement: PlanItem) => void;
   onRegenerateDay?: (dayNumber: number) => void;
+  onRemoveBlock?:   (dayNumber: number, blockId: string) => void;
 };
 
 export function ItineraryBoard({
   days,
+  stays = [],
+  rentals = [],
   preferences,
   locale,
   isOwner,
+  hideBudgetBar,
   swapSlot,
   onDaysChange,
   onSwapOpen,
   onSwapClose,
   onSwapSelect,
   onRegenerateDay,
+  onRemoveBlock,
 }: Props) {
-  const budget = useMemo(() => computeBudget(days, preferences), [days, preferences]);
+  const budget = useMemo(
+    () => computeBudget({ days, stays, rentals }, preferences),
+    [days, stays, rentals, preferences]
+  );
+  const budgetLevel = preferences.budget as 1 | 2 | 3 | undefined;
+  const groupType   = preferences.groupType;
 
   // Flat list of all existing item IDs for swap alternatives exclusion
   const existingItemIds = useMemo(
-    () => days.flatMap((d) => d.slots.map((s) => s.item.id)),
+    () => days.flatMap((d) => d.blocks.map((b) => b.item.id)),
     [days]
   );
 
@@ -71,49 +73,39 @@ export function ItineraryBoard({
       const { source, destination, draggableId } = result;
       if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
-      const srcParsed = parseDroppableId(source.droppableId);
-      const dstParsed = parseDroppableId(destination.droppableId);
-      if (!srcParsed || !dstParsed) return;
+      const srcDayNumber = parseDayDroppableId(source.droppableId);
+      const dstDayNumber = parseDayDroppableId(destination.droppableId);
+      if (!srcDayNumber || !dstDayNumber) return;
 
-      // Find the slot being moved
-      const srcDay = days.find((d) => d.dayNumber === srcParsed.dayNumber);
-      const movingSlot = srcDay?.slots.find((s) => s.id === draggableId);
-      if (!movingSlot) return;
-
-      // Enforce type constraint
-      if (!ALLOWED_TYPES[dstParsed.slotType]?.includes(movingSlot.item.type)) return;
+      // Find the block being moved — blocks are in array order (no time sort)
+      const srcDay = days.find((d) => d.dayNumber === srcDayNumber);
+      if (!srcDay) return;
+      const movingBlock = srcDay.blocks[source.index];
+      if (!movingBlock || movingBlock.id !== draggableId) return;
 
       // Build new days array immutably
       const newDays = days.map((day) => {
-        let slots = [...day.slots];
+        const blocks = [...day.blocks];
 
-        // Remove from source
-        if (day.dayNumber === srcParsed.dayNumber) {
-          slots = slots.filter((s) => s.id !== draggableId);
+        if (srcDayNumber === dstDayNumber) {
+          // Same-day reorder: splice in array order
+          blocks.splice(source.index, 1);
+          blocks.splice(destination.index, 0, movingBlock);
+          return { ...day, blocks };
         }
 
-        // Insert at destination
-        if (day.dayNumber === dstParsed.dayNumber) {
-          const updatedSlot: PlanSlot = {
-            ...movingSlot,
-            slotType: dstParsed.slotType,
-          };
-          const slotsOfType = slots.filter((s) => s.slotType === dstParsed.slotType);
-          const otherSlots = slots.filter((s) => s.slotType !== dstParsed.slotType);
-
-          // Insert at destination.index within the slot type group
-          slotsOfType.splice(destination.index, 0, updatedSlot);
-
-          // Re-merge maintaining time order: morning → lunch → afternoon → evening
-          const order: TimeSlot[] = ["morning", "lunch", "afternoon", "evening"];
-          slots = order.flatMap((st) =>
-            st === dstParsed.slotType
-              ? slotsOfType
-              : otherSlots.filter((s) => s.slotType === st)
-          );
+        // Cross-day: remove from source day
+        if (day.dayNumber === srcDayNumber) {
+          return { ...day, blocks: blocks.filter((b) => b.id !== draggableId) };
         }
 
-        return { ...day, slots };
+        // Cross-day: insert into destination day at target index
+        if (day.dayNumber === dstDayNumber) {
+          blocks.splice(destination.index, 0, movingBlock);
+          return { ...day, blocks };
+        }
+
+        return day;
       });
 
       onDaysChange(newDays);
@@ -123,7 +115,14 @@ export function ItineraryBoard({
 
   return (
     <>
-      <BudgetBar budget={budget} />
+      {!hideBudgetBar && (
+        <BudgetBar
+          budget={budget}
+          duration={days.length}
+          budgetLevel={budgetLevel}
+          groupType={groupType}
+        />
+      )}
 
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="space-y-4">
@@ -134,6 +133,7 @@ export function ItineraryBoard({
               locale={locale}
               isOwner={isOwner}
               onSwap={onSwapOpen}
+              onRemoveBlock={onRemoveBlock}
               onRegenerateDay={onRegenerateDay}
             />
           ))}

@@ -2,35 +2,38 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { FiCalendar, FiUsers, FiClock, FiPhone, FiMessageSquare, FiCheck, FiX } from "react-icons/fi";
 import { updateReservationStatus, type PartnerReservationRow } from "@/lib/actions/restaurant-reservations";
 import { BookingStatus } from "@prisma/client";
-
-const STATUS_LABELS: Record<BookingStatus, { label: string; classes: string }> = {
-  PENDING:   { label: "Pending",   classes: "bg-yellow-50 text-yellow-700 border border-yellow-200" },
-  CONFIRMED: { label: "Confirmed", classes: "bg-green-50 text-green-700 border border-green-200" },
-  CANCELLED: { label: "Cancelled", classes: "bg-red-50 text-red-600 border border-red-200" },
-  COMPLETED: { label: "Completed", classes: "bg-gray-50 text-gray-600 border border-gray-200" },
-};
 
 type Tab = "all" | BookingStatus;
 
 interface Props {
   initialReservations: PartnerReservationRow[];
+  locale?: string;
 }
 
-export function ReservationsTab({ initialReservations }: Props) {
+export function ReservationsTab({ initialReservations, locale = "en" }: Props) {
+  const t = useTranslations("PartnerDashboard.editRestaurant.reservations");
   const [reservations, setReservations] = useState(initialReservations);
   const [activeTab, setActiveTab]       = useState<Tab>("all");
   const [pending, start]                = useTransition();
   const [updating, setUpdating]         = useState<string | null>(null);
 
+  const STATUS_LABELS: Record<BookingStatus, { label: string; classes: string }> = {
+    PENDING:   { label: t("statusLabels.PENDING"),   classes: "bg-yellow-50 text-yellow-700 border border-yellow-200" },
+    CONFIRMED: { label: t("statusLabels.CONFIRMED"), classes: "bg-green-50 text-green-700 border border-green-200" },
+    CANCELLED: { label: t("statusLabels.CANCELLED"), classes: "bg-red-50 text-red-600 border border-red-200" },
+    COMPLETED: { label: t("statusLabels.COMPLETED"), classes: "bg-gray-50 text-gray-600 border border-gray-200" },
+  };
+
   const tabs: { key: Tab; label: string }[] = [
-    { key: "all",       label: "All" },
-    { key: "PENDING",   label: "Pending" },
-    { key: "CONFIRMED", label: "Confirmed" },
-    { key: "CANCELLED", label: "Cancelled" },
-    { key: "COMPLETED", label: "Completed" },
+    { key: "all",       label: t("tabs.all") },
+    { key: "PENDING",   label: t("tabs.pending") },
+    { key: "CONFIRMED", label: t("tabs.confirmed") },
+    { key: "CANCELLED", label: t("tabs.cancelled") },
+    { key: "COMPLETED", label: t("tabs.completed") },
   ];
 
   const filtered = activeTab === "all"
@@ -45,7 +48,7 @@ export function ReservationsTab({ initialReservations }: Props) {
         setReservations((prev) =>
           prev.map((r) => (r.id === id ? { ...r, status } : r))
         );
-        toast.success(`Reservation ${status.toLowerCase()}.`);
+        toast.success(STATUS_LABELS[status].label);
       } else {
         toast.error(result.error);
       }
@@ -86,7 +89,7 @@ export function ReservationsTab({ initialReservations }: Props) {
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <FiCalendar className="h-8 w-8 mx-auto mb-3 opacity-50" />
-          <p className="text-sm">No reservations in this category.</p>
+          <p className="text-sm">{t("empty")}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -111,7 +114,7 @@ export function ReservationsTab({ initialReservations }: Props) {
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
                     <span className="flex items-center gap-1">
                       <FiCalendar className="h-3.5 w-3.5" />
-                      {new Date(res.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                      {new Date(res.date).toLocaleDateString(locale, { day: "2-digit", month: "short", year: "numeric" })}
                     </span>
                     <span className="flex items-center gap-1">
                       <FiClock className="h-3.5 w-3.5" />
@@ -119,7 +122,7 @@ export function ReservationsTab({ initialReservations }: Props) {
                     </span>
                     <span className="flex items-center gap-1">
                       <FiUsers className="h-3.5 w-3.5" />
-                      {res.guests} {res.guests === 1 ? "guest" : "guests"}
+                      {res.guests} {res.guests === 1 ? t("guest") : t("guests")}
                     </span>
                   </div>
 
@@ -135,7 +138,7 @@ export function ReservationsTab({ initialReservations }: Props) {
                   )}
 
                   <p className="text-xs text-gray-300">
-                    {res.user.email} · Booked {new Date(res.createdAt).toLocaleDateString()}
+                    {res.user.email} · {t("booked")} {new Date(res.createdAt).toLocaleDateString()}
                   </p>
                 </div>
 
@@ -147,14 +150,14 @@ export function ReservationsTab({ initialReservations }: Props) {
                       onClick={() => handleStatusChange(res.id, "CONFIRMED")}
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-green-50 text-green-700 border border-green-200 text-sm font-medium hover:bg-green-100 transition-colors disabled:opacity-50"
                     >
-                      <FiCheck className="h-4 w-4" /> Confirm
+                      <FiCheck className="h-4 w-4" /> {t("confirm")}
                     </button>
                     <button
                       disabled={isUpdating}
                       onClick={() => handleStatusChange(res.id, "CANCELLED")}
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-50 text-red-600 border border-red-200 text-sm font-medium hover:bg-red-100 transition-colors disabled:opacity-50"
                     >
-                      <FiX className="h-4 w-4" /> Decline
+                      <FiX className="h-4 w-4" /> {t("decline")}
                     </button>
                   </div>
                 )}
@@ -164,7 +167,7 @@ export function ReservationsTab({ initialReservations }: Props) {
                     onClick={() => handleStatusChange(res.id, "COMPLETED")}
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gray-50 text-gray-600 border border-gray-200 text-sm font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 shrink-0"
                   >
-                    <FiCheck className="h-4 w-4" /> Mark completed
+                    <FiCheck className="h-4 w-4" /> {t("markCompleted")}
                   </button>
                 )}
               </div>

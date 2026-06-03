@@ -15,7 +15,21 @@ type Props = { params: Promise<{ locale: string }> };
 
 export default async function WishlistPage({ params }: Props) {
   const { locale } = await params;
-  const t = await getTranslations("WishlistPage");
+  const [t, tStays, tRestaurant] = await Promise.all([
+    getTranslations("WishlistPage"),
+    getTranslations({ locale, namespace: "StaysPage" }),
+    getTranslations({ locale, namespace: "RestaurantPage" }),
+  ]);
+
+  const restaurantCardLabels = {
+    typeLabels: {
+      RESTAURANT: tRestaurant("type.RESTAURANT"),
+      CAFEE_SHOP: tRestaurant("type.CAFEE_SHOP"),
+      BOTH:       tRestaurant("type.BOTH"),
+    },
+    reservationAvailable: tRestaurant("card.reservationsAvailable"),
+    walkinOnly:           tRestaurant("card.walkinOnly"),
+  };
   const { activities, stays, restaurants, shops, products, transfers, rentals } = await getWishlist();
 
   const isEmpty =
@@ -97,6 +111,8 @@ export default async function WishlistPage({ params }: Props) {
                     key={stay.id}
                     stay={stay}
                     locale={locale}
+                    perNight={tStays("perNight")}
+                    currency={tStays("currency")}
                     initialIsWishlisted={true}
                   />
                 ))}
@@ -120,6 +136,7 @@ export default async function WishlistPage({ params }: Props) {
                     restaurant={restaurant}
                     locale={locale}
                     initialIsWishlisted={true}
+                    cardLabels={restaurantCardLabels}
                   />
                 ))}
               </div>
@@ -205,7 +222,7 @@ export default async function WishlistPage({ params }: Props) {
                     id={rental.id}
                     slug={rental.slug}
                     title={rental.title}
-                    type={rental.type as "CAR" | "BIKE" | "SCOOTER" | "BOAT" | "OTHER"}
+                    type={rental.type as "CAR" | "MOTORBIKE" | "SCOOTER" | "BICYCLE" | "BOAT" | "QUAD" | "BUGGY" | "JET_SKI" | "OTHER"}
                     pricePerDay={rental.pricePerDay}
                     capacity={rental.capacity}
                     brand={rental.brand}

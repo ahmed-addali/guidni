@@ -56,7 +56,8 @@ export type PlanItemType =
   | "RESTAURANT"
   | "TRANSFER"
   | "RENTAL"
-  | "STAY";
+  | "STAY"
+  | "NOTE";
 
 export type PlanItem = {
   id: string;
@@ -99,22 +100,14 @@ export type RestaurantHoursSlim = {
 
 // ─── Time Slots ───────────────────────────────────────────────
 
-export type TimeSlot = "morning" | "lunch" | "afternoon" | "evening";
+export type TimeSlot = "morning" | "lunch" | "afternoon" | "evening" | "fullday" | "other";
 
 export type TimeRange = {
   start: string;  // "HH:MM"
   end: string;
 };
 
-// ─── Plan Day Structure ───────────────────────────────────────
-
-export type PlanSlot = {
-  id: string;                // unique slot id — used as drag-drop key
-  slotType: TimeSlot;
-  time: TimeRange;
-  item: PlanItem;
-  guideNote?: string;        // local expert annotation — visible on guide plans
-};
+// ─── Logistics type ───────────────────────────────────────────
 
 export type LogisticsType =
   | "ARRIVAL_TRANSFER"
@@ -123,11 +116,81 @@ export type LogisticsType =
   | "RENTAL_DROPOFF"
   | "CITY_TRANSFER";
 
-export type PlanLogisticsBlock = {
-  type: LogisticsType;
-  item: PlanItem;
-  note: string;
+// ─── Plan Block ───────────────────────────────────────────────
+//
+// A block is any item a guide adds to a day — activity, restaurant,
+// transfer, note, etc. Blocks are ordered by their position in the
+// `blocks` array, NOT by time. Time is an optional display label.
+//
+// `PlanSlot` is kept as an alias for backwards compatibility with
+// any code that hasn't been updated yet.
+
+export type PlanBlock = {
+  id:             string;          // stable id — array position = display order
+  item:           PlanItem;        // NOTE type: item.name = note text, price = 0
+  time?:          TimeRange;       // optional — display label only, NOT used for sort
+  slotType?:      TimeSlot;        // derived from time.start if time is set
+  logisticsType?: LogisticsType;   // set when item.type is TRANSFER or RENTAL
+  guideNote?:     string;          // local expert annotation visible to buyer
+  customTitle?:   string;          // guide override of platform name
+  addedByGuide?:  boolean;
 };
+
+/** @deprecated use PlanBlock */
+export type PlanSlot = PlanBlock;
+
+// ─── Plan Day Structure ───────────────────────────────────────
+
+export type PlanDay = {
+  dayNumber: number;
+  date?: string;             // ISO date string
+  theme: string;             // e.g. "Culture & History"
+  notes: string;             // practical tips shown above the block list
+  blocks: PlanBlock[];       // all blocks in guide-defined order
+  shopping?: PlanShoppingBlock;
+};
+
+// ─── Multi-Day Blocks (stays & rentals) ──────────────────────
+//
+// Stays and rentals span multiple days, so they live at the
+// trip level rather than inside a single PlanDay.blocks array.
+
+export type PlanMultiDayBlock = {
+  id:      string;
+  item:    PlanItem;          // type: STAY or RENTAL
+  fromDay: number;            // 1-based day number
+  toDay:   number;            // 1-based day number (inclusive end)
+  note?:   string;            // guide annotation
+};
+
+// ─── Trip-Level Itinerary Wrapper ─────────────────────────────
+//
+// Replaces the bare PlanDay[] stored in Plan.itinerary (Json).
+// parsePlanItinerary() handles the backward-compat migration.
+
+export type PlanItinerary = {
+  days:    PlanDay[];
+  stays:   PlanMultiDayBlock[];
+  rentals: PlanMultiDayBlock[];
+};
+
+/**
+ * Parse Plan.itinerary (Json) into a PlanItinerary.
+ * Handles legacy plans where itinerary was a bare PlanDay[].
+ */
+export function parsePlanItinerary(raw: unknown): PlanItinerary {
+  if (Array.isArray(raw)) {
+    return { days: raw as PlanDay[], stays: [], rentals: [] };
+  }
+  const obj = raw as Partial<PlanItinerary>;
+  return {
+    days:    obj.days    ?? [],
+    stays:   obj.stays   ?? [],
+    rentals: obj.rentals ?? [],
+  };
+}
+
+// ─── Shopping ─────────────────────────────────────────────────
 
 export type PlanProductSuggestion = {
   productId: string;
@@ -149,16 +212,6 @@ export type PlanShopSuggestion = {
 
 export type PlanShoppingBlock = {
   shops: PlanShopSuggestion[];
-};
-
-export type PlanDay = {
-  dayNumber: number;
-  date?: string;             // ISO date string
-  theme: string;             // e.g. "Culture & History"
-  notes: string;             // practical tips
-  logistics?: PlanLogisticsBlock;
-  slots: PlanSlot[];
-  shopping?: PlanShoppingBlock;
 };
 
 // ─── Planner Data (from DB) ───────────────────────────────────
@@ -187,6 +240,7 @@ export type PlannerData = {
   restaurants: PlanItem[];
   transfers: PlanItem[];
   rentals: PlanItem[];
+  stays: PlanItem[];
   shops: PlanShopData[];
 };
 

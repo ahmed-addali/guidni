@@ -62,6 +62,7 @@ export async function createTransferReservation(input: CreateInput) {
       userId:          session.user.id,
       transferId:      input.transferId,
     },
+    select: { id: true, bookingRef: true },
   });
 
   return { success: true as const, data: reservation };

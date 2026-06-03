@@ -2,14 +2,24 @@ import Link from "next/link";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { FaCartShopping } from "react-icons/fa6";
-import { FiPackage } from "react-icons/fi";
+import { FiPackage, FiCheckCircle } from "react-icons/fi";
 import { getUserOrders } from "@/lib/actions/product-orders";
 import { OrderStatusBadge } from "@/components/shared/OrderStatusBadge";
+import { PLATFORM_CURRENCY } from "@/lib/utils/constants";
 
-type Params = Promise<{ locale: string }>;
+type Params       = Promise<{ locale: string }>;
+type SearchParams = Promise<{ checkout?: string }>;
 
-export default async function OrdersPage({ params }: { params: Params }) {
-  const { locale } = await params;
+export default async function OrdersPage({
+  params,
+  searchParams,
+}: {
+  params:       Params;
+  searchParams: SearchParams;
+}) {
+  const { locale }   = await params;
+  const { checkout } = await searchParams;
+
   const [orders, t] = await Promise.all([
     getUserOrders(),
     getTranslations({ locale, namespace: "OrderPage" }),
@@ -21,6 +31,14 @@ export default async function OrdersPage({ params }: { params: Params }) {
         <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
         <p className="text-gray-500 mt-1 text-sm">{t("subtitle")}</p>
       </div>
+
+      {/* Checkout success banner */}
+      {checkout === "success" && (
+        <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-green-800">
+          <FiCheckCircle className="h-5 w-5 shrink-0 text-green-600" />
+          <p className="text-sm font-medium">{t("checkoutSuccess")}</p>
+        </div>
+      )}
 
       {orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
@@ -108,7 +126,9 @@ export default async function OrdersPage({ params }: { params: Params }) {
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-bold text-gray-900">{order.total} TND</span>
+                    <span className="text-sm font-bold text-gray-900">
+                      {order.total} {PLATFORM_CURRENCY}
+                    </span>
                     <Link
                       href={`/${locale}/orders/${order.orderRef}`}
                       className="text-sm text-blue-600 hover:underline"

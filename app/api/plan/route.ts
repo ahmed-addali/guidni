@@ -26,6 +26,7 @@ export async function POST(req: Request) {
 
     const planRequest = {
       user_id: session.user.id,
+      destinationId: prefs.destinationId,
       region: body.region ?? prefs.destinationName ?? prefs.destinationCity ?? "Djerba",
       num_days: body.num_days ?? prefs.duration ?? 3,
       traveler_type: body.traveler_type ?? mapGroup(prefs.groupType),
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
       accommodation_type: body.accommodation_type ?? prefs.accommodationType ?? "hotel",
       start_date: body.start_date ?? prefs.startDate ?? undefined,
       special_requests: body.special_requests ?? undefined,
-      model: body.model ?? undefined,
+      model: body.model ?? "ollama/gemma4:e4b",
     };
 
     const agentUrl = process.env.PLANNER_AGENT_URL ?? "http://localhost:8000/plan";

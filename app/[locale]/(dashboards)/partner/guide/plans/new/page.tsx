@@ -26,8 +26,6 @@ export default async function NewGuidePlanPage({ params }: { params: Params }) {
     (p) => p.planType === "USER_SAVED" || !["GUIDE_FREE", "GUIDE_PAID"].includes(p.planType ?? "")
   );
 
-  const base = `/${locale}/partner/guide`;
-
   return (
     <div className="max-w-2xl space-y-6">
       <div>
@@ -62,7 +60,7 @@ export default async function NewGuidePlanPage({ params }: { params: Params }) {
               return (
                 <Link
                   key={plan.id}
-                  href={`${base}/plans/${plan.id}`}
+                  href={`/${locale}/planner/${plan.id}/edit`}
                   className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-primary/30 hover:bg-primary/3 transition-colors"
                 >
                   <div>

@@ -25,6 +25,19 @@ export default async function PartnerEarningsPage() {
     .sort((a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime())
     .slice(-6);
 
+  // Group by listing for per-listing breakdown
+  const listingMap = new Map<string, { title: string; type: string; revenue: number; bookings: number }>();
+  for (const b of paidBookings) {
+    const existing = listingMap.get(b.listingId);
+    if (existing) {
+      existing.revenue += b.amount;
+      existing.bookings += 1;
+    } else {
+      listingMap.set(b.listingId, { title: b.title, type: b.type, revenue: b.amount, bookings: 1 });
+    }
+  }
+  const byListing = [...listingMap.values()].sort((a, b) => b.revenue - a.revenue);
+
   const statCards = [
     {
       label:    "Total Revenue",
@@ -106,6 +119,45 @@ export default async function PartnerEarningsPage() {
           Full earnings charts with payout management coming in Phase 20 (Payment integration).
         </p>
       </div>
+
+      {/* Per-listing breakdown */}
+      {byListing.length > 0 && (
+        <div className="bg-white border border-gray-100 rounded-2xl p-6">
+          <h2 className="font-semibold text-gray-800 mb-5">Revenue by Listing</h2>
+          <div className="space-y-3">
+            {byListing.map((item) => {
+              const maxRevenue = byListing[0].revenue;
+              const pct = maxRevenue > 0 ? (item.revenue / maxRevenue) * 100 : 0;
+              const typeBadge: Record<string, string> = {
+                activity:   "bg-blue-50 text-blue-600",
+                stay:       "bg-purple-50 text-purple-600",
+                restaurant: "bg-orange-50 text-orange-600",
+                rental:     "bg-teal-50 text-teal-600",
+              };
+              return (
+                <div key={item.title + item.type} className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 w-48 shrink-0 min-w-0">
+                    <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full shrink-0 ${typeBadge[item.type] ?? ""}`}>
+                      {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                    </span>
+                    <span className="text-sm text-gray-700 truncate">{item.title}</span>
+                  </div>
+                  <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-primary h-full rounded-full transition-all duration-500"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-sm font-semibold text-gray-700">{item.revenue.toLocaleString()} TND</span>
+                    <span className="text-xs text-gray-400 ml-1.5">· {item.bookings} bkgs</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Transaction list */}
       {paidBookings.length > 0 && (

@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
+import { auth } from "@/lib/auth";
 import { getActivities } from "@/lib/actions/activities";
 import { getDestinationSlug } from "@/lib/actions/destination-cookie";
 import { getBadgesForListings } from "@/lib/actions/badges";
+import { getRecommendedOrder } from "@/lib/recommendation/client";
 import { ArrowRight } from "lucide-react";
 import { ActivitiesCarousel } from "./ActivitiesCarousel";
 
@@ -12,13 +15,26 @@ interface Props {
 
 export async function ActivitiesSection({ locale }: Props) {
   const destinationSlug = await getDestinationSlug();
-  const [activities, t] = await Promise.all([
+  const [activities, t, session] = await Promise.all([
     getActivities(destinationSlug, undefined, true, 8),
     getTranslations({ locale, namespace: "HomePage.activities" }),
+    auth.api.getSession({ headers: await headers() }).catch(() => null),
   ]);
   const badgesMap = await getBadgesForListings(activities.map((a) => a.id), "ACTIVITY");
 
   if (activities.length === 0) return null;
+
+  // ── MAB-ranked ordering (personalized if logged in) ─────────
+  const rankedIds = await getRecommendedOrder(
+    "homepage_activity", "ACTIVITY", destinationSlug, session?.user?.id,
+  );
+
+  const sorted = rankedIds.length > 0
+    ? rankedIds
+        .map((id) => activities.find((a) => a.id === id))
+        .filter(Boolean)
+        .concat(activities.filter((a) => !rankedIds.includes(a.id)))
+    : activities;
 
   return (
     <section className="py-12 w-full">
@@ -35,7 +51,7 @@ export async function ActivitiesSection({ locale }: Props) {
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
-      <ActivitiesCarousel activities={activities} locale={locale} badgesMap={badgesMap} />
+      <ActivitiesCarousel activities={sorted as typeof activities} locale={locale} badgesMap={badgesMap} />
     </section>
   );
 }

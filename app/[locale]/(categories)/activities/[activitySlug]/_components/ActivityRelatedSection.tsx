@@ -5,7 +5,7 @@ type RelatedActivity = {
   slug: string;
   title: string;
   arabicTitle?: string | null;
-  category: string;
+  categories: string[];
   price: number;
   region: string;
   city?: string | null;

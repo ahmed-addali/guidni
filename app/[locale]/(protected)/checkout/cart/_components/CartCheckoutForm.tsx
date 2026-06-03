@@ -9,31 +9,32 @@ import { toast } from "sonner";
 import { FiShoppingCart, FiPackage } from "react-icons/fi";
 import { useCartStore } from "@/stores/cartStore";
 import { createProductOrders } from "@/lib/actions/product-orders";
+import { PLATFORM_CURRENCY } from "@/lib/utils/constants";
 
-type DeliveryMethod = "PICKUP" | "LOCAL_DELIVERY" | "NATIONWIDE" | "INTERNATIONAL";
+type DeliveryMethod = "PICKUP" | "DELIVERY";
 
 interface Labels {
-  empty:             string;
-  emptyHint:         string;
-  orderSummary:      string;
-  delivery:          string;
-  deliveryMethod:    Record<DeliveryMethod, string>;
-  deliveryAddress:   string;
-  deliveryCity:      string;
-  deliveryCountry:   string;
-  notes:             string;
-  notesPlaceholder:  string;
-  subtotal:          string;
-  deliveryCost:      string;
-  freeDelivery:      string;
+  empty:              string;
+  emptyHint:          string;
+  orderSummary:       string;
+  delivery:           string;
+  deliveryMethod:     Record<DeliveryMethod, string>;
+  deliveryAddress:    string;
+  deliveryCity:       string;
+  deliveryCountry:    string;
+  notes:              string;
+  notesPlaceholder:   string;
+  subtotal:           string;
+  deliveryCost:       string;
+  freeDelivery:       string;
   deliveryCalculated: string;
-  shopSubtotal:      string;
-  grandTotal:        string;
-  placeOrder:        string;
-  paymentNote:       string;
-  addressRequired:   string;
-  success:           string;
-  error:             string;
+  shopSubtotal:       string;
+  grandTotal:         string;
+  placeOrder:         string;
+  paymentNote:        string;
+  addressRequired:    string;
+  success:            string;
+  error:              string;
 }
 
 interface Props {
@@ -41,17 +42,12 @@ interface Props {
   labels: Labels;
 }
 
-const DELIVERY_METHODS: DeliveryMethod[] = [
-  "PICKUP",
-  "LOCAL_DELIVERY",
-  "NATIONWIDE",
-  "INTERNATIONAL",
-];
+const DELIVERY_METHODS: DeliveryMethod[] = ["PICKUP", "DELIVERY"];
 
 export function CartCheckoutForm({ locale, labels }: Props) {
-  const router  = useRouter();
-  const loc     = useLocale();
-  const items   = useCartStore((s) => s.items);
+  const router    = useRouter();
+  const loc       = useLocale();
+  const items     = useCartStore((s) => s.items);
   const clearCart = useCartStore((s) => s.clearCart);
 
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("PICKUP");
@@ -68,18 +64,15 @@ export function CartCheckoutForm({ locale, labels }: Props) {
     return acc;
   }, {});
 
-  const totalAmount = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const needsAddress = deliveryMethod !== "PICKUP";
+  const subtotalAmount = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const needsAddress   = deliveryMethod === "DELIVERY";
 
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
         <FiShoppingCart className="h-12 w-12 text-gray-200" />
         <p className="text-gray-500">{labels.empty}</p>
-        <Link
-          href={`/${locale}/shops`}
-          className="text-sm text-blue-600 hover:underline"
-        >
+        <Link href={`/${locale}/shops`} className="text-sm text-blue-600 hover:underline">
           {labels.emptyHint} →
         </Link>
       </div>
@@ -103,10 +96,10 @@ export function CartCheckoutForm({ locale, labels }: Props) {
       })),
       {
         deliveryMethod,
-        deliveryAddress: address || undefined,
-        deliveryCity:    city    || undefined,
-        deliveryCountry: country || undefined,
-        notes:           notes   || undefined,
+        deliveryAddress: address  || undefined,
+        deliveryCity:    city     || undefined,
+        deliveryCountry: country  || undefined,
+        notes:           notes    || undefined,
       }
     );
 
@@ -118,8 +111,8 @@ export function CartCheckoutForm({ locale, labels }: Props) {
     }
 
     clearCart();
-    toast.success(labels.success);
-    router.push(`/${loc}/orders/${result.data.orderRefs[0]}`);
+    // Redirect to orders list with success flag — multi-shop carts create multiple orders
+    router.push(`/${loc}/orders?checkout=success`);
   }
 
   return (
@@ -150,17 +143,17 @@ export function CartCheckoutForm({ locale, labels }: Props) {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
                       <p className="text-xs text-gray-400">
-                        {item.quantity} × {item.price} TND
+                        {item.quantity} × {item.price} {PLATFORM_CURRENCY}
                       </p>
                     </div>
                     <p className="text-sm font-semibold text-gray-900 shrink-0">
-                      {item.price * item.quantity} TND
+                      {item.price * item.quantity} {PLATFORM_CURRENCY}
                     </p>
                   </div>
                 ))}
                 <div className="flex justify-between text-xs font-medium text-gray-500 pt-2 border-t border-gray-50">
                   <span>{labels.shopSubtotal}</span>
-                  <span>{shopSubtotal} TND</span>
+                  <span>{shopSubtotal} {PLATFORM_CURRENCY}</span>
                 </div>
               </div>
             );
@@ -189,7 +182,7 @@ export function CartCheckoutForm({ locale, labels }: Props) {
             ))}
           </div>
 
-          {/* Address fields */}
+          {/* Address fields — shown only for DELIVERY */}
           {needsAddress && (
             <div className="space-y-3 pt-2">
               <div>
@@ -252,7 +245,7 @@ export function CartCheckoutForm({ locale, labels }: Props) {
         <div className="space-y-2 text-sm">
           <div className="flex justify-between text-gray-600">
             <span>{labels.subtotal}</span>
-            <span>{totalAmount} TND</span>
+            <span>{subtotalAmount} {PLATFORM_CURRENCY}</span>
           </div>
           <div className="flex justify-between text-gray-600">
             <span>{labels.deliveryCost}</span>
@@ -264,7 +257,7 @@ export function CartCheckoutForm({ locale, labels }: Props) {
 
         <div className="flex justify-between font-bold text-gray-900 text-base pt-2 border-t border-gray-100">
           <span>{labels.grandTotal}</span>
-          <span>{totalAmount} TND</span>
+          <span>{subtotalAmount} {PLATFORM_CURRENCY}</span>
         </div>
 
         <button
@@ -272,7 +265,12 @@ export function CartCheckoutForm({ locale, labels }: Props) {
           disabled={loading}
           className="w-full bg-primary text-white rounded-xl py-3 text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {loading ? "..." : labels.placeOrder}
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              {labels.placeOrder}
+            </span>
+          ) : labels.placeOrder}
         </button>
 
         <p className="text-xs text-gray-400 text-center leading-relaxed">

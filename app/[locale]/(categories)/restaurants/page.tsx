@@ -43,7 +43,20 @@ export default async function RestaurantsPage({
   const {
     type, cuisine, meal, foodType, diet, attributes, reservation, search, page: pageParam,
   } = await searchParams;
-  const t = await getTranslations({ locale, namespace: "RestaurantsPage" });
+  const [t, tCard] = await Promise.all([
+    getTranslations({ locale, namespace: "RestaurantsPage" }),
+    getTranslations({ locale, namespace: "RestaurantPage" }),
+  ]);
+
+  const cardLabels = {
+    typeLabels: {
+      RESTAURANT: tCard("type.RESTAURANT"),
+      CAFEE_SHOP: tCard("type.CAFEE_SHOP"),
+      BOTH:       tCard("type.BOTH"),
+    },
+    reservationAvailable: tCard("card.reservationsAvailable"),
+    walkinOnly:           tCard("card.walkinOnly"),
+  };
 
   const destination = await getDestinationSlug();
   const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
@@ -133,7 +146,7 @@ export default async function RestaurantsPage({
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {restaurants.map((r) => (
-                <RestaurantCard key={r.id} restaurant={r} locale={locale} badges={badgesMap[r.id]} />
+                <RestaurantCard key={r.id} restaurant={r} locale={locale} badges={badgesMap[r.id]} cardLabels={cardLabels} />
               ))}
             </div>
 

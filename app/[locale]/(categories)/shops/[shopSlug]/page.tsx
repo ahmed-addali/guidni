@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { RelationType } from "@prisma/client";
 import { Separator } from "@/components/ui/separator";
 import { getShopBySlug, getRelatedShops } from "@/lib/actions/shops";
 import { getReviews, hasCompletedBooking, hasReviewed } from "@/lib/actions/reviews";
@@ -11,23 +12,45 @@ import { BadgeList } from "@/components/badges/BadgeList";
 import { GuidniReviewSection } from "@/components/badges/GuidniReviewSection";
 import { ReviewsSection } from "@/components/activities/ReviewsSection";
 import { RatingSummary } from "@/components/shared/RatingSummary";
+import { DetailPageTracker } from "@/components/shared/DetailPageTracker";
 import { ShopCard } from "@/components/shops/ShopCard";
 import { ShopHero } from "./_components/ShopHero";
 import { ShopAnchorNav } from "./_components/ShopAnchorNav";
-import { ShopHostStrip } from "./_components/ShopHostStrip";
 import { ShopInfoCard } from "./_components/ShopInfoCard";
 import { ShopProductGrid } from "./_components/ShopProductGrid";
+import { ShopOpeningHours } from "./_components/ShopOpeningHours";
+import { ShopLocationSection } from "./_components/ShopLocationSection";
 import { getShopCategoryLabel } from "@/lib/utils/shop-categories";
+import { SITE_URL } from "@/lib/utils/constants";
 
 type Params = Promise<{ locale: string; shopSlug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
-  const { shopSlug } = await params;
+  const { locale, shopSlug } = await params;
   const shop = await getShopBySlug(shopSlug);
   if (!shop) return {};
+  const name        = locale === "ar" && shop.arabicName ? shop.arabicName : shop.name;
+  const title       = `${name} · Guidni`;
+  const description = shop.description.slice(0, 160);
+  const image       = shop.coverPhoto ?? shop.images[0]?.url ?? null;
+  const canonical   = `${SITE_URL}/${locale}/shops/${shopSlug}`;
   return {
-    title: `${shop.name} · Guidni`,
-    description: shop.description.slice(0, 160),
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url:    canonical,
+      type:   "website",
+      ...(image ? { images: [{ url: image, width: 1200, height: 630, alt: name }] } : {}),
+    },
+    twitter: {
+      card:        image ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
+    },
   };
 }
 
@@ -41,14 +64,14 @@ export default async function ShopDetailPage({ params }: { params: Params }) {
 
   if (!shop) notFound();
 
-  const [reviews, completedBooking, alreadyReviewed, , relatedShops, manualBadges, guidniReview] = await Promise.all([
-    getReviews(shop.id, "SHOP"),
+  const [reviews, completedBooking, alreadyReviewed, wishlisted, relatedShops, manualBadges, guidniReview] = await Promise.all([
+    getReviews(shop.id, RelationType.SHOP),
     hasCompletedBooking(shop.id, "SHOP"),
     hasReviewed(shop.id, "SHOP"),
     isInWishlist(shop.id, "SHOP"),
     getRelatedShops(shop.id, shop.destinationId, 3),
-    getManualBadges(shop.id, "SHOP"),
-    getGuidniReview(shop.id, "SHOP"),
+    getManualBadges(shop.id, RelationType.SHOP),
+    getGuidniReview(shop.id, RelationType.SHOP),
   ]);
 
   const autoBadges = getAutoBadges({ note: shop.note, nbReviews: shop.nbReviews });
@@ -79,18 +102,19 @@ export default async function ShopDetailPage({ params }: { params: Params }) {
   }));
 
   const deliveryLabels: Record<string, string> = {
-    PICKUP:         t("delivery.pickup"),
-    LOCAL_DELIVERY: t("delivery.local"),
-    NATIONWIDE:     t("delivery.nationwide"),
-    INTERNATIONAL:  t("delivery.international"),
+    PICKUP:   t("delivery.pickup"),
+    DELIVERY: t("delivery.delivery"),
   };
 
-  const memberSince = shop.businessProfile?.createdAt
-    ? new Date(shop.businessProfile.createdAt).getFullYear()
-    : new Date().getFullYear();
+
+  const hasHours    = shop.hours.length > 0;
+  const hasLocation = !!(shop.address || shop.location);
+  const totalProducts = shop.products.length;
+  const PRODUCTS_THRESHOLD = 8;
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-20 py-8 pb-16">
+      <DetailPageTracker listingId={shop.id} listingType="SHOP" />
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-sm text-gray-400 mb-5 flex-wrap">
@@ -120,6 +144,7 @@ export default async function ShopDetailPage({ params }: { params: Params }) {
         coverPhoto={shop.coverPhoto ?? shop.images[0]?.url ?? null}
         logo={shop.logo}
         locale={locale}
+        initialIsWishlisted={wishlisted ?? false}
         openLabel={t("open")}
         closedLabel={t("closed")}
         shareLabel={t("share")}
@@ -128,9 +153,13 @@ export default async function ShopDetailPage({ params }: { params: Params }) {
 
       {/* Anchor navigation — sticky, below hero */}
       <ShopAnchorNav
+        hasHours={hasHours}
+        hasLocation={hasLocation}
         labels={{
           products: t("anchorNav.products"),
           about:    t("anchorNav.about"),
+          hours:    t("anchorNav.hours"),
+          location: t("anchorNav.location"),
           reviews:  t("anchorNav.reviews"),
         }}
       />
@@ -140,20 +169,6 @@ export default async function ShopDetailPage({ params }: { params: Params }) {
         <div className="mt-6">
           <BadgeList badges={allBadges} detailPage />
         </div>
-      )}
-
-      {/* Host strip */}
-      {shop.businessProfile && (
-        <ShopHostStrip
-          name={shop.businessProfile.name}
-          profileImage={shop.businessProfile.profileImage}
-          isVerified={shop.businessProfile.isVerified}
-          memberSince={memberSince}
-          labels={{
-            hostedBy:    t("hostStrip.hostedBy"),
-            memberSince: t("hostStrip.memberSince"),
-          }}
-        />
       )}
 
       {/* Main two-column grid */}
@@ -170,17 +185,25 @@ export default async function ShopDetailPage({ params }: { params: Params }) {
             <ShopProductGrid
               shopSlug={shop.slug}
               shopName={name}
-              products={products}
+              products={products.slice(0, PRODUCTS_THRESHOLD)}
               locale={locale}
               allLabel={t("allProducts")}
               emptyLabel={t("noProducts")}
               handmadeLabel={t("handmade")}
             />
+            <div className="mt-6 flex justify-center">
+              <a
+                href={`/${locale}/shops/${shop.slug}/products`}
+                className="inline-flex items-center gap-2 border border-primary text-primary rounded-xl px-6 py-3 text-sm font-semibold hover:bg-primary/5 transition-colors"
+              >
+                {t("viewAllProducts")}
+              </a>
+            </div>
           </section>
         </div>
 
-        {/* Right: info card */}
-        <div>
+        {/* Right: info card + hours */}
+        <div className="space-y-5">
           <section id="shop-about" className="scroll-mt-28">
             <ShopInfoCard
               description={shop.description}
@@ -210,8 +233,38 @@ export default async function ShopDetailPage({ params }: { params: Params }) {
               }}
             />
           </section>
+
+          {hasHours && (
+            <section id="shop-hours" className="scroll-mt-28">
+              <ShopOpeningHours
+                hours={shop.hours}
+                labels={{
+                  title:     t("hours.title"),
+                  closed:    t("hours.closed"),
+                  open24h:   t("hours.open24h"),
+                  openNow:   t("hours.openNow"),
+                  closedNow: t("hours.closedNow"),
+                }}
+              />
+            </section>
+          )}
         </div>
       </div>
+
+      {/* Location — full width */}
+      {hasLocation && (
+        <>
+          <Separator className="my-10" />
+          <ShopLocationSection
+            address={shop.address}
+            location={shop.location}
+            labels={{
+              title:      t("location.title"),
+              viewOnMaps: t("location.viewOnMaps"),
+            }}
+          />
+        </>
+      )}
 
       {/* Guidni Review — full width */}
       {guidniReview && (

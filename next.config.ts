@@ -11,10 +11,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "planout.es" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "plus.unsplash.com" },
+      { protocol: "https", hostname: "media-cdn.tripadvisor.com" },
     ],
-  },
-  typescript: {
-    ignoreBuildErrors: true,
   },
 };
 

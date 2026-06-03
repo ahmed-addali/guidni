@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { FiChevronLeft } from "react-icons/fi";
 import { getMyBusinessProfile } from "@/lib/actions/partner";
 import { getDestinations } from "@/lib/actions/destinations";
@@ -6,15 +7,18 @@ import { CreateRestaurantWizard } from "./_components/CreateRestaurantWizard";
 
 type Params = Promise<{ locale: string }>;
 
-export async function generateMetadata() {
-  return { title: "New Restaurant · Partner Dashboard" };
+export async function generateMetadata({ params }: { params: Params }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "PartnerDashboard.newRestaurant" });
+  return { title: t("metaTitle") };
 }
 
 export default async function NewRestaurantPage({ params }: { params: Params }) {
   const { locale } = await params;
-  const [profile, destinations] = await Promise.all([
+  const [profile, destinations, t] = await Promise.all([
     getMyBusinessProfile(),
     getDestinations(),
+    getTranslations({ locale, namespace: "PartnerDashboard.newRestaurant" }),
   ]);
 
   return (
@@ -25,12 +29,12 @@ export default async function NewRestaurantPage({ params }: { params: Params }) 
           className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors"
         >
           <FiChevronLeft className="h-4 w-4" />
-          Restaurants
+          {t("backLabel")}
         </Link>
       </div>
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">New Restaurant</h1>
-        <p className="text-sm text-gray-400 mt-1">Add your restaurant or café to Guidni.</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t("pageTitle")}</h1>
+        <p className="text-sm text-gray-400 mt-1">{t("pageSubtitle")}</p>
       </div>
       <CreateRestaurantWizard
         profileCountry={profile?.country}

@@ -1,22 +1,34 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { toast } from "sonner";
-import { FiCheck, FiMinus, FiPlus } from "react-icons/fi";
+import { FiCheck, FiMinus, FiPlus, FiArrowRight, FiCalendar, FiAlertTriangle } from "react-icons/fi";
+import { format } from "date-fns";
 import { DatePickerInput } from "@/components/shared/DatePickerInput";
 import { TimePickerInput } from "@/components/shared/TimePickerInput";
 import { createTransferReservation } from "@/lib/actions/transfer-reservations";
 
 type TransferType = "AIRPORT_TRANSFER" | "TAXI" | "CHAUFFEUR" | "SHUTTLE";
 
+interface BookedSlot {
+  date:           string; // "yyyy-MM-dd"
+  time:           string; // "HH:MM"
+  hoursRequested: number;
+}
+
 interface Props {
-  transferId:      string;
-  type:            TransferType;
-  pricePerTrip?:   number | null;
-  pricePerHour?:   number | null;
-  pricePerPerson?: number | null;
-  capacity:        number;
-  locale:          string;
+  transferId:        string;
+  type:              TransferType;
+  pricePerTrip?:     number | null;
+  pricePerHour?:     number | null;
+  pricePerPerson?:   number | null;
+  capacity:          number;
+  locale:            string;
+  unavailableDates?: string[];
+  /** For CHAUFFEUR: active bookings with their time ranges for overlap detection */
+  bookedSlots?:      BookedSlot[];
   labels: {
     perTrip:             string;
     perHour:             string;
@@ -48,7 +60,15 @@ interface Props {
     errPickup:           string;
     errName:             string;
     errMinHour:          string;
+    errTimeConflict:     string;
+    viewBooking:         string;
+    bookAgain:           string;
   };
+}
+
+function toMins(time: string): number {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + (m ?? 0);
 }
 
 function calcTotal(
@@ -73,7 +93,11 @@ function calcTotal(
 
 export function TransferBookingWidget({
   transferId, type, pricePerTrip, pricePerHour, pricePerPerson, capacity, labels,
+  unavailableDates = [], bookedSlots = [],
 }: Props) {
+  const params = useParams();
+  const locale = params.locale as string;
+
   const [date,           setDate]           = useState<Date | undefined>();
   const [time,           setTime]           = useState("");
   const [pickup,         setPickup]         = useState("");
@@ -89,11 +113,44 @@ export function TransferBookingWidget({
 
   const total = calcTotal(type, passengers, hoursRequested, pricePerTrip, pricePerHour, pricePerPerson);
 
+  // Pre-compute which time slots are unavailable for the time picker (CHAUFFEUR only)
+  const unavailableTimes = useMemo((): string[] => {
+    if (type !== "CHAUFFEUR" || !date || bookedSlots.length === 0) return [];
+    const dateStr   = format(date, "yyyy-MM-dd");
+    const slotsForDay = bookedSlots.filter((s) => s.date === dateStr);
+    if (!slotsForDay.length) return [];
+
+    const result: string[] = [];
+    const MINS = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+    for (let h = 0; h < 24; h++) {
+      for (const m of MINS) {
+        const startMins = h * 60 + m;
+        const endMins   = startMins + hoursRequested * 60;
+        const conflicts = slotsForDay.some((slot) => {
+          const slotStart = toMins(slot.time);
+          const slotEnd   = slotStart + slot.hoursRequested * 60;
+          return startMins < slotEnd && slotStart < endMins;
+        });
+        if (conflicts) {
+          result.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+        }
+      }
+    }
+    return result;
+  }, [type, date, hoursRequested, bookedSlots]);
+
+  // Conflict check against the currently selected time
+  const hasTimeConflict = useMemo(() => {
+    if (!time || unavailableTimes.length === 0) return false;
+    return unavailableTimes.includes(time);
+  }, [time, unavailableTimes]);
+
   function handleBook() {
     if (!date || !time)        return toast.error(labels.errDateTime);
     if (!pickup)               return toast.error(labels.errPickup);
     if (!contactName.trim())   return toast.error(labels.errName);
     if (type === "CHAUFFEUR" && hoursRequested < 1) return toast.error(labels.errMinHour);
+    if (hasTimeConflict)       return toast.error(labels.errTimeConflict);
 
     start(async () => {
       const res = await createTransferReservation({
@@ -116,12 +173,36 @@ export function TransferBookingWidget({
 
   if (done) {
     return (
-      <div className="bg-white border border-gray-100 rounded-2xl p-6 text-center space-y-3">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 text-center space-y-4">
         <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mx-auto">
           <FiCheck className="h-6 w-6 text-green-600" />
         </div>
-        <p className="font-semibold text-gray-900">{labels.doneTitle}</p>
-        <p className="text-sm text-gray-500">{labels.doneMessage}</p>
+        <div className="space-y-1">
+          <p className="font-semibold text-gray-900">{labels.doneTitle}</p>
+          <p className="text-sm text-gray-500">{labels.doneMessage}</p>
+        </div>
+        <div className="flex flex-col gap-2 pt-1">
+          <Link
+            href={`/${locale}/bookings?tab=transfers`}
+            className="flex items-center justify-center gap-2 bg-primary text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
+          >
+            <FiArrowRight className="h-4 w-4" />
+            {labels.viewBooking}
+          </Link>
+          <button
+            type="button"
+            onClick={() => {
+              setDone(false);
+              setDate(undefined); setTime(""); setPickup(""); setDropoff("");
+              setFlightNumber(""); setContactName(""); setContactPhone(""); setNotes("");
+              setPassengers(1); setHoursRequested(1);
+            }}
+            className="flex items-center justify-center gap-2 text-sm font-medium text-gray-600 border border-gray-200 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            <FiCalendar className="h-4 w-4" />
+            {labels.bookAgain}
+          </button>
+        </div>
       </div>
     );
   }
@@ -153,6 +234,7 @@ export function TransferBookingWidget({
               onDateChange={setDate}
               minDate={new Date()}
               placeholder={labels.date}
+              disabledDates={unavailableDates}
             />
           </div>
         </div>
@@ -165,6 +247,7 @@ export function TransferBookingWidget({
               value={time}
               onChange={setTime}
               placeholder={labels.time}
+              unavailableTimes={unavailableTimes}
             />
           </div>
         </div>
@@ -263,8 +346,16 @@ export function TransferBookingWidget({
         </div>
       </div>
 
+      {/* Time conflict warning (CHAUFFEUR only) */}
+      {hasTimeConflict && (
+        <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+          <FiAlertTriangle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+          <p className="text-sm text-red-600">{labels.errTimeConflict}</p>
+        </div>
+      )}
+
       {/* Price summary */}
-      {total > 0 && (
+      {total > 0 && !hasTimeConflict && (
         <div className="bg-gray-50 rounded-xl border border-gray-200 p-3 space-y-1.5 text-sm">
           {type === "CHAUFFEUR" && (
             <div className="flex justify-between text-gray-600">
@@ -287,7 +378,7 @@ export function TransferBookingWidget({
 
       <button
         onClick={handleBook}
-        disabled={pending || !date || !time || !pickup || !contactName.trim()}
+        disabled={pending || !date || !time || !pickup || !contactName.trim() || hasTimeConflict}
         className="w-full bg-primary text-white rounded-xl py-3 text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
       >
         {pending ? labels.booking : labels.book}

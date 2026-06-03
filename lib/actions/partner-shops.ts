@@ -46,19 +46,55 @@ async function uniqueProductSlug(base: string) {
 
 // ─── Shop CRUD ────────────────────────────────────────────────────────────────
 
-export const getMyShops = cache(async () => {
+export const getMyShops = cache(async (page = 1, limit = 12) => {
   const profileId = await getProfileId();
-  if (!profileId) return [];
+  if (!profileId) return { shops: [], total: 0, totalPages: 0 };
 
-  return prisma.shop.findMany({
-    where: { profileId },
-    include: {
-      images:   { select: { id: true, url: true }, take: 1 },
-      products: { select: { id: true } },
-      orders:   { select: { id: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const skip = (page - 1) * limit;
+
+  const [shops, total] = await Promise.all([
+    prisma.shop.findMany({
+      where: { profileId },
+      select: {
+        id:            true,
+        slug:          true,
+        name:          true,
+        category:      true,
+        status:        true,
+        isOpen:        true,
+        coverPhoto:    true,
+        nbReviews:     true,
+        destination:   { select: { city: true, country: true } },
+        images:        { select: { id: true, url: true }, take: 1, orderBy: { order: "asc" } },
+        _count:        { select: { products: true, orders: true } },
+      },
+      orderBy: { id: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.shop.count({ where: { profileId } }),
+  ]);
+
+  // Fetch which shops have already been reviewed by Guidni (polymorphic relation via ListingBadge)
+  const shopIds = shops.map((s) => s.id);
+  const reviewedBadges = shopIds.length
+    ? await prisma.listingBadge.findMany({
+        where: {
+          relationType: "SHOP",
+          relationId:   { in: shopIds },
+          badgeKey:     "REVIEWED_BY_GUIDNI",
+        },
+        select: { relationId: true },
+      })
+    : [];
+  const reviewedIds = new Set(reviewedBadges.map((b) => b.relationId));
+
+  const shopsWithBadges = shops.map((s) => ({
+    ...s,
+    isReviewedByGuidni: reviewedIds.has(s.id),
+  }));
+
+  return { shops: shopsWithBadges, total, totalPages: Math.ceil(total / limit) };
 });
 
 export const getMyShopBySlug = cache(async (slug: string) => {
@@ -80,10 +116,12 @@ export const getMyShopBySlug = cache(async (slug: string) => {
               product: { select: { id: true, name: true } },
             },
           },
+          user: { select: { name: true, email: true } },
         },
         orderBy: { createdAt: "desc" },
       },
       destination: { select: { id: true, slug: true, city: true, country: true } },
+      hours: true,
     },
   });
 });
@@ -99,7 +137,7 @@ export async function createShop(rawData: unknown) {
 
   const slug = await uniqueSlug(parsed.data.name);
   const shop = await prisma.shop.create({
-    data: { ...parsed.data, slug, profileId },
+    data: { ...parsed.data, slug, profileId, status: "DRAFT" },
   });
 
   revalidatePath("/partner/shops");
@@ -118,8 +156,12 @@ export async function updateShop(shopId: string, rawData: unknown) {
     return { success: false as const, error: parsed.error.issues[0]?.message ?? "Validation error" };
   }
 
-  await prisma.shop.update({ where: { id: shopId }, data: parsed.data });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { featuredInHome: _featured, ...safeData } = parsed.data;
+  await prisma.shop.update({ where: { id: shopId }, data: safeData });
+
   revalidatePath("/partner/shops");
+  revalidatePath(`/shops/${shop.slug}`);
   return { success: true as const };
 }
 
@@ -284,6 +326,74 @@ export async function removeProductImage(imageId: string) {
 
   await prisma.images.delete({ where: { id: imageId } });
   revalidatePath("/partner/shops");
+  return { success: true as const };
+}
+
+export async function reorderShopImages(shopId: string, orderedIds: string[]) {
+  const profileId = await getProfileId();
+  if (!profileId) return { success: false as const, error: "Not authenticated" };
+
+  const shop = await prisma.shop.findFirst({ where: { id: shopId, profileId } });
+  if (!shop) return { success: false as const, error: "Unauthorized" };
+
+  await prisma.$transaction(
+    orderedIds.map((id, i) => prisma.images.update({ where: { id }, data: { order: i } }))
+  );
+  revalidatePath(`/partner/shops/${shop.slug}`);
+  return { success: true as const };
+}
+
+export async function setShopImageAsCover(imageId: string, shopId: string) {
+  const profileId = await getProfileId();
+  if (!profileId) return { success: false as const, error: "Not authenticated" };
+
+  const shop = await prisma.shop.findFirst({
+    where:   { id: shopId, profileId },
+    include: { images: { select: { id: true }, orderBy: { order: "asc" } } },
+  });
+  if (!shop) return { success: false as const, error: "Unauthorized" };
+
+  const reordered = [
+    shop.images.find((i) => i.id === imageId)!,
+    ...shop.images.filter((i) => i.id !== imageId),
+  ].filter(Boolean);
+
+  await prisma.$transaction(
+    reordered.map((img, i) => prisma.images.update({ where: { id: img.id }, data: { order: i } }))
+  );
+  revalidatePath(`/partner/shops/${shop.slug}`);
+  return { success: true as const };
+}
+
+export async function reorderProductImages(productId: string, orderedIds: string[]) {
+  const profileId = await getProfileId();
+  if (!profileId) return { success: false as const, error: "Not authenticated" };
+
+  const product = await prisma.product.findFirst({
+    where:  { id: productId },
+    select: { id: true, shop: { select: { profileId: true, slug: true } } },
+  });
+  if (!product || product.shop.profileId !== profileId) {
+    return { success: false as const, error: "Unauthorized" };
+  }
+
+  await prisma.$transaction(
+    orderedIds.map((id, i) => prisma.images.update({ where: { id }, data: { order: i } }))
+  );
+  revalidatePath(`/partner/shops/${product.shop.slug}`);
+  return { success: true as const };
+}
+
+export async function updateShopStatus(shopId: string, status: "DRAFT" | "ACTIVE") {
+  const profileId = await getProfileId();
+  if (!profileId) return { success: false as const, error: "Not authenticated" };
+
+  const shop = await prisma.shop.findFirst({ where: { id: shopId, profileId } });
+  if (!shop) return { success: false as const, error: "Shop not found" };
+
+  await prisma.shop.update({ where: { id: shopId }, data: { status } });
+  revalidatePath(`/partner/shops/${shop.slug}`);
+  revalidatePath(`/shops/${shop.slug}`);
   return { success: true as const };
 }
 

@@ -4,25 +4,31 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface Props {
+  hasHours:    boolean;
+  hasLocation: boolean;
   labels: {
     products: string;
     about:    string;
+    hours:    string;
+    location: string;
     reviews:  string;
   };
 }
 
-const SECTIONS = [
-  { id: "shop-products", key: "products" as const },
-  { id: "shop-about",    key: "about"    as const },
-  { id: "shop-reviews",  key: "reviews"  as const },
-];
+export function ShopAnchorNav({ hasHours, hasLocation, labels }: Props) {
+  const sections = [
+    { id: "shop-products", key: "products" as const },
+    { id: "shop-about",    key: "about"    as const },
+    ...(hasHours    ? [{ id: "shop-hours",    key: "hours"    as const }] : []),
+    ...(hasLocation ? [{ id: "shop-location", key: "location" as const }] : []),
+    { id: "shop-reviews",  key: "reviews"  as const },
+  ];
 
-export function ShopAnchorNav({ labels }: Props) {
-  const [active, setActive] = useState("shop-products");
+  const [active, setActive] = useState(sections[0].id);
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
-    SECTIONS.forEach(({ id }) => {
+    sections.forEach(({ id }) => {
       const el = document.getElementById(id);
       if (!el) return;
       const obs = new IntersectionObserver(
@@ -33,7 +39,8 @@ export function ShopAnchorNav({ labels }: Props) {
       observers.push(obs);
     });
     return () => observers.forEach((o) => o.disconnect());
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasHours, hasLocation]);
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
     e.preventDefault();
@@ -47,7 +54,7 @@ export function ShopAnchorNav({ labels }: Props) {
       className="sticky top-16 z-30 bg-white border-b border-gray-100 -mx-4 md:-mx-20 px-4 md:px-20 mt-6"
     >
       <div className="flex overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {SECTIONS.map(({ id, key }) => (
+        {sections.map(({ id, key }) => (
           <a
             key={id}
             href={`#${id}`}

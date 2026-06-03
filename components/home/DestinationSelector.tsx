@@ -12,7 +12,7 @@ type Destination = {
   slug: string;
   city: string;
   country: string;
-  coverImage?: string | null;
+  images?: { url: string }[];
   description?: string | null;
 };
 
@@ -60,9 +60,9 @@ export function DestinationSelector({ destinations, title }: Props) {
                   : "border-transparent hover:border-gray-300 hover:scale-[1.02]"
               )}
             >
-              {dest.coverImage ? (
+              {dest.images?.[0]?.url ? (
                 <Image
-                  src={dest.coverImage}
+                  src={dest.images[0].url}
                   alt={dest.city}
                   fill
                   className="object-cover"

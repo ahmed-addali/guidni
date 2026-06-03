@@ -11,6 +11,7 @@ export const getDestinations = cache(async (featuredOnly = false) => {
       ...(featuredOnly ? { featured: true } : {}),
     },
     include: {
+      images: { select: { url: true } },
       _count: {
         select: { activities: true, stays: true, restaurants: true },
       },
@@ -22,5 +23,8 @@ export const getDestinations = cache(async (featuredOnly = false) => {
 export const getDestinationBySlug = cache(async (slug: string) => {
   return prisma.destination.findUnique({
     where: { slug, active: true },
+    include: {
+      images: { select: { url: true } },
+    },
   });
 });

@@ -1,8 +1,106 @@
 import { PrismaClient } from "@prisma/client";
+import fs from "fs";
+import path from "path";
+import { extendedActivities, extendedStays, extendedAttractions, extendedRestaurants } from "./extended_data";
+import { activityImagePool, stayImagePool, attractionImagePool, restaurantImagePool } from "./image_pools";
+
 
 const prisma = new PrismaClient();
 
 // ─── Destinations ──────────────────────────────────────────────────────────────
+
+const destinationImages: Record<string, string[]> = {
+  // First URL = cover/hero; remainder = gallery slideshow
+  "djerba": [
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200", // beach
+    "https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=1200", // island overview
+    "https://images.unsplash.com/photo-1552083375-1447ce886485?w=1200",   // traditional architecture
+    "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200", // landscape
+    "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200", // crafts
+  ],
+  "hammamet": [
+    "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1200", // beach
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200", // sea
+    "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200",   // coastal
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200",   // water
+  ],
+  "tunis": [
+    "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1200", // medina
+    "https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=1200", // souk
+    "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200", // architecture
+    "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200", // streets
+  ],
+  "sousse": [
+    "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200",   // coastline
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200", // beach
+    "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1200", // medina
+  ],
+  "mahdia": [
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200",   // fishing boats
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200", // sea
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200", // beach
+  ],
+  "tozeur": [
+    "https://images.unsplash.com/photo-1451337516015-6b6e9a44a8a3?w=1200", // desert dunes
+    "https://images.unsplash.com/photo-1548430769-9fb29a9e7f76?w=1200",   // sahara
+    "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200",   // oasis
+    "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200", // landscape
+  ],
+  "paris": [
+    "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200", // eiffel tower
+    "https://images.unsplash.com/photo-1431274172761-fcdab704a114?w=1200", // seine
+    "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200", // louvre
+    "https://images.unsplash.com/photo-1520939817895-060bdaf4fe1b?w=1200", // montmartre
+    "https://images.unsplash.com/photo-1568797629192-789acf8e4df3?w=1200", // café
+  ],
+  "nice": [
+    "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=1200", // promenade
+    "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200",   // coastline
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200", // beach
+    "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1200", // riviera
+  ],
+  "dubai": [
+    "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200", // skyline
+    "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200",   // burj khalifa
+    "https://images.unsplash.com/photo-1582266255765-fa5cf1a1d501?w=1200", // marina
+    "https://images.unsplash.com/photo-1548430769-9fb29a9e7f76?w=1200",   // desert
+    "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200", // luxury hotel
+  ],
+};
+
+const attractionImages: Record<string, string[]> = {
+  "guellala-museum": [
+    "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200",
+    "https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=1200",
+    "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1200",
+  ],
+  "el-ghriba-synagogue": [
+    "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200",
+    "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1200",
+    "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200",
+  ],
+  "djerba-heritage-village": [
+    "https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=1200",
+    "https://images.unsplash.com/photo-1552083375-1447ce886485?w=1200",
+    "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200",
+  ],
+  "beach-sidi-mahrez": [
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200",
+    "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1200",
+    "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200",
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200",
+  ],
+  "houmt-souk-medina": [
+    "https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=1200",
+    "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200",
+    "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200",
+  ],
+  "flamingo-lake": [
+    "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1200",
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
+    "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200",
+  ],
+};
 
 const destinations = [
   {
@@ -11,11 +109,9 @@ const destinations = [
     country: "Tunisia",
     region: "Médenine",
     featured: true,
-    coverImage: "/images/djerba.jpg",
-    gallery: [
-      "/images/djerba.jpg",
-      "/images/el-fondoq.jpg",
-    ],
+    latitude: 33.8075,
+    longitude: 11.0211,
+    timezone: "Africa/Tunis",
     description:
       "A Mediterranean island with 3,000 years of history, pristine beaches, and vibrant culture. Home to ancient heritage sites, colorful markets, and crystal-clear waters.",
     arabicDescription:
@@ -27,7 +123,6 @@ const destinations = [
     country: "Tunisia",
     region: "Nabeul",
     featured: true,
-    coverImage: "/images/architecture.jpg",
     description:
       "Tunisia's premier beach resort destination. Known for its beautiful sandy beaches, jasmine-scented medina, and world-class resorts along the Gulf of Hammamet.",
     arabicDescription:
@@ -39,7 +134,9 @@ const destinations = [
     country: "Tunisia",
     region: "Tunis",
     featured: true,
-    coverImage: "/images/el-ghriba.jpg",
+    latitude: 36.8065,
+    longitude: 10.1815,
+    timezone: "Africa/Tunis",
     description:
       "The vibrant capital of Tunisia, where ancient medina meets modern boulevards. Explore UNESCO-listed heritage, bustling souks, and a rich culinary scene.",
     arabicDescription:
@@ -51,7 +148,9 @@ const destinations = [
     country: "Tunisia",
     region: "Sousse",
     featured: true,
-    coverImage: "/images/architecture.jpg",
+    latitude: 35.8256,
+    longitude: 10.6084,
+    timezone: "Africa/Tunis",
     description:
       "The Pearl of the Sahel — a UNESCO-listed medina, long sandy beaches, and a lively marina. One of Tunisia's most vibrant coastal cities with rich Phoenician and Roman history.",
     arabicDescription:
@@ -63,7 +162,9 @@ const destinations = [
     country: "Tunisia",
     region: "Mahdia",
     featured: true,
-    coverImage: "/images/djerba.jpg",
+    latitude: 35.5042,
+    longitude: 11.0622,
+    timezone: "Africa/Tunis",
     description:
       "A hidden gem on Tunisia's eastern coast. Known for its unspoiled beaches, authentic fishing village charm, historic medina, and some of the country's finest seafood.",
     arabicDescription:
@@ -75,7 +176,9 @@ const destinations = [
     country: "Tunisia",
     region: "Tozeur",
     featured: true,
-    coverImage: "/images/guellala-museum.jpg",
+    latitude: 33.9189,
+    longitude: 8.1325,
+    timezone: "Africa/Tunis",
     description:
       "Gateway to the Sahara. Ancient palm oases, dramatic salt lakes, Star Wars filming locations, and breathtaking desert landscapes make Tozeur an unforgettable adventure.",
     arabicDescription:
@@ -87,7 +190,9 @@ const destinations = [
     country: "France",
     region: "Île-de-France",
     featured: true,
-    coverImage: "/images/architecture1.jpg",
+    latitude: 48.8566,
+    longitude: 2.3522,
+    timezone: "Europe/Paris",
     description:
       "The City of Light — a timeless destination for art, fashion, gastronomy, and iconic landmarks. From the Eiffel Tower to Montmartre, Paris never stops inspiring.",
     arabicDescription:
@@ -99,7 +204,9 @@ const destinations = [
     country: "France",
     region: "Provence-Alpes-Côte d'Azur",
     featured: true,
-    coverImage: "/images/djerbahood.jpg",
+    latitude: 43.7102,
+    longitude: 7.262,
+    timezone: "Europe/Paris",
     description:
       "The jewel of the French Riviera. Stunning azure coastline, elegant Belle Époque architecture, and a perfect blend of beach life and cultural richness.",
     arabicDescription:
@@ -111,13 +218,85 @@ const destinations = [
     country: "UAE",
     region: "Dubai",
     featured: true,
-    coverImage: "/images/guellala-museum.jpg",
+    latitude: 25.2048,
+    longitude: 55.2708,
+    timezone: "Asia/Dubai",
     description:
       "A city of superlatives — the tallest buildings, most luxurious hotels, and a dizzying blend of futuristic architecture and Arabian heritage in the heart of the desert.",
     arabicDescription:
       "مدينة العجائب — أطول المباني وأفخم الفنادق ومزيج رائع من العمارة المستقبلية والتراث العربي في قلب الصحراء.",
   },
+  {
+    slug: "monastir",
+    city: "Monastir",
+    country: "Tunisia",
+    region: "Monastir",
+    featured: true,
+    latitude: 35.7643,
+    longitude: 10.8113,
+    timezone: "Africa/Tunis",
+    description: "A coastal city with a majestic Ribat and a rich history as the birthplace of modern Tunisia.",
+    arabicDescription: "مدينة ساحلية برباط مهيب وتاريخ غني كمسقط رأس تونس الحديثة.",
+  },
+  {
+    slug: "kairouan",
+    city: "Kairouan",
+    country: "Tunisia",
+    region: "Kairouan",
+    featured: true,
+    latitude: 35.6781,
+    longitude: 10.0963,
+    timezone: "Africa/Tunis",
+    description: "The spiritual capital of Tunisia, home to the Great Mosque and famous for its carpets and pastries.",
+    arabicDescription: "العاصمة الروحية لتونس، موطن الجامع الكبير ومشهورة بزرابيها وحلوياتها.",
+  },
+  {
+    slug: "tabarka",
+    city: "Tabarka",
+    country: "Tunisia",
+    region: "Jendouba",
+    featured: true,
+    latitude: 36.9531,
+    longitude: 8.7561,
+    timezone: "Africa/Tunis",
+    description: "Where the mountains meet the sea. Famous for coral diving, jazz festivals, and lush greenery.",
+    arabicDescription: "حيث تلتقي الجبال بالبحر. مشهورة بصيد المرجان ومهرجانات الجاز والخضرة الوافرة.",
+  },
+  {
+    slug: "bizerte",
+    city: "Bizerte",
+    country: "Tunisia",
+    region: "Bizerte",
+    featured: true,
+    latitude: 37.2744,
+    longitude: 9.8739,
+    timezone: "Africa/Tunis",
+    description: "The northernmost city in Africa, featuring a charming old port and pristine Mediterranean coastline.",
+    arabicDescription: "أقصى مدينة في شمال أفريقيا، تتميز بميناء قديم ساحر وساحل متوسطي بكر.",
+  },
+  {
+    slug: "douz",
+    city: "Douz",
+    country: "Tunisia",
+    region: "Kebili",
+    featured: true,
+    latitude: 33.4667,
+    longitude: 9.0167,
+    timezone: "Africa/Tunis",
+    description: "The ultimate gateway to the Sahara. Famous for its dunes and the International Festival of the Sahara.",
+    arabicDescription: "البوابة النهائية للصحراء الكبرى. مشهورة بكثبانها الرملية والمهرجان الدولي للصحراء.",
+  },
+  {
+    slug: "tataouine",
+    city: "Tataouine",
+    country: "Tunisia",
+    region: "Tataouine",
+    featured: true,
+    description: "Famous for its unique Ksours (fortified granaries) and as a major Star Wars filming location.",
+    arabicDescription: "مشهورة بقصورها الفريدة ومواقع تصوير حرب النجوم العالمية.",
+  }
 ];
+
 
 // ─── Demo user + business profiles ─────────────────────────────────────────────
 
@@ -145,6 +324,166 @@ const demoCustomers = [
 
 // ─── Activities ─────────────────────────────────────────────────────────────────
 
+const activityImages: Record<string, string[]> = {
+  "djerba-camel-ride-beach": [
+    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200",
+    "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200",
+    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200",
+  ],
+  "djerba-island-discovery-tour": [
+    "https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=1200",
+    "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200",
+    "https://images.unsplash.com/photo-1552083375-1447ce886485?w=1200",
+    "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200",
+  ],
+  "djerba-pirate-boat-trip": [
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200",
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
+    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200",
+  ],
+  "dubai-desert-safari-4x4": [
+    "https://images.unsplash.com/photo-1451337516015-6b6e9a44a8a3?w=1200",
+    "https://images.unsplash.com/photo-1548430769-9fb29a9e7f76?w=1200",
+    "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200",
+    "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200",
+  ],
+  "dubai-burj-khalifa-sky-experience": [
+    "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200",
+    "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200",
+    "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200",
+  ],
+  "dubai-dhow-cruise-marina": [
+    "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200",
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200",
+    "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200",
+  ],
+};
+
+const stayImages: Record<string, string[]> = {
+  "djerba-beachfront-villa": [
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200",
+    "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200",
+    "https://images.unsplash.com/photo-1540541338537-41369657e8e4?w=1200",
+    "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=1200",
+    "https://images.unsplash.com/photo-1416331108676-a22ccb276e35?w=1200",
+  ],
+  "djerba-traditional-dar": [
+    "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1200",
+    "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200",
+    "https://images.unsplash.com/photo-1587381420270-3e1a5b9e6904?w=1200",
+    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200",
+  ],
+  "djerba-sea-view-apartment": [
+    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200",
+    "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200",
+    "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1200",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200",
+  ],
+  "dubai-palm-luxury-villa": [
+    "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=1200",
+    "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200",
+    "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200",
+    "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200",
+    "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=1200",
+  ],
+  "dubai-downtown-hotel-suite": [
+    "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200",
+    "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1200",
+    "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200",
+    "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200",
+  ],
+  "dubai-marina-apartment": [
+    "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200",
+    "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200",
+    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200",
+    "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1200",
+  ],
+};
+
+const restaurantImages: Record<string, string[]> = {
+  "dar-houmt-souk": [
+    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200",
+    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200",
+    "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=1200",
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200",
+  ],
+  "la-plage-cafe-djerba": [
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200",
+    "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200",
+    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200",
+  ],
+  "le-berbere-djerba": [
+    "https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=1200",
+    "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200",
+    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200",
+  ],
+  "the-spice-route-dubai": [
+    "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=1200",
+    "https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?w=1200",
+    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200",
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200",
+  ],
+  "marina-cafe-lounge-dubai": [
+    "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200",
+    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200",
+    "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=1200",
+  ],
+  "al-fanar-dubai": [
+    "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200",
+    "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=1200",
+    "https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?w=1200",
+    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200",
+  ],
+};
+
+const rentalImages: Record<string, string[]> = {
+  "toyota-corolla-djerba": [
+    "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1200",
+    "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=1200",
+  ],
+  "scooter-50cc-djerba": [
+    "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1200",
+    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200",
+  ],
+  "fishing-boat-djerba": [
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200",
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
+  ],
+  "bmw-5-series-dubai": [
+    "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1200",
+    "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1200",
+  ],
+  "electric-bike-dubai-marina": [
+    "https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=1200",
+    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200",
+  ],
+  "speedboat-dubai-marina": [
+    "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=1200",
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200",
+    "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200",
+  ],
+};
+
+const transferImages: Record<string, string[]> = {
+  "djerba-airport-transfer": [
+    "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1200",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200",
+  ],
+  "djerba-city-taxi": [
+    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200",
+    "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1200",
+  ],
+  "djerba-private-chauffeur": [
+    "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1200",
+    "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=1200",
+    "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1200",
+  ],
+  "djerba-shuttle-service": [
+    "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200",
+    "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1200",
+  ],
+};
+
 const djerbaActivities = [
   {
     slug: "djerba-camel-ride-beach",
@@ -154,11 +493,13 @@ const djerbaActivities = [
       "Experience the magic of Djerba from the back of a camel as you ride along the golden shores. Our experienced guides lead you through scenic coastal paths, offering stunning views of the Mediterranean and the island's iconic palm groves. Perfect for families and first-time riders.",
     arabicDescription:
       "اختبر سحر جربة من فوق ظهر جمل وأنت تتجول على طول الشواطئ الذهبية. يقودك مرشدونا ذوو الخبرة عبر مسارات ساحلية خلابة توفر مناظر بديعة للبحر المتوسط وبساتين النخيل الأيقونية.",
-    category: "adventures",
+    categories: ["Adventure"],
     price: 45,
     region: "Médenine",
     city: "Midoun",
     country: "Tunisia",
+    latitude: 33.809,
+    longitude: 10.906,
     duration: "1h",
     capacity: 12,
     availableTimes: "09:00,10:30,14:00,15:30",
@@ -179,11 +520,13 @@ const djerbaActivities = [
       "Discover the best of Djerba in one unforgettable day. Visit the ancient El Ghriba synagogue, the historic Guellala pottery village, the colorful Houmt Souk market, and the breathtaking viewpoints over the Mediterranean. Your private driver-guide shares the stories behind each landmark.",
     arabicDescription:
       "اكتشف أجمل ما في جربة في يوم واحد لا يُنسى. قم بزيارة كنيس الغريبة العريق وقرية غلالة الفخارية التاريخية وسوق حومة السوق الملون والمناظر الخلابة على البحر المتوسط.",
-    category: "trips",
+    categories: ["Culture & History"],
     price: 75,
     region: "Médenine",
     city: "Houmt Souk",
     country: "Tunisia",
+    latitude: 33.876,
+    longitude: 10.859,
     duration: "6h",
     capacity: 8,
     availableTimes: "09:00,09:30",
@@ -205,11 +548,13 @@ const djerbaActivities = [
       "Set sail on a traditional pirate-themed boat for an exciting half-day sea adventure around Djerba's coastline. Swim in crystal-clear waters, snorkel over vibrant reefs, and enjoy fresh seafood on board. A fun experience for the whole family.",
     arabicDescription:
       "أبحر على متن قارب تقليدي بمظهر القراصنة في مغامرة بحرية نصف يوم حول ساحل جربة. اسبح في مياه صافية كالكريستال وغطس فوق الشعاب المرجانية واستمتع بالمأكولات البحرية الطازجة على متن القارب.",
-    category: "water_sports",
+    categories: ["Water Sports"],
     price: 55,
     region: "Médenine",
     city: "Aghir",
     country: "Tunisia",
+    latitude: 33.774,
+    longitude: 10.953,
     duration: "4h",
     capacity: 20,
     availableTimes: "09:30,14:00",
@@ -233,11 +578,13 @@ const dubaiActivities = [
       "Experience the thrill of dune bashing in the heart of the Arabian Desert. After an exhilarating 4x4 ride over the golden dunes, settle in at a traditional Bedouin camp for camel riding, sandboarding, henna painting, and a lavish BBQ dinner under the stars.",
     arabicDescription:
       "اختبر إثارة التزلج على الكثبان في قلب الصحراء العربية. بعد رحلة مثيرة بالسيارة الرباعية، استقر في مخيم بدوي تقليدي لركوب الجمال والتزلج على الرمال والحنة وعشاء الشواء الفاخر تحت النجوم.",
-    category: "adventures",
+    categories: ["Desert", "Adventure"],
     price: 120,
     region: "Dubai",
     city: "Dubai",
     country: "UAE",
+    latitude: 24.839,
+    longitude: 55.633,
     duration: "6h",
     capacity: 16,
     availableTimes: "15:00,15:30,16:00",
@@ -258,11 +605,13 @@ const dubaiActivities = [
       "Ascend to the 148th floor observation deck of the world's tallest building for a breathtaking 360° panorama of Dubai. See the city's iconic skyline, the vast desert, and the shimmering Arabian Gulf from 555 meters above ground. Includes priority access and a digital photo package.",
     arabicDescription:
       "اصعد إلى منصة المراقبة في الطابق 148 من أطول مبنى في العالم للحصول على بانوراما 360 درجة مذهلة لدبي. شاهد الأفق الأيقوني للمدينة والصحراء الشاسعة وخليج العرب اللامع من ارتفاع 555 مترًا.",
-    category: "attractions",
+    categories: ["Culture & History"],
     price: 160,
     region: "Dubai",
     city: "Dubai",
     country: "UAE",
+    latitude: 25.197,
+    longitude: 55.274,
     duration: "2h",
     capacity: 20,
     availableTimes: "10:00,12:00,14:00,16:00,18:00,20:00",
@@ -284,11 +633,13 @@ const dubaiActivities = [
       "Glide along the stunning Dubai Marina aboard a traditional wooden dhow as the city lights illuminate the skyline. Enjoy a lavish international buffet dinner, live Tanoura dance performance, and unobstructed views of the marina's skyscrapers. The perfect way to end a Dubai evening.",
     arabicDescription:
       "انزلق على طول مارينا دبي الرائعة على متن داو خشبي تقليدي بينما تضيء أضواء المدينة الأفق. استمتع بعشاء بوفيه دولي فاخر وعرض رقص تنورة حي ومناظر غير مقيدة لناطحات سحاب المارينا.",
-    category: "trips",
+    categories: ["Food & Drink", "Culture & History"],
     price: 85,
     region: "Dubai",
     city: "Dubai",
     country: "UAE",
+    latitude: 25.079,
+    longitude: 55.139,
     duration: "2h",
     capacity: 40,
     availableTimes: "19:00,20:30",
@@ -534,15 +885,128 @@ const dubaiStays = [
 
 // ─── Main ───────────────────────────────────────────────────────────────────────
 
+function getRandomImages(pool: string[], count: number = 3): string[] {
+  const shuffled = [...pool].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+}
+
+async function seedExtendedData() {
+  console.log("\nSeeding extended data (100 entries per category)...");
+
+  const djerba = await prisma.destination.findUnique({ where: { slug: "djerba" } });
+  const tunis = await prisma.destination.findUnique({ where: { slug: "tunis" } });
+  
+  // Use existing profile or create a generic one if needed
+  const DJERBA_PROFILE_ID = "seed-profile-djerba-001";
+
+  // 1. Extended Activities
+  console.log("  - Activities...");
+  for (const act of extendedActivities) {
+    const dest = await prisma.destination.findFirst({
+      where: { OR: [{ city: act.city }, { region: act.region }] }
+    });
+    
+    const created = await prisma.activity.upsert({
+      where: { slug: act.slug },
+      update: { ...act, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id },
+      create: { ...act, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id },
+    });
+
+    const existingImages = await prisma.images.count({ where: { activityId: created.id } });
+    if (existingImages === 0) {
+      const urls = getRandomImages(activityImagePool, 4);
+      await prisma.images.createMany({ data: urls.map(url => ({ url, activityId: created.id })) });
+    }
+
+    const existingSlots = await prisma.activityTimeSlot.count({ where: { activityId: created.id } });
+    if (existingSlots === 0) {
+      const times = (act.availableTimes || "09:00,14:00").split(",").map(t => t.trim()).filter(Boolean);
+      await prisma.activityTimeSlot.createMany({ data: times.map(time => ({ time, activityId: created.id })) });
+    }
+  }
+
+  // 2. Extended Stays
+  console.log("  - Stays...");
+  for (const stay of extendedStays) {
+    const dest = await prisma.destination.findFirst({
+      where: { OR: [{ city: stay.city }, { region: stay.region }] }
+    });
+
+    const created = await prisma.stay.upsert({
+      where: { slug: stay.slug },
+      update: { ...stay, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id },
+      create: { ...stay, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id },
+    });
+
+    const existingImages = await prisma.images.count({ where: { stayId: created.id } });
+    if (existingImages === 0) {
+      const urls = getRandomImages(stayImagePool, 5);
+      await prisma.images.createMany({ data: urls.map(url => ({ url, stayId: created.id })) });
+    }
+  }
+
+  // 3. Extended Attractions
+  console.log("  - Attractions...");
+  for (const attr of extendedAttractions) {
+    // Try to find destination from location string (e.g. "Carthage", "Sousse", "Houmt Souk, Djerba")
+    const dest = await prisma.destination.findFirst({
+      where: { 
+        OR: [
+          { city: { contains: attr.location.split(',')[0].trim(), mode: 'insensitive' } },
+          { region: { contains: attr.location.split(',')[0].trim(), mode: 'insensitive' } }
+        ] 
+      }
+    });
+
+    const created = await prisma.attraction.upsert({
+      where: { slug: attr.slug },
+      update: { ...attr, destinationId: dest?.id || tunis!.id }, 
+      create: { ...attr, destinationId: dest?.id || tunis!.id },
+    });
+
+    const existingImages = await prisma.images.count({ where: { attractionId: created.id } });
+    if (existingImages === 0) {
+      const urls = getRandomImages(attractionImagePool, 3);
+      await prisma.images.createMany({ data: urls.map(url => ({ url, attractionId: created.id })) });
+    }
+  }
+
+  // 4. Extended Restaurants
+  console.log("  - Restaurants...");
+  for (const rest of extendedRestaurants) {
+    const dest = await prisma.destination.findFirst({
+      where: { OR: [{ city: rest.city }, { region: rest.region || "" }] }
+    });
+
+    const created = await prisma.restaurant.upsert({
+      where: { slug: rest.slug },
+      update: { ...rest, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id },
+      create: { ...rest, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id },
+    });
+
+    const existingImages = await prisma.images.count({ where: { restaurantId: created.id } });
+    if (existingImages === 0) {
+      const urls = getRandomImages(restaurantImagePool, 4);
+      await prisma.images.createMany({ data: urls.map(url => ({ url, restaurantId: created.id })) });
+    }
+  }
+}
+
 async function main() {
+
   // 1. Destinations
   console.log("Seeding destinations...");
   for (const dest of destinations) {
-    await prisma.destination.upsert({
+    const createdDest = await prisma.destination.upsert({
       where: { slug: dest.slug },
       update: dest,
       create: dest,
     });
+    const destUrls = destinationImages[dest.slug] ?? [];
+    const destImgEx = await prisma.images.count({ where: { destinationId: createdDest.id } });
+    if (destImgEx === 0 && destUrls.length > 0) {
+      await prisma.images.createMany({ data: destUrls.map((url) => ({ url, destinationId: createdDest.id })) });
+    }
     console.log(`  ✓ ${dest.city}, ${dest.country}`);
   }
 
@@ -627,11 +1091,21 @@ async function main() {
   console.log("\nSeeding Djerba activities...");
   const djerba = await prisma.destination.findUnique({ where: { slug: "djerba" } });
   for (const act of djerbaActivities) {
-    await prisma.activity.upsert({
-      where: { slug: act.slug },
-      update: { ...act, profileId: DJERBA_PROFILE_ID, destinationId: djerba!.id },
-      create: { ...act, profileId: DJERBA_PROFILE_ID, destinationId: djerba!.id },
+    const created = await prisma.activity.upsert({
+      where:  { slug: act.slug },
+      update: { ...act, profileId: DJERBA_PROFILE_ID, destinationId: djerba!.id, status: "ACTIVE" },
+      create: { ...act, profileId: DJERBA_PROFILE_ID, destinationId: djerba!.id, status: "ACTIVE" },
     });
+    const urls = activityImages[act.slug] ?? [];
+    const existingImages = await prisma.images.count({ where: { activityId: created.id } });
+    if (existingImages === 0 && urls.length > 0) {
+      await prisma.images.createMany({ data: urls.map((url) => ({ url, activityId: created.id })) });
+    }
+    const existingSlots = await prisma.activityTimeSlot.count({ where: { activityId: created.id } });
+    if (existingSlots === 0) {
+      const times = act.availableTimes.split(",").map((t) => t.trim()).filter(Boolean);
+      await prisma.activityTimeSlot.createMany({ data: times.map((time) => ({ time, activityId: created.id })) });
+    }
     console.log(`  ✓ ${act.title}`);
   }
 
@@ -639,33 +1113,53 @@ async function main() {
   console.log("\nSeeding Dubai activities...");
   const dubai = await prisma.destination.findUnique({ where: { slug: "dubai" } });
   for (const act of dubaiActivities) {
-    await prisma.activity.upsert({
-      where: { slug: act.slug },
-      update: { ...act, profileId: DUBAI_PROFILE_ID, destinationId: dubai!.id },
-      create: { ...act, profileId: DUBAI_PROFILE_ID, destinationId: dubai!.id },
+    const created = await prisma.activity.upsert({
+      where:  { slug: act.slug },
+      update: { ...act, profileId: DUBAI_PROFILE_ID, destinationId: dubai!.id, status: "ACTIVE" },
+      create: { ...act, profileId: DUBAI_PROFILE_ID, destinationId: dubai!.id, status: "ACTIVE" },
     });
+    const urls = activityImages[act.slug] ?? [];
+    const existingImages = await prisma.images.count({ where: { activityId: created.id } });
+    if (existingImages === 0 && urls.length > 0) {
+      await prisma.images.createMany({ data: urls.map((url) => ({ url, activityId: created.id })) });
+    }
+    const existingSlots = await prisma.activityTimeSlot.count({ where: { activityId: created.id } });
+    if (existingSlots === 0) {
+      const times = act.availableTimes.split(",").map((t) => t.trim()).filter(Boolean);
+      await prisma.activityTimeSlot.createMany({ data: times.map((time) => ({ time, activityId: created.id })) });
+    }
     console.log(`  ✓ ${act.title}`);
   }
 
   // 8. Djerba stays
   console.log("\nSeeding Djerba stays...");
   for (const stay of djerbaStays) {
-    await prisma.stay.upsert({
-      where: { slug: stay.slug },
+    const created = await prisma.stay.upsert({
+      where:  { slug: stay.slug },
       update: { ...stay, profileId: DJERBA_PROFILE_ID, destinationId: djerba!.id },
       create: { ...stay, profileId: DJERBA_PROFILE_ID, destinationId: djerba!.id },
     });
+    const urls = stayImages[stay.slug] ?? [];
+    const existing = await prisma.images.count({ where: { stayId: created.id } });
+    if (existing === 0 && urls.length > 0) {
+      await prisma.images.createMany({ data: urls.map((url) => ({ url, stayId: created.id })) });
+    }
     console.log(`  ✓ ${stay.title}`);
   }
 
   // 9. Dubai stays
   console.log("\nSeeding Dubai stays...");
   for (const stay of dubaiStays) {
-    await prisma.stay.upsert({
-      where: { slug: stay.slug },
+    const created = await prisma.stay.upsert({
+      where:  { slug: stay.slug },
       update: { ...stay, profileId: DUBAI_PROFILE_ID, destinationId: dubai!.id },
       create: { ...stay, profileId: DUBAI_PROFILE_ID, destinationId: dubai!.id },
     });
+    const urls = stayImages[stay.slug] ?? [];
+    const existing = await prisma.images.count({ where: { stayId: created.id } });
+    if (existing === 0 && urls.length > 0) {
+      await prisma.images.createMany({ data: urls.map((url) => ({ url, stayId: created.id })) });
+    }
     console.log(`  ✓ ${stay.title}`);
   }
 
@@ -807,6 +1301,11 @@ async function main() {
       { restaurantId: darHoumt.id, day: "Sunday",    opening: "12:00", closing: "23:00", isClosed: false },
     ],
   });
+  const darHoumtImgUrls = restaurantImages["dar-houmt-souk"] ?? [];
+  const darHoumtImgEx = await prisma.images.count({ where: { restaurantId: darHoumt.id } });
+  if (darHoumtImgEx === 0 && darHoumtImgUrls.length > 0) {
+    await prisma.images.createMany({ data: darHoumtImgUrls.map((url) => ({ url, restaurantId: darHoumt.id })) });
+  }
 
   // Djerba restaurant 2 — beachside café
   const laPlage = await prisma.restaurant.upsert({
@@ -861,6 +1360,11 @@ async function main() {
       { restaurantId: laPlage.id, day: "Sunday",    isFullDayOpening: true },
     ],
   });
+  const laPlageImgUrls = restaurantImages["la-plage-cafe-djerba"] ?? [];
+  const laPlageImgEx = await prisma.images.count({ where: { restaurantId: laPlage.id } });
+  if (laPlageImgEx === 0 && laPlageImgUrls.length > 0) {
+    await prisma.images.createMany({ data: laPlageImgUrls.map((url) => ({ url, restaurantId: laPlage.id })) });
+  }
 
   // Djerba restaurant 3 — Berber grill
   const leBerbere = await prisma.restaurant.upsert({
@@ -914,6 +1418,11 @@ async function main() {
       { restaurantId: leBerbere.id, day: "Sunday",    isClosed: true },
     ],
   });
+  const leBerbereImgUrls = restaurantImages["le-berbere-djerba"] ?? [];
+  const leBerbereImgEx = await prisma.images.count({ where: { restaurantId: leBerbere.id } });
+  if (leBerbereImgEx === 0 && leBerbereImgUrls.length > 0) {
+    await prisma.images.createMany({ data: leBerbereImgUrls.map((url) => ({ url, restaurantId: leBerbere.id })) });
+  }
 
   // Dubai restaurant 1 — Middle Eastern fine dining
   const spiceRoute = await prisma.restaurant.upsert({
@@ -969,6 +1478,11 @@ async function main() {
       { restaurantId: spiceRoute.id, day: "Sunday",    opening: "12:00", closing: "23:00", isClosed: false },
     ],
   });
+  const spiceRouteImgUrls = restaurantImages["the-spice-route-dubai"] ?? [];
+  const spiceRouteImgEx = await prisma.images.count({ where: { restaurantId: spiceRoute.id } });
+  if (spiceRouteImgEx === 0 && spiceRouteImgUrls.length > 0) {
+    await prisma.images.createMany({ data: spiceRouteImgUrls.map((url) => ({ url, restaurantId: spiceRoute.id })) });
+  }
 
   // Dubai restaurant 2 — marina café
   const marinaCafe = await prisma.restaurant.upsert({
@@ -1023,6 +1537,11 @@ async function main() {
       { restaurantId: marinaCafe.id, day: "Sunday",    opening: "08:00", closing: "23:00", isClosed: false },
     ],
   });
+  const marinaCafeImgUrls = restaurantImages["marina-cafe-lounge-dubai"] ?? [];
+  const marinaCafeImgEx = await prisma.images.count({ where: { restaurantId: marinaCafe.id } });
+  if (marinaCafeImgEx === 0 && marinaCafeImgUrls.length > 0) {
+    await prisma.images.createMany({ data: marinaCafeImgUrls.map((url) => ({ url, restaurantId: marinaCafe.id })) });
+  }
 
   // Dubai restaurant 3 — Emirati heritage
   const alFanar = await prisma.restaurant.upsert({
@@ -1076,6 +1595,11 @@ async function main() {
       { restaurantId: alFanar.id, day: "Sunday",    opening: "12:00", closing: "23:00", isClosed: false },
     ],
   });
+  const alFanarImgUrls = restaurantImages["al-fanar-dubai"] ?? [];
+  const alFanarImgEx = await prisma.images.count({ where: { restaurantId: alFanar.id } });
+  if (alFanarImgEx === 0 && alFanarImgUrls.length > 0) {
+    await prisma.images.createMany({ data: alFanarImgUrls.map((url) => ({ url, restaurantId: alFanar.id })) });
+  }
 
   console.log("  ✓ 6 restaurants created (3 Djerba + 3 Dubai)");
 
@@ -1291,7 +1815,7 @@ async function main() {
       slug:             "electric-bike-dubai-marina",
       title:            "Electric Bike — Dubai Marina",
       description:      "Eco-friendly e-bike for exploring Dubai Marina, JBR Walk, and Bluewaters Island. Battery range of 60km, helmet and lock included. Great for morning rides or sunset tours along the waterfront.",
-      type:             "BIKE" as const,
+      type:             "BICYCLE" as const,
       pricePerDay:      80,
       pricePerHour:     15,
       minDays:          1,
@@ -1333,20 +1857,30 @@ async function main() {
   ];
 
   for (const rental of djerbaRentals) {
-    await prisma.rental.upsert({
+    const createdRental = await prisma.rental.upsert({
       where:  { slug: rental.slug },
-      update: { ...rental, profileId: DJERBA_PROFILE_ID, destinationId: djerbaDest!.id },
-      create: { ...rental, profileId: DJERBA_PROFILE_ID, destinationId: djerbaDest!.id },
+      update: { ...rental, status: "ACTIVE", profileId: DJERBA_PROFILE_ID, destinationId: djerbaDest!.id },
+      create: { ...rental, status: "ACTIVE", profileId: DJERBA_PROFILE_ID, destinationId: djerbaDest!.id },
     });
+    const rentalUrls = rentalImages[rental.slug] ?? [];
+    const rentalImgEx = await prisma.images.count({ where: { rentalId: createdRental.id } });
+    if (rentalImgEx === 0 && rentalUrls.length > 0) {
+      await prisma.images.createMany({ data: rentalUrls.map((url) => ({ url, rentalId: createdRental.id })) });
+    }
     console.log(`  ✓ ${rental.title}`);
   }
 
   for (const rental of dubaiRentals) {
-    await prisma.rental.upsert({
+    const createdRental = await prisma.rental.upsert({
       where:  { slug: rental.slug },
-      update: { ...rental, profileId: DUBAI_PROFILE_ID, destinationId: dubaiDest!.id },
-      create: { ...rental, profileId: DUBAI_PROFILE_ID, destinationId: dubaiDest!.id },
+      update: { ...rental, status: "ACTIVE", profileId: DUBAI_PROFILE_ID, destinationId: dubaiDest!.id },
+      create: { ...rental, status: "ACTIVE", profileId: DUBAI_PROFILE_ID, destinationId: dubaiDest!.id },
     });
+    const rentalUrls = rentalImages[rental.slug] ?? [];
+    const rentalImgEx = await prisma.images.count({ where: { rentalId: createdRental.id } });
+    if (rentalImgEx === 0 && rentalUrls.length > 0) {
+      await prisma.images.createMany({ data: rentalUrls.map((url) => ({ url, rentalId: createdRental.id })) });
+    }
     console.log(`  ✓ ${rental.title}`);
   }
 
@@ -1354,177 +1888,216 @@ async function main() {
   console.log("\n── Shops ──");
 
   // Djerba shops
+  const djerbaShop1Data = {
+    name:              "Artisanat Djerba",
+    arabicName:        "حرف جربة",
+    description:       "A curated selection of handmade crafts from local Djerba artisans — ceramics, woven baskets, embroidered textiles, and olive wood pieces. Every item tells a story of the island.",
+    arabicDescription: "مجموعة مختارة من الحرف اليدوية المصنوعة من قِبَل حرفيين محليين من جربة — فخار وسلال منسوجة ومنسوجات مطرزة وقطع من خشب الزيتون.",
+    category:          "crafts",
+    country:           "Tunisia",
+    region:            "Djerba",
+    city:              "Houmt Souk",
+    address:           "Souk el Attarine, Houmt Souk",
+    location:          "https://maps.google.com/?q=Souk+el+Attarine+Houmt+Souk+Djerba",
+    coverPhoto:        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800",
+    logo:              "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=200",
+    note:              "4.8",
+    nbReviews:         24,
+    status:            "ACTIVE" as const,
+    isOpen:            true,
+    featuredInHome:    true,
+    deliveryMethods:   ["PICKUP", "DELIVERY"] as const,
+    deliveryFee:       500,
+    freeShippingAbove: 150,
+    profileId:         DJERBA_PROFILE_ID,
+    destinationId:     djerbaDest!.id,
+  };
   const djerbaShop1 = await prisma.shop.upsert({
-    where: { slug: "artisanat-djerba" },
-    update: {},
-    create: {
-      slug:              "artisanat-djerba",
-      name:              "Artisanat Djerba",
-      arabicName:        "حرف جربة",
-      description:       "A curated selection of handmade crafts from local Djerba artisans — ceramics, woven baskets, embroidered textiles, and olive wood pieces. Every item tells a story of the island.",
-      arabicDescription: "مجموعة مختارة من الحرف اليدوية المصنوعة من قِبَل حرفيين محليين من جربة — فخار وسلال منسوجة ومنسوجات مطرزة وقطع من خشب الزيتون.",
-      category:          "crafts",
-      country:           "Tunisia",
-      region:            "Djerba",
-      city:              "Houmt Souk",
-      address:           "Souk el Attarine, Houmt Souk",
-      coverPhoto:        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800",
-      logo:              "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=200",
-      note:              "4.8",
-      nbReviews:         24,
-      isOpen:            true,
-      featuredInHome:    true,
-      deliveryMethods:   ["PICKUP", "LOCAL_DELIVERY"],
-      freeShippingAbove: 150,
-      profileId:         DJERBA_PROFILE_ID,
-      destinationId:     djerbaDest!.id,
-    },
+    where:  { slug: "artisanat-djerba" },
+    update: djerbaShop1Data,
+    create: { slug: "artisanat-djerba", ...djerbaShop1Data },
   });
   console.log("  ✓ Artisanat Djerba");
 
+  const djerbaShop2Data = {
+    name:              "Épicerie du Sahel",
+    arabicName:        "بقالة الساحل",
+    description:       "Authentic Tunisian pantry essentials — harissa, dried rose petals, spice blends, organic olive oil, and seasonal local produce. Sourced directly from Tunisian farmers and cooperatives.",
+    arabicDescription: "أساسيات المطبخ التونسي الأصيلة — هريسة وبتلات الورد المجففة وخلطات التوابل وزيت الزيتون العضوي.",
+    category:          "spices",
+    country:           "Tunisia",
+    region:            "Djerba",
+    city:              "Midoun",
+    address:           "Marché Central, Midoun",
+    location:          "https://maps.google.com/?q=Marche+Central+Midoun+Djerba",
+    coverPhoto:        "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800",
+    logo:              "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200",
+    note:              "4.6",
+    nbReviews:         18,
+    status:            "ACTIVE" as const,
+    isOpen:            true,
+    featuredInHome:    false,
+    deliveryMethods:   ["PICKUP", "DELIVERY"] as const,
+    deliveryFee:       300,
+    freeShippingAbove: 200,
+    profileId:         DJERBA_PROFILE_ID,
+    destinationId:     djerbaDest!.id,
+  };
   const djerbaShop2 = await prisma.shop.upsert({
-    where: { slug: "epicerie-du-sahel" },
-    update: {},
-    create: {
-      slug:              "epicerie-du-sahel",
-      name:              "Épicerie du Sahel",
-      arabicName:        "بقالة الساحل",
-      description:       "Authentic Tunisian pantry essentials — harissa, dried rose petals, spice blends, organic olive oil, and seasonal local produce. Sourced directly from Tunisian farmers and cooperatives.",
-      arabicDescription: "أساسيات المطبخ التونسي الأصيلة — هريسة وبتلات الورد المجففة وخلطات التوابل وزيت الزيتون العضوي.",
-      category:          "spices",
-      country:           "Tunisia",
-      region:            "Djerba",
-      city:              "Midoun",
-      address:           "Marché Central, Midoun",
-      coverPhoto:        "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800",
-      logo:              "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200",
-      note:              "4.6",
-      nbReviews:         18,
-      isOpen:            true,
-      featuredInHome:    false,
-      deliveryMethods:   ["PICKUP", "LOCAL_DELIVERY", "NATIONWIDE"],
-      freeShippingAbove: 200,
-      profileId:         DJERBA_PROFILE_ID,
-      destinationId:     djerbaDest!.id,
-    },
+    where:  { slug: "epicerie-du-sahel" },
+    update: djerbaShop2Data,
+    create: { slug: "epicerie-du-sahel", ...djerbaShop2Data },
   });
   console.log("  ✓ Épicerie du Sahel");
 
+  const djerbaShop3Data = {
+    name:              "La Soierie de Houmt Souk",
+    arabicName:        "دار النسيج في حومة السوق",
+    description:       "Handloomed Tunisian textiles — wool blankets, silk scarves, traditional fouta towels, and embroidered table runners. All pieces are woven on traditional looms by local weavers.",
+    arabicDescription: "منسوجات تونسية منسوجة يدوياً — بطانيات صوفية وأوشحة حرير ومناشف فوطة تقليدية.",
+    category:          "textiles",
+    country:           "Tunisia",
+    region:            "Djerba",
+    city:              "Houmt Souk",
+    address:           "Rue de l'Artisanat, Houmt Souk",
+    location:          "https://maps.google.com/?q=Rue+Artisanat+Houmt+Souk+Djerba",
+    coverPhoto:        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
+    logo:              "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200",
+    note:              "4.7",
+    nbReviews:         15,
+    status:            "ACTIVE" as const,
+    isOpen:            true,
+    featuredInHome:    false,
+    deliveryMethods:   ["PICKUP", "DELIVERY"] as const,
+    deliveryFee:       800,
+    freeShippingAbove: 300,
+    profileId:         DJERBA_PROFILE_ID,
+    destinationId:     djerbaDest!.id,
+  };
   const djerbaShop3 = await prisma.shop.upsert({
-    where: { slug: "soierie-houmt-souk" },
-    update: {},
-    create: {
-      slug:              "soierie-houmt-souk",
-      name:              "La Soierie de Houmt Souk",
-      arabicName:        "دار النسيج في حومة السوق",
-      description:       "Handloomed Tunisian textiles — wool blankets, silk scarves, traditional fouta towels, and embroidered table runners. All pieces are woven on traditional looms by local weavers.",
-      arabicDescription: "منسوجات تونسية منسوجة يدوياً — بطانيات صوفية وأوشحة حرير ومناشف فوطة تقليدية.",
-      category:          "textiles",
-      country:           "Tunisia",
-      region:            "Djerba",
-      city:              "Houmt Souk",
-      address:           "Rue de l'Artisanat, Houmt Souk",
-      coverPhoto:        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
-      logo:              "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200",
-      note:              "4.7",
-      nbReviews:         15,
-      isOpen:            true,
-      featuredInHome:    false,
-      deliveryMethods:   ["PICKUP", "LOCAL_DELIVERY", "NATIONWIDE", "INTERNATIONAL"],
-      freeShippingAbove: 300,
-      profileId:         DJERBA_PROFILE_ID,
-      destinationId:     djerbaDest!.id,
-    },
+    where:  { slug: "soierie-houmt-souk" },
+    update: djerbaShop3Data,
+    create: { slug: "soierie-houmt-souk", ...djerbaShop3Data },
   });
   console.log("  ✓ La Soierie de Houmt Souk");
 
   // Dubai shops
+  const dubaiShop1Data = {
+    name:              "The Souk Collective",
+    arabicName:        "مجمع السوق",
+    description:       "A curated marketplace bringing together Dubai's finest artisan crafts — oud incense, hand-painted figurines, Arabic calligraphy prints, and mother-of-pearl pieces. A perfect stop for authentic souvenirs.",
+    arabicDescription: "سوق منتقى يجمع أفضل الحرف اليدوية في دبي — بخور عود وتماثيل مرسومة يدوياً ولوحات خط عربي.",
+    category:          "crafts",
+    country:           "UAE",
+    region:            "Dubai",
+    city:              "Dubai",
+    address:           "Al Fahidi Historical Neighbourhood, Bur Dubai",
+    location:          "https://maps.google.com/?q=Al+Fahidi+Historical+Neighbourhood+Dubai",
+    coverPhoto:        "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800",
+    logo:              "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=200",
+    note:              "4.9",
+    nbReviews:         41,
+    status:            "ACTIVE" as const,
+    isOpen:            true,
+    featuredInHome:    true,
+    deliveryMethods:   ["PICKUP", "DELIVERY"] as const,
+    deliveryFee:       1500,
+    freeShippingAbove: 500,
+    profileId:         DUBAI_PROFILE_ID,
+    destinationId:     dubaiDest!.id,
+  };
   const dubaiShop1 = await prisma.shop.upsert({
-    where: { slug: "the-souk-collective" },
-    update: {},
-    create: {
-      slug:              "the-souk-collective",
-      name:              "The Souk Collective",
-      arabicName:        "مجمع السوق",
-      description:       "A curated marketplace bringing together Dubai's finest artisan crafts — oud incense, hand-painted figurines, Arabic calligraphy prints, and mother-of-pearl pieces. A perfect stop for authentic souvenirs.",
-      arabicDescription: "سوق منتقى يجمع أفضل الحرف اليدوية في دبي — بخور عود وتماثيل مرسومة يدوياً ولوحات خط عربي.",
-      category:          "crafts",
-      country:           "UAE",
-      region:            "Dubai",
-      city:              "Dubai",
-      address:           "Al Fahidi Historical Neighbourhood, Bur Dubai",
-      coverPhoto:        "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800",
-      logo:              "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=200",
-      note:              "4.9",
-      nbReviews:         41,
-      isOpen:            true,
-      featuredInHome:    true,
-      deliveryMethods:   ["PICKUP", "LOCAL_DELIVERY", "INTERNATIONAL"],
-      freeShippingAbove: 500,
-      profileId:         DUBAI_PROFILE_ID,
-      destinationId:     dubaiDest!.id,
-    },
+    where:  { slug: "the-souk-collective" },
+    update: dubaiShop1Data,
+    create: { slug: "the-souk-collective", ...dubaiShop1Data },
   });
   console.log("  ✓ The Souk Collective");
 
+  const dubaiShop2Data = {
+    name:              "Desert Spice Market",
+    arabicName:        "سوق توابل الصحراء",
+    description:       "Premium Middle Eastern spices sourced directly from regional farms — saffron threads, sumac, za'atar, baharat, and hand-blended spice mixes. Everything a home chef needs to recreate authentic flavours.",
+    arabicDescription: "توابل الشرق الأوسط الفاخرة من المزارع الإقليمية — خيوط الزعفران والسماق والزعتر وبهارات وخلطات التوابل.",
+    category:          "spices",
+    country:           "UAE",
+    region:            "Dubai",
+    city:              "Dubai",
+    address:           "Spice Souk, Deira, Dubai",
+    location:          "https://maps.google.com/?q=Spice+Souk+Deira+Dubai",
+    coverPhoto:        "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800",
+    note:              "4.7",
+    nbReviews:         29,
+    status:            "ACTIVE" as const,
+    isOpen:            true,
+    featuredInHome:    false,
+    deliveryMethods:   ["PICKUP", "DELIVERY"] as const,
+    deliveryFee:       1000,
+    freeShippingAbove: 400,
+    profileId:         DUBAI_PROFILE_ID,
+    destinationId:     dubaiDest!.id,
+  };
   const dubaiShop2 = await prisma.shop.upsert({
-    where: { slug: "desert-spice-market" },
-    update: {},
-    create: {
-      slug:              "desert-spice-market",
-      name:              "Desert Spice Market",
-      arabicName:        "سوق توابل الصحراء",
-      description:       "Premium Middle Eastern spices sourced directly from regional farms — saffron threads, sumac, za'atar, baharat, and hand-blended spice mixes. Everything a home chef needs to recreate authentic flavours.",
-      arabicDescription: "توابل الشرق الأوسط الفاخرة من المزارع الإقليمية — خيوط الزعفران والسماق والزعتر وبهارات وخلطات التوابل.",
-      category:          "spices",
-      country:           "UAE",
-      region:            "Dubai",
-      city:              "Dubai",
-      address:           "Spice Souk, Deira, Dubai",
-      coverPhoto:        "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800",
-      note:              "4.7",
-      nbReviews:         29,
-      isOpen:            true,
-      featuredInHome:    false,
-      deliveryMethods:   ["PICKUP", "LOCAL_DELIVERY", "NATIONWIDE", "INTERNATIONAL"],
-      freeShippingAbove: 400,
-      profileId:         DUBAI_PROFILE_ID,
-      destinationId:     dubaiDest!.id,
-    },
+    where:  { slug: "desert-spice-market" },
+    update: dubaiShop2Data,
+    create: { slug: "desert-spice-market", ...dubaiShop2Data },
   });
   console.log("  ✓ Desert Spice Market");
 
+  const dubaiShop3Data = {
+    name:              "Nomad Leather",
+    arabicName:        "نوماد للجلديات",
+    description:       "Handcrafted leather goods made by skilled Dubai artisans — camel leather wallets, hand-stitched clutch bags, and premium belts. Every piece is unique and made to last.",
+    arabicDescription: "منتجات جلدية مصنوعة يدوياً من قِبَل حرفيين مهرة في دبي — محافظ من جلد الإبل وحقائب مخيطة يدوياً وأحزمة فاخرة.",
+    category:          "leather",
+    country:           "UAE",
+    region:            "Dubai",
+    city:              "Dubai",
+    address:           "Gold Souk Area, Deira, Dubai",
+    location:          "https://maps.google.com/?q=Gold+Souk+Deira+Dubai",
+    coverPhoto:        "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800",
+    note:              "4.8",
+    nbReviews:         22,
+    status:            "ACTIVE" as const,
+    isOpen:            true,
+    featuredInHome:    false,
+    deliveryMethods:   ["PICKUP", "DELIVERY"] as const,
+    deliveryFee:       1200,
+    minOrderAmount:    100,
+    profileId:         DUBAI_PROFILE_ID,
+    destinationId:     dubaiDest!.id,
+  };
   const dubaiShop3 = await prisma.shop.upsert({
-    where: { slug: "nomad-leather-dubai" },
-    update: {},
-    create: {
-      slug:              "nomad-leather-dubai",
-      name:              "Nomad Leather",
-      arabicName:        "نوماد للجلديات",
-      description:       "Handcrafted leather goods made by skilled Dubai artisans — camel leather wallets, hand-stitched clutch bags, and premium belts. Every piece is unique and made to last.",
-      arabicDescription: "منتجات جلدية مصنوعة يدوياً من قِبَل حرفيين مهرة في دبي — محافظ من جلد الإبل وحقائب مخيطة يدوياً وأحزمة فاخرة.",
-      category:          "leather",
-      country:           "UAE",
-      region:            "Dubai",
-      city:              "Dubai",
-      address:           "Gold Souk Area, Deira, Dubai",
-      coverPhoto:        "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800",
-      note:              "4.8",
-      nbReviews:         22,
-      isOpen:            true,
-      featuredInHome:    false,
-      deliveryMethods:   ["PICKUP", "LOCAL_DELIVERY", "INTERNATIONAL"],
-      minOrderAmount:    100,
-      profileId:         DUBAI_PROFILE_ID,
-      destinationId:     dubaiDest!.id,
-    },
+    where:  { slug: "nomad-leather-dubai" },
+    update: dubaiShop3Data,
+    create: { slug: "nomad-leather-dubai", ...dubaiShop3Data },
   });
   console.log("  ✓ Nomad Leather");
+
+  // ─── SHOP HOURS ─────────────────────────────────────────────────────────────
+  console.log("\n── Shop Hours ──");
+
+  const DEFAULT_SHOP_HOURS = [
+    { day: "Monday",    opening: "09:00", closing: "20:00", isClosed: false, isFullDayOpening: false },
+    { day: "Tuesday",   opening: "09:00", closing: "20:00", isClosed: false, isFullDayOpening: false },
+    { day: "Wednesday", opening: "09:00", closing: "20:00", isClosed: false, isFullDayOpening: false },
+    { day: "Thursday",  opening: "09:00", closing: "20:00", isClosed: false, isFullDayOpening: false },
+    { day: "Friday",    opening: null,    closing: null,    isClosed: true,  isFullDayOpening: false },
+    { day: "Saturday",  opening: "09:00", closing: "22:00", isClosed: false, isFullDayOpening: false },
+    { day: "Sunday",    opening: "10:00", closing: "18:00", isClosed: false, isFullDayOpening: false },
+  ];
+
+  for (const shop of [djerbaShop1, djerbaShop2, djerbaShop3, dubaiShop1, dubaiShop2, dubaiShop3]) {
+    await prisma.shopHours.deleteMany({ where: { shopId: shop.id } });
+    await prisma.shopHours.createMany({
+      data: DEFAULT_SHOP_HOURS.map((h) => ({ ...h, shopId: shop.id })),
+    });
+  }
+  console.log("  ✓ Shop hours seeded for 6 shops");
 
   // ─── PRODUCTS ───────────────────────────────────────────────────────────────
   console.log("\n── Products ──");
 
-  // Artisanat Djerba products
+  // ── Artisanat Djerba — 9 products (crafts + ceramics + textiles)
   const djerbaProducts = [
     {
       slug: "berber-ceramic-bowl-djerba",
@@ -1532,15 +2105,11 @@ async function main() {
       arabicName: "طبق خزفي بربري",
       description: "Handcrafted ceramic bowl with traditional Berber geometric patterns. Hand-painted by local artisans using natural pigments. Perfect for serving or as a decorative piece.",
       arabicDescription: "طبق خزفي مصنوع يدوياً بزخارف هندسية بربرية تقليدية.",
-      price: 45,
-      comparePrice: 60,
-      category: "ceramics",
-      material: "Ceramic",
-      origin: "Djerba, Tunisia",
-      weight: 400,
-      stock: 12,
-      isHandmade: true,
+      price: 45, comparePrice: 60,
+      category: "ceramics", material: "Ceramic", origin: "Djerba, Tunisia", weight: 400, stock: 12,
+      isHandmade: true, featured: true,
       tags: ["ceramic", "berber", "handmade", "souvenir", "djerba"],
+      imageUrl: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600",
       shopId: djerbaShop1.id,
     },
     {
@@ -1550,13 +2119,10 @@ async function main() {
       description: "Set of 6 decorative tiles hand-painted with traditional Djerbian motifs — blue, white, and terracotta tones. Ideal for kitchen splashbacks or wall decoration.",
       arabicDescription: "طقم من 6 بلاطات زخرفية مرسومة يدوياً بزخارف جربية تقليدية.",
       price: 85,
-      category: "ceramics",
-      material: "Glazed ceramic",
-      origin: "Djerba, Tunisia",
-      weight: 1200,
-      stock: 8,
+      category: "ceramics", material: "Glazed ceramic", origin: "Djerba, Tunisia", weight: 1200, stock: 8,
       isHandmade: true,
       tags: ["tile", "ceramic", "handpainted", "djerba", "decor"],
+      imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600",
       shopId: djerbaShop1.id,
     },
     {
@@ -1566,13 +2132,10 @@ async function main() {
       description: "Traditional basket woven from dried palm leaves by Djerban craftswomen. Lightweight and sturdy — great as a beach bag or market tote.",
       arabicDescription: "سلة تقليدية منسوجة من أوراق النخيل المجففة على يد حرفيات جربيات.",
       price: 30,
-      category: "crafts",
-      material: "Palm leaf",
-      origin: "Djerba, Tunisia",
-      weight: 200,
-      stock: 20,
+      category: "crafts", material: "Palm leaf", origin: "Djerba, Tunisia", weight: 200, stock: 20,
       isHandmade: true,
       tags: ["basket", "palm", "woven", "beach", "eco"],
+      imageUrl: "https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=600",
       shopId: djerbaShop1.id,
     },
     {
@@ -1581,16 +2144,11 @@ async function main() {
       arabicName: "غطاء وسادة مطرز",
       description: "Vibrant cushion cover hand-embroidered with traditional Tunisian patterns. 45×45 cm. Each one is unique — slight variations are part of the handmade character.",
       arabicDescription: "غطاء وسادة نابض بالألوان مطرز يدوياً بزخارف تونسية تقليدية.",
-      price: 38,
-      comparePrice: 50,
-      category: "textiles",
-      material: "Cotton + silk thread",
-      origin: "Djerba, Tunisia",
-      weight: 150,
-      stock: 15,
-      isHandmade: true,
-      featured: true,
+      price: 38, comparePrice: 50,
+      category: "textiles", material: "Cotton + silk thread", origin: "Djerba, Tunisia", weight: 150, stock: 15,
+      isHandmade: true, featured: true,
       tags: ["cushion", "embroidery", "textile", "handmade"],
+      imageUrl: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600",
       shopId: djerbaShop1.id,
     },
     {
@@ -1600,19 +2158,67 @@ async function main() {
       description: "Natural olive wood serving board with beautiful grain patterns. Each board is unique. Hand-finished with food-safe oil. Perfect for cheese, bread, or as a kitchen display piece.",
       arabicDescription: "لوح تقديم طبيعي من خشب الزيتون بأنماط حبوب جميلة. كل لوح فريد من نوعه.",
       price: 55,
-      category: "crafts",
-      material: "Olive wood",
-      origin: "Djerba, Tunisia",
-      weight: 600,
-      stock: 10,
-      isHandmade: true,
-      featured: true,
+      category: "crafts", material: "Olive wood", origin: "Djerba, Tunisia", weight: 600, stock: 10,
+      isHandmade: true, featured: true,
       tags: ["olive wood", "serving board", "kitchen", "natural"],
+      imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600",
+      shopId: djerbaShop1.id,
+    },
+    {
+      slug: "terracotta-vase-djerba",
+      name: "Terracotta Vase",
+      arabicName: "مزهرية فخارية",
+      description: "Hand-thrown terracotta vase with an earthy, natural finish. Inspired by ancient Djerbian pottery traditions. Perfect for dried flowers or as a standalone decorative object.",
+      arabicDescription: "مزهرية فخارية مصنوعة يدوياً بلمسة نهائية طبيعية ترابية. مستوحاة من تقاليد الفخار الجربي القديمة.",
+      price: 40,
+      category: "ceramics", material: "Terracotta", origin: "Djerba, Tunisia", weight: 500, stock: 9,
+      isHandmade: true,
+      tags: ["vase", "terracotta", "pottery", "decor", "djerba"],
+      imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600",
+      shopId: djerbaShop1.id,
+    },
+    {
+      slug: "painted-wooden-jewellery-box-djerba",
+      name: "Painted Wooden Jewellery Box",
+      arabicName: "صندوق مجوهرات خشبي مطلي",
+      description: "Small wooden jewellery box hand-painted with geometric Berber motifs in indigo and gold. Hinged lid, velvet-lined interior. A beautiful keepsake or gift.",
+      arabicDescription: "صندوق مجوهرات خشبي صغير مطلي يدوياً بزخارف هندسية بربرية باللون النيلي والذهبي.",
+      price: 48, comparePrice: 65,
+      category: "crafts", material: "Wood + natural paint", origin: "Djerba, Tunisia", weight: 300, stock: 7,
+      isHandmade: true,
+      tags: ["jewellery box", "wooden", "painted", "berber", "gift"],
+      imageUrl: "https://images.unsplash.com/photo-1561532178-5b6d89e0abd0?w=600",
+      shopId: djerbaShop1.id,
+    },
+    {
+      slug: "hand-knotted-rug-djerba",
+      name: "Hand-knotted Kilim Rug (60×90 cm)",
+      arabicName: "سجادة كيليم مربوطة يدوياً (60×90 سم)",
+      description: "Small hand-knotted kilim rug in bold Berber colour combinations — red, black, and natural cream. 100% wool. Perfect as a wall hanging or accent rug.",
+      arabicDescription: "سجادة كيليم صغيرة مربوطة يدوياً بمجموعات ألوان بربرية جريئة — أحمر وأسود وكريمي طبيعي.",
+      price: 95, comparePrice: 120,
+      category: "textiles", material: "100% wool", origin: "Djerba, Tunisia", weight: 800, stock: 5,
+      isHandmade: true, featured: true,
+      tags: ["rug", "kilim", "berber", "wool", "handknotted"],
+      imageUrl: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=600",
+      shopId: djerbaShop1.id,
+    },
+    {
+      slug: "ceramic-tagine-djerba",
+      name: "Decorative Ceramic Tagine",
+      arabicName: "طاجين خزفي زخرفي",
+      description: "Hand-painted ceramic tagine with traditional Djerbian motifs. Suitable for serving cold dishes or as a decorative centrepiece. Not intended for direct heat.",
+      arabicDescription: "طاجين خزفي مرسوم يدوياً بزخارف جربية تقليدية. مناسب لتقديم الأطباق الباردة أو كقطعة زخرفية.",
+      price: 70,
+      category: "ceramics", material: "Glazed ceramic", origin: "Djerba, Tunisia", weight: 900, stock: 6,
+      isHandmade: true,
+      tags: ["tagine", "ceramic", "decorative", "djerba", "kitchen"],
+      imageUrl: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600",
       shopId: djerbaShop1.id,
     },
   ];
 
-  // Épicerie du Sahel products
+  // ── Épicerie du Sahel — 9 products (food, spices, wellness)
   const epicerieProducts = [
     {
       slug: "harissa-250g-djerba",
@@ -1621,14 +2227,10 @@ async function main() {
       description: "Authentic Tunisian harissa paste made from sun-dried red peppers, garlic, olive oil, and spices. Medium heat. A staple of Tunisian cuisine.",
       arabicDescription: "معجون الهريسة التونسية الأصيلة مصنوع من الفلفل الأحمر المجفف بالشمس والثوم وزيت الزيتون والتوابل.",
       price: 18,
-      category: "food_drink",
-      material: null,
-      origin: "Tunisia",
-      weight: 300,
-      stock: 30,
-      isHandmade: false,
-      featured: true,
+      category: "food_drink", origin: "Tunisia", weight: 300, stock: 30,
+      isHandmade: false, featured: true,
       tags: ["harissa", "condiment", "spicy", "tunisian", "food"],
+      imageUrl: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600",
       shopId: djerbaShop2.id,
     },
     {
@@ -1638,12 +2240,10 @@ async function main() {
       description: "Classic Tunisian tabil — a fragrant blend of coriander, caraway, garlic, and chilli. The secret ingredient in most Tunisian dishes. Freshly ground.",
       arabicDescription: "تابل تونسي كلاسيكي — مزيج عطري من الكزبرة والكراوية والثوم والفلفل الحار.",
       price: 12,
-      category: "food_drink",
-      origin: "Tunisia",
-      weight: 120,
-      stock: 40,
+      category: "food_drink", origin: "Tunisia", weight: 120, stock: 40,
       isHandmade: false,
       tags: ["spice", "tabil", "tunisian", "seasoning"],
+      imageUrl: "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=600",
       shopId: djerbaShop2.id,
     },
     {
@@ -1652,15 +2252,11 @@ async function main() {
       arabicName: "زيت زيتون عضوي (500 مل)",
       description: "First cold-press extra virgin olive oil from Djerba's ancient olive groves. Certified organic. Rich, fruity flavour with low acidity. A Tunisian national treasure.",
       arabicDescription: "زيت الزيتون البكر الممتاز من أول ضغط بارد من بساتين الزيتون القديمة في جربة. عضوي معتمد.",
-      price: 28,
-      comparePrice: 35,
-      category: "food_drink",
-      origin: "Djerba, Tunisia",
-      weight: 600,
-      stock: 25,
-      isHandmade: false,
-      featured: true,
+      price: 28, comparePrice: 35,
+      category: "food_drink", origin: "Djerba, Tunisia", weight: 600, stock: 25,
+      isHandmade: false, featured: true,
       tags: ["olive oil", "organic", "djerba", "cooking"],
+      imageUrl: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=600",
       shopId: djerbaShop2.id,
     },
     {
@@ -1670,34 +2266,92 @@ async function main() {
       description: "Fragrant dried rose petals from Tunisian gardens — used in teas, desserts, and cooking. Also beautiful as a natural home fragrance or bath soak.",
       arabicDescription: "بتلات ورد مجففة عطرة من الحدائق التونسية — تستخدم في الشاي والحلويات والطبخ.",
       price: 14,
-      category: "wellness",
-      origin: "Tunisia",
-      weight: 80,
-      stock: 20,
+      category: "wellness", origin: "Tunisia", weight: 80, stock: 20,
       isHandmade: false,
       tags: ["rose", "tea", "wellness", "fragrance", "natural"],
+      imageUrl: "https://images.unsplash.com/photo-1548438294-1ad5d5f4f063?w=600",
+      shopId: djerbaShop2.id,
+    },
+    {
+      slug: "djerba-wildflower-honey-djerba",
+      name: "Djerba Wildflower Honey (350g)",
+      arabicName: "عسل الأزهار البرية من جربة (350 غ)",
+      description: "Raw, unfiltered wildflower honey from Djerba's coastal hives. Light floral aroma, golden colour, and a clean sweet finish. Harvested twice yearly by local beekeepers.",
+      arabicDescription: "عسل الأزهار البرية الخام غير المصفى من خلايا النحل الساحلية في جربة.",
+      price: 22,
+      category: "food_drink", origin: "Djerba, Tunisia", weight: 400, stock: 18,
+      isHandmade: false,
+      tags: ["honey", "raw", "natural", "djerba", "local"],
+      imageUrl: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600",
+      shopId: djerbaShop2.id,
+    },
+    {
+      slug: "fig-jam-djerba",
+      name: "Homemade Fig Jam (200g)",
+      arabicName: "مربى التين البيتي (200 غ)",
+      description: "Artisanal fig jam made from Djerba's sun-ripened figs, sugar, and a squeeze of lemon. No preservatives, no additives. Pairs perfectly with fresh bread, cheese, or yogurt.",
+      arabicDescription: "مربى التين الحرفية مصنوعة من تين جربة الناضج بالشمس والسكر وعصير الليمون. بدون مواد حافظة.",
+      price: 16,
+      category: "food_drink", origin: "Djerba, Tunisia", weight: 250, stock: 22,
+      isHandmade: true,
+      tags: ["jam", "fig", "homemade", "artisan", "local"],
+      imageUrl: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=600",
+      shopId: djerbaShop2.id,
+    },
+    {
+      slug: "spearmint-tea-blend-djerba",
+      name: "Spearmint & Green Tea Blend (80g)",
+      arabicName: "خلطة النعناع والشاي الأخضر (80 غ)",
+      description: "Classic Tunisian afternoon tea blend — spearmint, green tea, and a touch of dried verbena. Brew strong, sweeten with sugar, and serve in small glasses. The taste of Djerba hospitality.",
+      arabicDescription: "خلطة الشاي التونسي الكلاسيكية للعصر — نعناع وشاي أخضر ولمسة من الليمون المجفف.",
+      price: 10,
+      category: "food_drink", origin: "Tunisia", weight: 100, stock: 35,
+      isHandmade: false,
+      tags: ["tea", "mint", "tunisian", "herbal", "drink"],
+      imageUrl: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600",
+      shopId: djerbaShop2.id,
+    },
+    {
+      slug: "argan-oil-djerba",
+      name: "Pure Argan Oil (100ml)",
+      arabicName: "زيت الأرغان النقي (100 مل)",
+      description: "Cold-pressed culinary argan oil from the Maghreb. Nutty, rich flavour — drizzle over salads, couscous, or use as a dipping oil. Also prized for skin and hair care.",
+      arabicDescription: "زيت الأرغان الغذائي المعصور على البارد من المغرب العربي. نكهة غنية بالمكسرات.",
+      price: 32, comparePrice: 42,
+      category: "wellness", origin: "Morocco (via Tunisia)", weight: 150, stock: 12,
+      isHandmade: false, featured: true,
+      tags: ["argan", "oil", "organic", "beauty", "cooking"],
+      imageUrl: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600",
+      shopId: djerbaShop2.id,
+    },
+    {
+      slug: "couscous-semolina-djerba",
+      name: "Fine Couscous Semolina (500g)",
+      arabicName: "سميد الكسكسي الناعم (500 غ)",
+      description: "Stone-ground fine semolina for making traditional Tunisian couscous. Sourced from durum wheat grown in the Sahel. Cook in a traditional couscoussier for best results.",
+      arabicDescription: "سميد ناعم مطحون بالحجارة لصنع الكسكسي التونسي التقليدي. مصدره قمح الدريم المزروع في الساحل.",
+      price: 8,
+      category: "food_drink", origin: "Tunisia", weight: 550, stock: 50,
+      isHandmade: false,
+      tags: ["couscous", "semolina", "tunisian", "staple", "food"],
+      imageUrl: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600",
       shopId: djerbaShop2.id,
     },
   ];
 
-  // La Soierie products
+  // ── La Soierie de Houmt Souk — 8 products (textiles + clothing)
   const soierieProducts = [
     {
       slug: "handloomed-wool-blanket-djerba",
       name: "Hand-loomed Wool Blanket",
       arabicName: "بطانية صوفية منسوجة يدوياً",
       description: "Thick wool blanket woven on a traditional loom by Djerban weavers. Natural undyed wool with geometric stripe patterns. Warm, durable, and beautiful.",
-      arabicDescription: "بطانية صوف سميكة منسوجة على نول تقليدي من قِبَل نساجي جربة. صوف طبيعي غير مصبوغ بأنماط هندسية.",
-      price: 120,
-      comparePrice: 150,
-      category: "textiles",
-      material: "Merino wool",
-      origin: "Djerba, Tunisia",
-      weight: 1400,
-      stock: 6,
-      isHandmade: true,
-      featured: true,
+      arabicDescription: "بطانية صوف سميكة منسوجة على نول تقليدي من قِبَل نساجي جربة.",
+      price: 120, comparePrice: 150,
+      category: "textiles", material: "Merino wool", origin: "Djerba, Tunisia", weight: 1400, stock: 6,
+      isHandmade: true, featured: true,
       tags: ["blanket", "wool", "handloomed", "warm", "djerba"],
+      imageUrl: "https://images.unsplash.com/photo-1588194074936-b498b4d7f68e?w=600",
       shopId: djerbaShop3.id,
     },
     {
@@ -1707,13 +2361,10 @@ async function main() {
       description: "The iconic Tunisian fouta — a lightweight flat-woven towel used as a beach towel, sarong, or scarf. 100% cotton, quick-drying. Available in natural stripes.",
       arabicDescription: "الفوطة التونسية الأيقونية — منشفة خفيفة الوزن تستخدم كمنشفة شاطئ أو إزار.",
       price: 35,
-      category: "textiles",
-      material: "100% cotton",
-      origin: "Djerba, Tunisia",
-      weight: 300,
-      stock: 18,
+      category: "textiles", material: "100% cotton", origin: "Djerba, Tunisia", weight: 300, stock: 18,
       isHandmade: true,
       tags: ["fouta", "towel", "cotton", "beach", "tunisian"],
+      imageUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600",
       shopId: djerbaShop3.id,
     },
     {
@@ -1723,18 +2374,80 @@ async function main() {
       description: "Elegant linen table runner with hand-embroidered traditional motifs at each end. 40×140 cm. Natural linen with deep blue and terracotta thread.",
       arabicDescription: "مفرش طاولة أنيق من الكتان مع زخارف تقليدية مطرزة يدوياً.",
       price: 48,
-      category: "textiles",
-      material: "Linen + silk thread",
-      origin: "Djerba, Tunisia",
-      weight: 200,
-      stock: 10,
+      category: "textiles", material: "Linen + silk thread", origin: "Djerba, Tunisia", weight: 200, stock: 10,
       isHandmade: true,
       tags: ["table runner", "embroidery", "linen", "home decor"],
+      imageUrl: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600",
+      shopId: djerbaShop3.id,
+    },
+    {
+      slug: "silk-scarf-djerba",
+      name: "Hand-painted Silk Scarf",
+      arabicName: "وشاح حريري مرسوم يدوياً",
+      description: "Luxurious silk scarf hand-painted with watercolour-style Djerbian motifs — olive branches, sea waves, and geometric patterns. 45×180 cm. A wearable piece of art.",
+      arabicDescription: "وشاح حريري فاخر مرسوم يدوياً بتصاميم جربية — أغصان الزيتون وأمواج البحر والزخارف الهندسية.",
+      price: 75, comparePrice: 95,
+      category: "clothing", material: "100% silk", origin: "Djerba, Tunisia", weight: 90, stock: 8,
+      isHandmade: true, featured: true,
+      tags: ["scarf", "silk", "painted", "fashion", "gift"],
+      imageUrl: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=600",
+      shopId: djerbaShop3.id,
+    },
+    {
+      slug: "cotton-kaftan-djerba",
+      name: "Traditional Cotton Kaftan",
+      arabicName: "قفطان قطني تقليدي",
+      description: "Lightweight cotton kaftan with subtle embroidery at the neckline and cuffs. Airy and comfortable — perfect for warm evenings in Djerba. One size fits most.",
+      arabicDescription: "قفطان قطني خفيف الوزن مع تطريز رقيق عند الياقة والأكمام. هوائي ومريح.",
+      price: 65,
+      category: "clothing", material: "100% cotton", origin: "Djerba, Tunisia", weight: 350, stock: 12,
+      isHandmade: true,
+      tags: ["kaftan", "cotton", "traditional", "tunisian", "clothing"],
+      imageUrl: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600",
+      shopId: djerbaShop3.id,
+    },
+    {
+      slug: "woven-placemats-set-djerba",
+      name: "Woven Placemat Set (4 pcs)",
+      arabicName: "طقم مفارش المائدة المنسوجة (4 قطع)",
+      description: "Set of 4 hand-woven cotton placemats with traditional stripe patterns. 30×45 cm each. Machine washable. Natural undyed cotton with terracotta and indigo accents.",
+      arabicDescription: "طقم من 4 مفارش مائدة قطنية منسوجة يدوياً بأنماط خطوط تقليدية.",
+      price: 42,
+      category: "textiles", material: "100% cotton", origin: "Djerba, Tunisia", weight: 400, stock: 14,
+      isHandmade: true,
+      tags: ["placemats", "woven", "table", "cotton", "set"],
+      imageUrl: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600",
+      shopId: djerbaShop3.id,
+    },
+    {
+      slug: "embroidered-tote-bag-djerba",
+      name: "Embroidered Canvas Tote Bag",
+      arabicName: "حقيبة كانفاس مطرزة",
+      description: "Sturdy canvas tote bag with a large hand-embroidered Djerbian motif on the front. 38×42 cm with two long handles. Great as a shopping bag, beach bag, or everyday carry.",
+      arabicDescription: "حقيبة كانفاس متينة مع زخرفة جربية كبيرة مطرزة يدوياً في الأمام.",
+      price: 28,
+      category: "accessories", material: "Canvas + cotton thread", origin: "Djerba, Tunisia", weight: 250, stock: 16,
+      isHandmade: true,
+      tags: ["tote", "bag", "embroidered", "canvas", "eco"],
+      imageUrl: "https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=600",
+      shopId: djerbaShop3.id,
+    },
+    {
+      slug: "berber-cushion-set-djerba",
+      name: "Berber Cushion Set (2 pcs)",
+      arabicName: "طقم وسائد بربرية (قطعتان)",
+      description: "Pair of handwoven Berber-patterned cushion covers in red, black, and natural cream. 45×45 cm. Zip closure, removable. Cushion inserts not included.",
+      arabicDescription: "زوج من أغطية الوسائد بنقوش بربرية منسوجة يدوياً باللون الأحمر والأسود والكريمي الطبيعي.",
+      price: 60, comparePrice: 75,
+      category: "textiles", material: "Wool + cotton", origin: "Djerba, Tunisia", weight: 500, stock: 9,
+      isHandmade: true,
+      tags: ["cushion", "berber", "woven", "set", "home decor"],
+      imageUrl: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=600",
       shopId: djerbaShop3.id,
     },
   ];
 
-  // The Souk Collective products
+  // ── The Souk Collective — 10 products (crafts + wellness + jewelry)
   const soukProducts = [
     {
       slug: "oud-incense-sticks-dubai",
@@ -1742,16 +2455,11 @@ async function main() {
       arabicName: "عيدان بخور العود (20 قطعة)",
       description: "Premium Arabian oud incense sticks. Rich, woody fragrance — the scent of the Gulf. Hand-rolled using traditional methods. Burns for approx. 45 minutes per stick.",
       arabicDescription: "عيدان بخور العود العربي الفاخر. عطر خشبي غني — رائحة الخليج. ملفوفة يدوياً بالطرق التقليدية.",
-      price: 65,
-      comparePrice: 80,
-      category: "wellness",
-      material: "Oud wood",
-      origin: "Dubai, UAE",
-      weight: 100,
-      stock: 30,
-      isHandmade: false,
-      featured: true,
+      price: 65, comparePrice: 80,
+      category: "wellness", material: "Oud wood", origin: "Dubai, UAE", weight: 100, stock: 30,
+      isHandmade: false, featured: true,
       tags: ["oud", "incense", "fragrance", "arabic", "luxury"],
+      imageUrl: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600",
       shopId: dubaiShop1.id,
     },
     {
@@ -1761,14 +2469,10 @@ async function main() {
       description: "Hand-drawn Arabic calligraphy art print on premium archival paper. Each print features a classic Arabic poem or proverb. Signed and numbered. Framing instructions included.",
       arabicDescription: "لوحة فنية بالخط العربي مرسومة يدوياً على ورق أرشيفي فاخر.",
       price: 90,
-      category: "crafts",
-      material: "Archival paper + ink",
-      origin: "Dubai, UAE",
-      weight: 200,
-      stock: 8,
-      isHandmade: true,
-      featured: true,
+      category: "crafts", material: "Archival paper + ink", origin: "Dubai, UAE", weight: 200, stock: 8,
+      isHandmade: true, featured: true,
       tags: ["calligraphy", "art", "arabic", "print", "gift"],
+      imageUrl: "https://images.unsplash.com/photo-1482160549825-59d1b23cb208?w=600",
       shopId: dubaiShop1.id,
     },
     {
@@ -1778,13 +2482,10 @@ async function main() {
       description: "Detailed ceramic camel figurine hand-painted by Dubai artisans. 15 cm tall. Each one is slightly unique. A classic Gulf souvenir with an artistic touch.",
       arabicDescription: "تمثال جمل خزفي مفصل مرسوم يدوياً من قِبَل حرفيين دبيين.",
       price: 42,
-      category: "crafts",
-      material: "Ceramic",
-      origin: "Dubai, UAE",
-      weight: 350,
-      stock: 15,
+      category: "crafts", material: "Ceramic", origin: "Dubai, UAE", weight: 350, stock: 15,
       isHandmade: true,
       tags: ["camel", "figurine", "souvenir", "ceramic", "dubai"],
+      imageUrl: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600",
       shopId: dubaiShop1.id,
     },
     {
@@ -1794,18 +2495,93 @@ async function main() {
       description: "Intricately inlaid mother-of-pearl box handcrafted in the old souk tradition. Perfect for jewelry, trinkets, or as a display piece. Approximately 10×7 cm.",
       arabicDescription: "صندوق مُرصَّع بصدف اللؤلؤ مصنوع يدوياً وفق تقاليد السوق القديم.",
       price: 75,
-      category: "crafts",
-      material: "Wood + mother-of-pearl",
-      origin: "Dubai, UAE",
-      weight: 250,
-      stock: 12,
+      category: "crafts", material: "Wood + mother-of-pearl", origin: "Dubai, UAE", weight: 250, stock: 12,
       isHandmade: true,
       tags: ["pearl", "box", "inlay", "gift", "luxury"],
+      imageUrl: "https://images.unsplash.com/photo-1561532178-5b6d89e0abd0?w=600",
+      shopId: dubaiShop1.id,
+    },
+    {
+      slug: "brass-dallah-coffee-pot-dubai",
+      name: "Brass Dallah Coffee Pot",
+      arabicName: "دلة قهوة نحاسية",
+      description: "Traditional Gulf dallah hand-crafted from brass. Used for serving Arabic coffee (qahwa). Height: 30 cm. An iconic piece of Gulf heritage, perfect for home display or ceremonial use.",
+      arabicDescription: "دلة الخليج التقليدية مصنوعة يدوياً من النحاس. تستخدم لتقديم القهوة العربية.",
+      price: 130, comparePrice: 160,
+      category: "crafts", material: "Brass", origin: "Dubai, UAE", weight: 700, stock: 5,
+      isHandmade: true, featured: true,
+      tags: ["dallah", "brass", "coffee", "gulf", "heritage"],
+      imageUrl: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600",
+      shopId: dubaiShop1.id,
+    },
+    {
+      slug: "evil-eye-necklace-dubai",
+      name: "Evil Eye Nazar Necklace",
+      arabicName: "عقد عين نظر (عين الحسد)",
+      description: "Handmade glass evil eye pendant on a 925 sterling silver chain. The iconic blue nazar bead — believed to ward off negative energy. Length: 45 cm. Comes in a gift box.",
+      arabicDescription: "قلادة عين نظر مصنوعة يدوياً من الزجاج على سلسلة فضية عيار 925.",
+      price: 55, comparePrice: 70,
+      category: "jewelry", material: "Glass + sterling silver", origin: "Dubai, UAE", weight: 20, stock: 20,
+      isHandmade: true,
+      tags: ["evil eye", "nazar", "necklace", "jewelry", "protection"],
+      imageUrl: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600",
+      shopId: dubaiShop1.id,
+    },
+    {
+      slug: "sand-art-bottle-dubai",
+      name: "Desert Sand Art Bottle",
+      arabicName: "زجاجة فن الرمال الصحراوية",
+      description: "Handcrafted glass bottle with layered coloured desert sand forming a scenic landscape — dunes, camels, and a sunset sky. Each one is a unique, one-of-a-kind piece.",
+      arabicDescription: "زجاجة زجاجية مصنوعة يدوياً برمال صحراوية ملونة تشكّل مشهداً طبيعياً — كثبان ورسوم وسماء غروب.",
+      price: 35,
+      category: "crafts", material: "Glass + sand", origin: "Dubai, UAE", weight: 300, stock: 18,
+      isHandmade: true,
+      tags: ["sand art", "bottle", "souvenir", "unique", "dubai"],
+      imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600",
+      shopId: dubaiShop1.id,
+    },
+    {
+      slug: "arabic-perfume-oil-dubai",
+      name: "Arabian Perfume Oil (12ml)",
+      arabicName: "زيت عطر عربي (12 مل)",
+      description: "Concentrated Arabian perfume oil — a blend of rose, oud, amber, and musk. Long-lasting, alcohol-free. Apply to pulse points. A signature Gulf fragrance in a hand-decorated bottle.",
+      arabicDescription: "زيت عطر عربي مركّز — مزيج من الورد والعود والعنبر والمسك. طويل الأمد وخالٍ من الكحول.",
+      price: 48,
+      category: "wellness", material: "Natural fragrance oils", origin: "Dubai, UAE", weight: 60, stock: 25,
+      isHandmade: false, featured: true,
+      tags: ["perfume", "oud", "fragrance", "arabic", "oil"],
+      imageUrl: "https://images.unsplash.com/photo-1619994402583-9a41f6e6c2d6?w=600",
+      shopId: dubaiShop1.id,
+    },
+    {
+      slug: "gold-plated-arabic-bangle-dubai",
+      name: "Gold-plated Arabic Bangle",
+      arabicName: "سوار عربي مطلي بالذهب",
+      description: "Elegant bangle with intricate Arabic calligraphy engraved around the band. 18k gold-plated brass. One size, adjustable. Comes gift-boxed with polishing cloth.",
+      arabicDescription: "سوار أنيق منقوش بخط عربي دقيق حول الحلقة. نحاس مطلي بالذهب عيار 18.",
+      price: 85,
+      category: "jewelry", material: "Gold-plated brass", origin: "Dubai, UAE", weight: 45, stock: 10,
+      isHandmade: true,
+      tags: ["bangle", "gold", "arabic", "calligraphy", "jewelry"],
+      imageUrl: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600",
+      shopId: dubaiShop1.id,
+    },
+    {
+      slug: "wooden-arabic-puzzle-box-dubai",
+      name: "Inlaid Wooden Puzzle Box",
+      arabicName: "صندوق خشبي لغز مطعّم",
+      description: "Handcrafted wooden puzzle box with intricate geometric inlay work — a traditional Middle Eastern craft. The lid opens only when you solve the sequence. Great as a gift or curiosity piece.",
+      arabicDescription: "صندوق خشبي لغز مصنوع يدوياً مع تطعيم هندسي دقيق. يفتح الغطاء فقط عند حل التسلسل الصحيح.",
+      price: 95, comparePrice: 120,
+      category: "crafts", material: "Wood + bone inlay", origin: "Dubai, UAE", weight: 400, stock: 7,
+      isHandmade: true,
+      tags: ["puzzle box", "wood", "inlay", "gift", "unique"],
+      imageUrl: "https://images.unsplash.com/photo-1561532178-5b6d89e0abd0?w=600",
       shopId: dubaiShop1.id,
     },
   ];
 
-  // Desert Spice Market products
+  // ── Desert Spice Market — 9 products (food + wellness)
   const desertSpiceProducts = [
     {
       slug: "saffron-threads-dubai",
@@ -1814,13 +2590,10 @@ async function main() {
       description: "Grade A Persian saffron threads — the highest quality saffron available. Intensely aromatic and deeply coloured. Essential for paella, biryani, and Middle Eastern desserts.",
       arabicDescription: "خيوط الزعفران الفارسي من الدرجة الأولى — أعلى جودة من الزعفران المتاح.",
       price: 38,
-      category: "food_drink",
-      origin: "Iran (via Dubai)",
-      weight: 10,
-      stock: 25,
-      isHandmade: false,
-      featured: true,
+      category: "food_drink", origin: "Iran (via Dubai)", weight: 10, stock: 25,
+      isHandmade: false, featured: true,
       tags: ["saffron", "spice", "premium", "cooking", "persian"],
+      imageUrl: "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=600",
       shopId: dubaiShop2.id,
     },
     {
@@ -1830,12 +2603,10 @@ async function main() {
       description: "Traditional Levantine za'atar blend — wild thyme, sumac, sesame seeds, and salt. Versatile condiment: mix with olive oil for dipping, sprinkle on flatbreads, or season meats.",
       arabicDescription: "خلطة الزعتر الشامية التقليدية — زعتر بري وسماق وبذور سمسم وملح.",
       price: 16,
-      category: "food_drink",
-      origin: "Lebanon/Syria",
-      weight: 180,
-      stock: 35,
+      category: "food_drink", origin: "Lebanon/Syria", weight: 180, stock: 35,
       isHandmade: false,
       tags: ["zaatar", "spice blend", "levantine", "condiment"],
+      imageUrl: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600",
       shopId: dubaiShop2.id,
     },
     {
@@ -1845,12 +2616,10 @@ async function main() {
       description: "Aromatic baharat — the quintessential Gulf spice blend. Allspice, black pepper, coriander, cinnamon, and cloves. Perfect for lamb, chicken, and rice dishes.",
       arabicDescription: "بهارات عطرية — خلطة التوابل الخليجية بامتياز. بهار أسود وقرفة وقرنفل.",
       price: 14,
-      category: "food_drink",
-      origin: "Gulf region",
-      weight: 120,
-      stock: 40,
+      category: "food_drink", origin: "Gulf region", weight: 120, stock: 40,
       isHandmade: false,
       tags: ["baharat", "spice", "gulf", "arabic", "cooking"],
+      imageUrl: "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=600",
       shopId: dubaiShop2.id,
     },
     {
@@ -1860,34 +2629,92 @@ async function main() {
       description: "Deep burgundy sumac powder — tangy, fruity, and earthy. A staple of Middle Eastern cooking. Use as a salad dressing, rub for meats, or topping for hummus.",
       arabicDescription: "مسحوق السماق الداكن — حامض وفاكهي وترابي. ركيزة أساسية في الطبخ الشرقي.",
       price: 15,
-      category: "food_drink",
-      origin: "Middle East",
-      weight: 170,
-      stock: 30,
+      category: "food_drink", origin: "Middle East", weight: 170, stock: 30,
       isHandmade: false,
       tags: ["sumac", "spice", "tangy", "middle eastern"],
+      imageUrl: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600",
+      shopId: dubaiShop2.id,
+    },
+    {
+      slug: "dried-lemon-loomi-dubai",
+      name: "Dried Lemon Loomi (100g)",
+      arabicName: "ليمون لومي مجفف (100 غ)",
+      description: "Whole dried black limes (loomi) from Oman — a signature ingredient in Gulf stews, rice dishes, and teas. Gives a deep, smoky-sour flavour that fresh lemon cannot replicate.",
+      arabicDescription: "ليمون أسود مجفف كامل (لومي) من عُمان — مكوّن أساسي في يخنات الخليج وأطباق الأرز والشاي.",
+      price: 18,
+      category: "food_drink", origin: "Oman", weight: 130, stock: 28,
+      isHandmade: false,
+      tags: ["dried lemon", "loomi", "gulf", "spice", "cooking"],
+      imageUrl: "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=600",
+      shopId: dubaiShop2.id,
+    },
+    {
+      slug: "rose-water-250ml-dubai",
+      name: "Pure Rose Water (250ml)",
+      arabicName: "ماء الورد النقي (250 مل)",
+      description: "Steam-distilled pure rose water from Iranian Damask roses. Use in baklava, rice pudding, and sweets — or as a natural facial mist. No additives, no alcohol.",
+      arabicDescription: "ماء ورد نقي مقطر بالبخار من ورد دمشق الإيراني. يستخدم في الحلويات أو كبخاخ للوجه.",
+      price: 20,
+      category: "wellness", origin: "Iran", weight: 280, stock: 22,
+      isHandmade: false,
+      tags: ["rose water", "wellness", "cooking", "beauty", "natural"],
+      imageUrl: "https://images.unsplash.com/photo-1548438294-1ad5d5f4f063?w=600",
+      shopId: dubaiShop2.id,
+    },
+    {
+      slug: "cardamom-pods-dubai",
+      name: "Green Cardamom Pods (50g)",
+      arabicName: "حبوب الهيل الأخضر (50 غ)",
+      description: "Freshly harvested green cardamom pods from Kerala. Intensely aromatic — the backbone of Arabic coffee (qahwa), masala chai, and Gulf desserts. Best ground fresh.",
+      arabicDescription: "حبوب الهيل الأخضر المحصودة حديثاً من كيرالا. عطرية بشدة — العمود الفقري للقهوة العربية وحلويات الخليج.",
+      price: 22,
+      category: "food_drink", origin: "India/UAE", weight: 65, stock: 35,
+      isHandmade: false, featured: true,
+      tags: ["cardamom", "spice", "arabic coffee", "gulf", "aromatic"],
+      imageUrl: "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=600",
+      shopId: dubaiShop2.id,
+    },
+    {
+      slug: "turmeric-powder-dubai",
+      name: "Premium Turmeric Powder (100g)",
+      arabicName: "مسحوق الكركم الفاخر (100 غ)",
+      description: "High-curcumin turmeric powder from Alleppey, India. Vibrant golden colour and strong earthy aroma. Use in rice, stews, golden milk, and marinades.",
+      arabicDescription: "مسحوق كركم عالي الكركمين من أليبي، الهند. لون ذهبي نابض وأريج ترابي قوي.",
+      price: 14,
+      category: "food_drink", origin: "India", weight: 120, stock: 40,
+      isHandmade: false,
+      tags: ["turmeric", "spice", "healthy", "cooking", "golden"],
+      imageUrl: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600",
+      shopId: dubaiShop2.id,
+    },
+    {
+      slug: "dates-medjool-box-dubai",
+      name: "Medjool Dates Gift Box (500g)",
+      arabicName: "تمر مجدول هدية (500 غ)",
+      description: "Premium Medjool dates from the Jordan Valley — large, soft, and caramel-sweet. Presented in an elegant gift box. The most prized variety in the Arab world. Perfect for gifting.",
+      arabicDescription: "تمر مجدول فاخر من وادي الأردن — كبير وطري وحلو كالكراميل. يُقدّم في علبة هدية أنيقة.",
+      price: 45, comparePrice: 58,
+      category: "food_drink", origin: "Jordan", weight: 600, stock: 20,
+      isHandmade: false, featured: true,
+      tags: ["dates", "medjool", "gift", "arabic", "luxury"],
+      imageUrl: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=600",
       shopId: dubaiShop2.id,
     },
   ];
 
-  // Nomad Leather products
+  // ── Nomad Leather — 8 products (leather accessories)
   const nomadLeatherProducts = [
     {
       slug: "camel-leather-wallet-dubai",
       name: "Camel Leather Bifold Wallet",
       arabicName: "محفظة جلد الإبل المطوية",
       description: "Slim bifold wallet hand-stitched from genuine camel leather. Features 6 card slots, a bill compartment, and ID window. Ages beautifully with a distinctive patina.",
-      arabicDescription: "محفظة نحيفة مطوية مخيطة يدوياً من جلد الإبل الأصيل. تتميز بـ 6 فتحات للبطاقات.",
-      price: 95,
-      comparePrice: 120,
-      category: "accessories",
-      material: "Camel leather",
-      origin: "Dubai, UAE",
-      weight: 80,
-      stock: 14,
-      isHandmade: true,
-      featured: true,
+      arabicDescription: "محفظة نحيفة مطوية مخيطة يدوياً من جلد الإبل الأصيل.",
+      price: 95, comparePrice: 120,
+      category: "accessories", material: "Camel leather", origin: "Dubai, UAE", weight: 80, stock: 14,
+      isHandmade: true, featured: true,
       tags: ["wallet", "leather", "camel", "handmade", "gift"],
+      imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600",
       shopId: dubaiShop3.id,
     },
     {
@@ -1897,13 +2724,10 @@ async function main() {
       description: "Elegant clutch bag hand-stitched by Dubai artisans. Natural tan leather with brass fittings. Fits a phone, cards, and keys. Can be carried solo or used as a bag insert.",
       arabicDescription: "حقيبة أنيقة مخيطة يدوياً من قِبَل حرفيين دبيين. جلد طبيعي مع تجهيزات نحاسية.",
       price: 140,
-      category: "accessories",
-      material: "Full-grain leather",
-      origin: "Dubai, UAE",
-      weight: 180,
-      stock: 8,
+      category: "accessories", material: "Full-grain leather", origin: "Dubai, UAE", weight: 180, stock: 8,
       isHandmade: true,
       tags: ["clutch", "leather", "handmade", "luxury", "bag"],
+      imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600",
       shopId: dubaiShop3.id,
     },
     {
@@ -1913,13 +2737,75 @@ async function main() {
       description: "Full-grain leather belt with solid brass buckle. Handcrafted in Dubai. Available in tan and dark brown. Adjustable — one size fits most (trimable at home).",
       arabicDescription: "حزام جلد حبوب كاملة مع إبزيم نحاسي صلب. مصنوع يدوياً في دبي.",
       price: 110,
-      category: "accessories",
-      material: "Full-grain leather + brass",
-      origin: "Dubai, UAE",
-      weight: 250,
-      stock: 11,
+      category: "accessories", material: "Full-grain leather + brass", origin: "Dubai, UAE", weight: 250, stock: 11,
       isHandmade: true,
       tags: ["belt", "leather", "brass", "handmade", "accessory"],
+      imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600",
+      shopId: dubaiShop3.id,
+    },
+    {
+      slug: "passport-holder-leather-dubai",
+      name: "Leather Passport Holder",
+      arabicName: "حافظة جواز سفر جلدية",
+      description: "Slim passport holder in full-grain camel leather. Two card slots, a document pocket, and a pen loop. Fits all standard passports. Personalisation available.",
+      arabicDescription: "حافظة جواز سفر نحيفة من جلد الإبل حبوب كاملة. فتحتان للبطاقات وجيب للمستندات وحلقة للقلم.",
+      price: 65, comparePrice: 85,
+      category: "accessories", material: "Camel leather", origin: "Dubai, UAE", weight: 60, stock: 16,
+      isHandmade: true, featured: true,
+      tags: ["passport", "holder", "leather", "travel", "gift"],
+      imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600",
+      shopId: dubaiShop3.id,
+    },
+    {
+      slug: "leather-card-holder-dubai",
+      name: "Minimalist Card Holder",
+      arabicName: "حافظة بطاقات مينيمالية",
+      description: "Ultra-slim card holder made from vegetable-tanned leather. Holds 4–6 cards. Simple, elegant design with a thumb slot for easy access. Available in tan, brown, and black.",
+      arabicDescription: "حافظة بطاقات فائقة النحافة مصنوعة من الجلد المدبوغ بالنباتات. تسع 4–6 بطاقات.",
+      price: 45,
+      category: "accessories", material: "Vegetable-tanned leather", origin: "Dubai, UAE", weight: 30, stock: 20,
+      isHandmade: true,
+      tags: ["card holder", "leather", "minimalist", "slim", "wallet"],
+      imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600",
+      shopId: dubaiShop3.id,
+    },
+    {
+      slug: "leather-key-fob-dubai",
+      name: "Leather Key Fob",
+      arabicName: "سلسلة مفاتيح جلدية",
+      description: "Handstitched leather key fob with a solid brass ring. Loop design — fits most keys and bag clips. Personalise with initials. A small gift with a luxurious feel.",
+      arabicDescription: "حلقة مفاتيح جلدية مخيطة يدوياً مع حلقة نحاسية صلبة.",
+      price: 28,
+      category: "accessories", material: "Full-grain leather + brass", origin: "Dubai, UAE", weight: 25, stock: 30,
+      isHandmade: true,
+      tags: ["key fob", "leather", "accessory", "gift", "brass"],
+      imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600",
+      shopId: dubaiShop3.id,
+    },
+    {
+      slug: "leather-journal-cover-dubai",
+      name: "Leather Journal Cover (A5)",
+      arabicName: "غلاف مجلة جلدي (A5)",
+      description: "Hand-stitched leather journal cover with a refillable A5 notebook insert. Two pen loops, business card pocket, and a bookmark ribbon. Embossed with an Arabic geometric pattern.",
+      arabicDescription: "غلاف مجلة جلدي مخيط يدوياً مع دفتر A5 قابل للاستبدال. حلقتان للأقلام وجيب للبطاقات.",
+      price: 80, comparePrice: 100,
+      category: "accessories", material: "Full-grain leather", origin: "Dubai, UAE", weight: 350, stock: 9,
+      isHandmade: true,
+      tags: ["journal", "leather", "notebook", "handmade", "gift"],
+      imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600",
+      shopId: dubaiShop3.id,
+    },
+    {
+      slug: "leather-luggage-tag-dubai",
+      name: "Personalised Luggage Tag",
+      arabicName: "بطاقة أمتعة مخصصة",
+      description: "Thick full-grain leather luggage tag with a stainless steel loop. Includes a removable ID card insert. Hand-stitched edges in contrasting thread. A durable travel companion.",
+      arabicDescription: "بطاقة أمتعة من الجلد حبوب كاملة السميك مع حلقة فولاذية. حواف مخيطة يدوياً.",
+      price: 38,
+      category: "accessories", material: "Full-grain leather + steel", origin: "Dubai, UAE", weight: 50, stock: 22,
+      isHandmade: true,
+      tags: ["luggage tag", "leather", "travel", "personalised", "gift"],
+      imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600",
       shopId: dubaiShop3.id,
     },
   ];
@@ -1933,14 +2819,79 @@ async function main() {
     ...nomadLeatherProducts,
   ];
 
-  for (const product of allProducts) {
-    await prisma.product.upsert({
+  for (const { imageUrl, ...product } of allProducts) {
+    const created = await prisma.product.upsert({
       where:  { slug: product.slug },
-      update: {},
+      update: product,
       create: product,
     });
+    // Seed one product image (skip if already exists to avoid duplicates)
+    if (imageUrl) {
+      const exists = await prisma.images.findFirst({ where: { productId: created.id } });
+      if (!exists) {
+        await prisma.images.create({ data: { url: imageUrl, productId: created.id } });
+      }
+    }
     console.log(`  ✓ ${product.name}`);
   }
+
+  // ─── SHOP REVIEWS ───────────────────────────────────────────────────────────
+  console.log("\n── Shop Reviews ──");
+
+  const shopReviewsData = [
+    // ── Artisanat Djerba ────────────────────────────────────────────────────
+    { userId: CUSTOMER_IDS.sarah,   userName: "Sarah Johnson",  relationId: djerbaShop1.id, relationType: "SHOP" as const, rating: 5, title: "The best craft shop in Djerba",        comment: "I spent an entire morning here and left with a ceramic bowl, a cushion cover, and an olive wood board. Every single piece is genuinely handmade. The owner was kind enough to show me how the bowls are painted.", createdAt: d(14), response: "Thank you Sarah! Come back next time and we'll show you the weaving loom too.", responseDate: d(12).toISOString() },
+    { userId: CUSTOMER_IDS.marco,   userName: "Marco Rossi",    relationId: djerbaShop1.id, relationType: "SHOP" as const, rating: 5, title: "Authentic, not touristy",               comment: "Finally a craft shop that doesn't feel like a souvenir factory. The pieces here have soul. The kilim rug I bought is now hanging in my living room in Milan.", createdAt: d(22) },
+    { userId: CUSTOMER_IDS.amir,    userName: "Amir Hassan",    relationId: djerbaShop1.id, relationType: "SHOP" as const, rating: 4, title: "Quality craftsmanship",                 comment: "Excellent quality throughout. The terracotta vase and embroidered cushion arrived perfectly packed. Would have rated 5 stars but shipping took a bit longer than expected.", createdAt: d(35) },
+    { userId: CUSTOMER_IDS.emma,    userName: "Emma Wilson",    relationId: djerbaShop1.id, relationType: "SHOP" as const, rating: 5, title: "Worth every dinar",                    comment: "A must-visit if you are in Houmt Souk. The prices are fair for the level of craftsmanship. The olive wood board is stunning and so practical.", createdAt: d(8) },
+
+    // ── Épicerie du Sahel ───────────────────────────────────────────────────
+    { userId: CUSTOMER_IDS.youssef, userName: "Youssef Benali", relationId: djerbaShop2.id, relationType: "SHOP" as const, rating: 5, title: "Real Tunisian pantry essentials",      comment: "I stock up here every time I visit Djerba. The harissa is the best I've ever tasted — smoky, deep, not just hot. The argan oil and rose petals are gifts I bring back to friends in France.", createdAt: d(10) },
+    { userId: CUSTOMER_IDS.sarah,   userName: "Sarah Johnson",  relationId: djerbaShop2.id, relationType: "SHOP" as const, rating: 5, title: "Bought half the shop",                 comment: "The honey is extraordinary — light and floral, completely different from anything you'd find in a supermarket. The owner let me try everything before buying. Such a lovely experience.", createdAt: d(18), response: "We love hearing this! The honey comes from hives just 3 km from the shop. You are always welcome.", responseDate: d(16).toISOString() },
+    { userId: CUSTOMER_IDS.emma,    userName: "Emma Wilson",    relationId: djerbaShop2.id, relationType: "SHOP" as const, rating: 4, title: "Great local produce",                  comment: "Good selection and friendly service. The spearmint tea blend is a daily ritual at home now. Packaging is simple but everything travels well.", createdAt: d(27) },
+
+    // ── La Soierie de Houmt Souk ────────────────────────────────────────────
+    { userId: CUSTOMER_IDS.marco,   userName: "Marco Rossi",    relationId: djerbaShop3.id, relationType: "SHOP" as const, rating: 5, title: "Extraordinary weaving",               comment: "I watched the weaver working the loom for 20 minutes before I even looked at what was for sale. The wool blanket I bought is heavy, warm, and beautiful — exactly what a Berber blanket should be.", createdAt: d(20) },
+    { userId: CUSTOMER_IDS.amir,    userName: "Amir Hassan",    relationId: djerbaShop3.id, relationType: "SHOP" as const, rating: 5, title: "The silk scarf is perfection",         comment: "Bought the hand-painted silk scarf as a gift for my wife. She loves it. The motifs are delicate and the silk quality is excellent. Well worth the price.", createdAt: d(30), response: "Thank you! The scarf is hand-painted by one weaver who has been with us for 15 years. Your wife has great taste!", responseDate: d(28).toISOString() },
+    { userId: CUSTOMER_IDS.youssef, userName: "Youssef Benali", relationId: djerbaShop3.id, relationType: "SHOP" as const, rating: 4, title: "Beautiful textiles, slow shipping",    comment: "The fouta towels are excellent — light, quick-drying, and the stripe patterns are classic. Shipped to Paris and arrived in 10 days. Solidly packaged.", createdAt: d(45) },
+
+    // ── The Souk Collective ─────────────────────────────────────────────────
+    { userId: CUSTOMER_IDS.emma,    userName: "Emma Wilson",    relationId: dubaiShop1.id, relationType: "SHOP" as const, rating: 5, title: "Dubai's best artisan market",         comment: "We spent 2 hours here and still didn't see everything. The brass dallah is a centrepiece in our kitchen now. The calligraphy print arrived beautifully framed and signed.", createdAt: d(16) },
+    { userId: CUSTOMER_IDS.sarah,   userName: "Sarah Johnson",  relationId: dubaiShop1.id, relationType: "SHOP" as const, rating: 5, title: "Gifts that actually mean something",   comment: "I refuse to buy airport souvenirs anymore. The Souk Collective has everything you need: proper gifts with a story behind them. The evil eye necklace and the perfume oil are already favourites.", createdAt: d(24), response: "Thank you Sarah! Every piece in the shop comes with a story. Come back and we will tell you more of them.", responseDate: d(22).toISOString() },
+    { userId: CUSTOMER_IDS.marco,   userName: "Marco Rossi",    relationId: dubaiShop1.id, relationType: "SHOP" as const, rating: 5, title: "Exceptional quality and curation",     comment: "The mother-of-pearl box and the wooden puzzle box were the standouts for me. Both are handmade, well-finished, and arrived with zero damage. The packaging is a gift in itself.", createdAt: d(32) },
+    { userId: CUSTOMER_IDS.amir,    userName: "Amir Hassan",    relationId: dubaiShop1.id, relationType: "SHOP" as const, rating: 4, title: "A little pricey but worth it",         comment: "Prices reflect the quality and authenticity — you are not paying for mass-produced trinkets. The oud incense sticks are divine. One stick fills the whole apartment.", createdAt: d(41) },
+
+    // ── Desert Spice Market ─────────────────────────────────────────────────
+    { userId: CUSTOMER_IDS.youssef, userName: "Youssef Benali", relationId: dubaiShop2.id, relationType: "SHOP" as const, rating: 5, title: "The real Deira spice experience",      comment: "Walking into this shop is like walking into the old souk — the aromas hit you immediately. The cardamom is the best I've found outside of India. Medjool dates were a revelation.", createdAt: d(12) },
+    { userId: CUSTOMER_IDS.sarah,   userName: "Sarah Johnson",  relationId: dubaiShop2.id, relationType: "SHOP" as const, rating: 5, title: "My go-to spice shop in Dubai",         comment: "I have been back three times in one trip. The saffron is genuine Grade A and the loomi (dried lime) transformed my lamb stew. The owner gave me a recipe card — above and beyond.", createdAt: d(19), response: "Always happy to share recipes! Come back next time and we will show you how to blend your own baharat.", responseDate: d(17).toISOString() },
+    { userId: CUSTOMER_IDS.emma,    userName: "Emma Wilson",    relationId: dubaiShop2.id, relationType: "SHOP" as const, rating: 4, title: "Great quality, generous portions",     comment: "Za'atar blend and rose water are now permanent features in my kitchen. The packaging is sturdy and the spices kept their aroma for months. Very good value.", createdAt: d(38) },
+
+    // ── Nomad Leather ───────────────────────────────────────────────────────
+    { userId: CUSTOMER_IDS.marco,   userName: "Marco Rossi",    relationId: dubaiShop3.id, relationType: "SHOP" as const, rating: 5, title: "The finest leather goods in the souk",comment: "The camel leather wallet is extraordinary — it's been 6 months and the patina just gets better. The stitching is perfect. Worth every dirham. The journal cover is next on my list.", createdAt: d(7) },
+    { userId: CUSTOMER_IDS.amir,    userName: "Amir Hassan",    relationId: dubaiShop3.id, relationType: "SHOP" as const, rating: 5, title: "Handmade leather, genuinely",          comment: "I've bought leather goods all over the world and this is real craftsmanship. The passport holder arrived monogrammed with my initials, exactly as discussed. Impressive.", createdAt: d(15), response: "Thank you Amir! Every piece is cut and stitched in-house. The monogramming takes 2 days but it's always worth it.", responseDate: d(13).toISOString() },
+    { userId: CUSTOMER_IDS.youssef, userName: "Youssef Benali", relationId: dubaiShop3.id, relationType: "SHOP" as const, rating: 4, title: "Quality you can feel",                 comment: "The card holder is beautifully made — clean lines, perfect stitching, already developing a nice patina. Only small note: delivery took 2 weeks but the product was worth the wait.", createdAt: d(29) },
+    { userId: CUSTOMER_IDS.emma,    userName: "Emma Wilson",    relationId: dubaiShop3.id, relationType: "SHOP" as const, rating: 5, title: "Best gift shop in Deira",              comment: "Bought the leather clutch as a birthday gift and everyone asked where it was from. Beautifully packaged, well-made, and the brass fittings are solid. Nomad Leather is a gem.", createdAt: d(52) },
+  ];
+
+  for (const r of shopReviewsData) {
+    await prisma.review.upsert({
+      where:  { id: `seed-shop-review-${r.userId}-${r.relationId.slice(-8)}` },
+      update: {},
+      create: {
+        id:           `seed-shop-review-${r.userId}-${r.relationId.slice(-8)}`,
+        userId:       r.userId,
+        userName:     r.userName,
+        relationId:   r.relationId,
+        relationType: r.relationType,
+        rating:       r.rating,
+        title:        r.title,
+        comment:      r.comment,
+        createdAt:    r.createdAt,
+        ...(r.response ? { response: r.response, responseDate: r.responseDate } : {}),
+      },
+    });
+  }
+  console.log(`  ✓ ${shopReviewsData.length} shop reviews seeded`);
 
   // ─── TRANSFERS ──────────────────────────────────────────────────────────────
   console.log("\n── Transfers ──");
@@ -2038,11 +2989,16 @@ async function main() {
   ];
 
   for (const transfer of djerbaTransfers) {
-    await prisma.transfer.upsert({
+    const createdTransfer = await prisma.transfer.upsert({
       where:  { slug: transfer.slug },
-      update: { ...transfer, profileId: DJERBA_PROFILE_ID, destinationId: djerbaDest!.id },
-      create: { ...transfer, profileId: DJERBA_PROFILE_ID, destinationId: djerbaDest!.id },
+      update: { ...transfer, status: "ACTIVE", profileId: DJERBA_PROFILE_ID, destinationId: djerbaDest!.id },
+      create: { ...transfer, status: "ACTIVE", profileId: DJERBA_PROFILE_ID, destinationId: djerbaDest!.id },
     });
+    const transferUrls = transferImages[transfer.slug] ?? [];
+    const transferImgEx = await prisma.images.count({ where: { transferId: createdTransfer.id } });
+    if (transferImgEx === 0 && transferUrls.length > 0) {
+      await prisma.images.createMany({ data: transferUrls.map((url) => ({ url, transferId: createdTransfer.id })) });
+    }
     console.log(`  ✓ ${transfer.title}`);
   }
 
@@ -2149,7 +3105,7 @@ async function main() {
 
   for (const attraction of djerbaAttractions) {
     const { coordinates, feeAmount, feeNote, ...rest } = attraction;
-    await prisma.attraction.upsert({
+    const createdAttraction = await prisma.attraction.upsert({
       where: { slug: attraction.slug },
       update: {
         ...rest,
@@ -2164,6 +3120,11 @@ async function main() {
         ...(feeNote !== null ? { feeNote } : {}),
       },
     });
+    const attrUrls = attractionImages[attraction.slug] ?? [];
+    const attrImgEx = await prisma.images.count({ where: { attractionId: createdAttraction.id } });
+    if (attrImgEx === 0 && attrUrls.length > 0) {
+      await prisma.images.createMany({ data: attrUrls.map((url) => ({ url, attractionId: createdAttraction.id })) });
+    }
     console.log(`  ✓ ${attraction.title}`);
   }
 
@@ -2199,8 +3160,33 @@ async function main() {
     select: { id: true },
   });
 
-  const artisanatShop = await prisma.shop.findFirst({
-    where: { destinationId: djerbaDest!.id },
+  const artisanatShop = await prisma.shop.findUnique({
+    where: { slug: "artisanat-djerba" },
+    select: { id: true },
+  });
+
+  const epicerieShop = await prisma.shop.findUnique({
+    where: { slug: "epicerie-du-sahel" },
+    select: { id: true },
+  });
+
+  const soierieShop = await prisma.shop.findUnique({
+    where: { slug: "soierie-houmt-souk" },
+    select: { id: true },
+  });
+
+  const soukCollective = await prisma.shop.findUnique({
+    where: { slug: "the-souk-collective" },
+    select: { id: true },
+  });
+
+  const desertSpice = await prisma.shop.findUnique({
+    where: { slug: "desert-spice-market" },
+    select: { id: true },
+  });
+
+  const nomadLeather = await prisma.shop.findUnique({
+    where: { slug: "nomad-leather-dubai" },
     select: { id: true },
   });
 
@@ -2235,8 +3221,43 @@ async function main() {
   }
   if (artisanatShop) {
     badgesToSeed.push(
-      { badgeKey: "VERIFIED", relationType: "SHOP", relationId: artisanatShop.id },
-      { badgeKey: "OWNER_OPERATED", relationType: "SHOP", relationId: artisanatShop.id },
+      { badgeKey: "VERIFIED",          relationType: "SHOP", relationId: artisanatShop.id },
+      { badgeKey: "OWNER_OPERATED",    relationType: "SHOP", relationId: artisanatShop.id },
+      { badgeKey: "GUEST_FAVORITE",    relationType: "SHOP", relationId: artisanatShop.id },
+      { badgeKey: "REVIEWED_BY_GUIDNI",relationType: "SHOP", relationId: artisanatShop.id },
+    );
+  }
+  if (epicerieShop) {
+    badgesToSeed.push(
+      { badgeKey: "VERIFIED",       relationType: "SHOP", relationId: epicerieShop.id },
+      { badgeKey: "OWNER_OPERATED", relationType: "SHOP", relationId: epicerieShop.id },
+    );
+  }
+  if (soierieShop) {
+    badgesToSeed.push(
+      { badgeKey: "VERIFIED",       relationType: "SHOP", relationId: soierieShop.id },
+      { badgeKey: "OWNER_OPERATED", relationType: "SHOP", relationId: soierieShop.id },
+    );
+  }
+  if (soukCollective) {
+    badgesToSeed.push(
+      { badgeKey: "VERIFIED",          relationType: "SHOP", relationId: soukCollective.id },
+      { badgeKey: "OWNER_OPERATED",    relationType: "SHOP", relationId: soukCollective.id },
+      { badgeKey: "GUEST_FAVORITE",    relationType: "SHOP", relationId: soukCollective.id },
+      { badgeKey: "REVIEWED_BY_GUIDNI",relationType: "SHOP", relationId: soukCollective.id },
+    );
+  }
+  if (desertSpice) {
+    badgesToSeed.push(
+      { badgeKey: "VERIFIED",       relationType: "SHOP", relationId: desertSpice.id },
+      { badgeKey: "OWNER_OPERATED", relationType: "SHOP", relationId: desertSpice.id },
+    );
+  }
+  if (nomadLeather) {
+    badgesToSeed.push(
+      { badgeKey: "VERIFIED",       relationType: "SHOP", relationId: nomadLeather.id },
+      { badgeKey: "OWNER_OPERATED", relationType: "SHOP", relationId: nomadLeather.id },
+      { badgeKey: "GUEST_FAVORITE", relationType: "SHOP", relationId: nomadLeather.id },
     );
   }
   if (djerbaTransfer) {
@@ -2371,19 +3392,130 @@ async function main() {
     console.log("Seeded GuidniReview (UNDER_REVIEW) — restaurant");
   }
 
-  // 4. SHOP — artisanat shop (SCHEDULED — request accepted, visit upcoming)
+  // 4. SHOP — Artisanat Djerba (PUBLISHED)
   if (artisanatShop) {
     await prisma.guidniReview.upsert({
       where: { relationType_relationId: { relationType: "SHOP", relationId: artisanatShop.id } },
+      update: {
+        status:        "PUBLISHED",
+        reviewerName:  "Leila",
+        reviewerTitle: "Guidni Craft & Culture Editor",
+        visitedAt:     new Date("2026-03-10"),
+        season:        "Spring 2026",
+        summaryQuote:  "The kind of craft shop that reminds you why handmade things matter.",
+        fullReview:    "We spent nearly three hours at Artisanat Djerba and still felt we left too soon. The shop sits inside a restored stone courtyard just off Souk el Attarine — you could walk past it without noticing, which is part of the charm. Hassan, the owner, has been selling crafts here since his father's time, and his knowledge of what each piece means, which village it came from, which technique was used, is extraordinary.\n\nThe ceramics are the standout. Every bowl and vase is hand-thrown, then hand-painted using natural mineral pigments that Hassan sources himself from the Guellala potters. Nothing is imported. The Berber patterns are not decorative shortcuts — they are geometric vocabularies that have been passed down for centuries, and Hassan can explain every one of them.\n\nThe woven pieces — kilims, cushion covers, baskets — are equally impressive. The hand-knotted kilim rug we examined took one weaver eight weeks to complete. When you understand that, the price becomes not a question but an obvious statement of value.",
+        whatWeLoved:   "Everything is genuinely made on the island — no imports\nHassan's storytelling turns shopping into an education\nLive pottery demonstration on request — a rare experience\nPricing is honest and the quality justifies every dinar",
+        worthKnowing:  "The shop can get busy in July–August — visit in the morning\nLarge items (rugs, blankets) can be shipped internationally on request\nCash preferred, though card is accepted",
+        bestFor:       "Craft lovers, design-conscious shoppers, thoughtful gift seekers",
+        scoreAccuracy: 95,
+        scoreQuality:  98,
+        scoreValue:    90,
+        scorePresent:  93,
+        scoreHost:     99,
+        scoreTotal:    95,
+        publishedAt:   new Date("2026-03-18"),
+        instagramUrl:  "https://www.instagram.com/p/example-shop-djerba",
+        partnerOffer:  "Welcome gift for Guidni visitors — free palm basket (worth 30 TND) with any purchase over 100 TND\nMention 'Guidni' at checkout\nContact: Hassan — +216 75 xxx xxx",
+      },
+      create: {
+        relationType:  "SHOP",
+        relationId:    artisanatShop.id,
+        status:        "PUBLISHED",
+        reviewerName:  "Leila",
+        reviewerTitle: "Guidni Craft & Culture Editor",
+        visitedAt:     new Date("2026-03-10"),
+        season:        "Spring 2026",
+        summaryQuote:  "The kind of craft shop that reminds you why handmade things matter.",
+        fullReview:    "We spent nearly three hours at Artisanat Djerba and still felt we left too soon. The shop sits inside a restored stone courtyard just off Souk el Attarine — you could walk past it without noticing, which is part of the charm. Hassan, the owner, has been selling crafts here since his father's time, and his knowledge of what each piece means, which village it came from, which technique was used, is extraordinary.\n\nThe ceramics are the standout. Every bowl and vase is hand-thrown, then hand-painted using natural mineral pigments that Hassan sources himself from the Guellala potters. Nothing is imported. The Berber patterns are not decorative shortcuts — they are geometric vocabularies that have been passed down for centuries, and Hassan can explain every one of them.\n\nThe woven pieces — kilims, cushion covers, baskets — are equally impressive. The hand-knotted kilim rug we examined took one weaver eight weeks to complete. When you understand that, the price becomes not a question but an obvious statement of value.",
+        whatWeLoved:   "Everything is genuinely made on the island — no imports\nHassan's storytelling turns shopping into an education\nLive pottery demonstration on request — a rare experience\nPricing is honest and the quality justifies every dinar",
+        worthKnowing:  "The shop can get busy in July–August — visit in the morning\nLarge items (rugs, blankets) can be shipped internationally on request\nCash preferred, though card is accepted",
+        bestFor:       "Craft lovers, design-conscious shoppers, thoughtful gift seekers",
+        scoreAccuracy: 95,
+        scoreQuality:  98,
+        scoreValue:    90,
+        scorePresent:  93,
+        scoreHost:     99,
+        scoreTotal:    95,
+        publishedAt:   new Date("2026-03-18"),
+        instagramUrl:  "https://www.instagram.com/p/example-shop-djerba",
+        partnerOffer:  "Welcome gift for Guidni visitors — free palm basket (worth 30 TND) with any purchase over 100 TND\nMention 'Guidni' at checkout\nContact: Hassan — +216 75 xxx xxx",
+      },
+    });
+    // Ensure REVIEWED_BY_GUIDNI badge is set
+    await prisma.listingBadge.upsert({
+      where: { badgeKey_relationType_relationId: { badgeKey: "REVIEWED_BY_GUIDNI", relationType: "SHOP", relationId: artisanatShop.id } },
+      update: {},
+      create: { badgeKey: "REVIEWED_BY_GUIDNI", relationType: "SHOP", relationId: artisanatShop.id },
+    });
+    console.log("Seeded GuidniReview (PUBLISHED) — Artisanat Djerba");
+  }
+
+  // 5b. SHOP — The Souk Collective Dubai (PUBLISHED)
+  if (soukCollective) {
+    await prisma.guidniReview.upsert({
+      where: { relationType_relationId: { relationType: "SHOP", relationId: soukCollective.id } },
       update: {},
       create: {
         relationType: "SHOP",
-        relationId: artisanatShop.id,
-        status: "SCHEDULED",
-        partnerOffer: "Product selection for reviewer — ceramic bowl set, woven palm basket, embroidered cushion cover, olive wood board (all handmade on-site)\nBest times: weekday mornings 9:00–12:00\nHighlight: live pottery demonstration available on request\nContact: Hassan — +216 75 xxx xxx",
+        relationId: soukCollective.id,
+        status: "PUBLISHED",
+        reviewerName: "Nadia",
+        reviewerTitle: "Guidni Lifestyle Editor",
+        visitedAt: new Date("2026-02-28"),
+        season: "Spring 2026",
+        summaryQuote: "The antidote to Dubai's airport souvenir shops — real objects with real stories.",
+        fullReview: "The Souk Collective sits inside Al Fahidi Historical Neighbourhood, which is already the most atmospheric part of Old Dubai. Finding it requires a short walk through narrow shaded lanes — and that walk is exactly the right way to arrive, because it prepares you for a shop that operates at a completely different pace from the rest of the city.\n\nThe curation is exceptional. Every piece has a typed card explaining its origin, technique, and the craftsperson who made it. The brass dallah coffee pots are sourced from a single family of metalworkers in Oman. The mother-of-pearl boxes come from a workshop in Sharjah that has been operating since the 1960s. The calligraphy prints are hand-drawn by a young Dubai-based artist who trained under a master in Damascus.\n\nThe oud incense selection alone would justify the visit. The owner blends several varieties in-house — including a 'desert after rain' blend that is unlike anything sold elsewhere in the city. We bought three boxes.",
+        whatWeLoved: "Every product has provenance — the typed cards are genuinely informative\nOud incense blended in-house: complex, long-lasting, nothing like mass-market versions\nStaff are knowledgeable without being pushy — rare in a tourist area\nThe brass dallah collection is the best we have seen in Dubai",
+        worthKnowing: "Al Fahidi neighbourhood is closed to vehicles — arrive by taxi to the entrance\nBusy on weekend mornings; quieter on weekday afternoons\nInternational shipping available for fragile items — ask at the counter",
+        bestFor: "Discerning gift buyers, design lovers, anyone who wants authentic Dubai",
+        scoreAccuracy: 97,
+        scoreQuality: 96,
+        scoreValue: 88,
+        scorePresent: 99,
+        scoreHost: 95,
+        scoreTotal: 95,
+        publishedAt: new Date("2026-03-07"),
+        instagramUrl: "https://www.instagram.com/p/example-shop-dubai",
+        tiktokUrl: "https://www.tiktok.com/@guidni/video/example-shop-dubai",
+        partnerOffer: "Complimentary gift wrapping + 10% discount for Guidni visitors on any purchase\nMention 'Guidni' at checkout\nContact: Mariam — +971 50 xxx xxxx",
       },
     });
-    console.log("Seeded GuidniReview (SCHEDULED) — shop");
+    await prisma.listingBadge.upsert({
+      where: { badgeKey_relationType_relationId: { badgeKey: "REVIEWED_BY_GUIDNI", relationType: "SHOP", relationId: soukCollective.id } },
+      update: {},
+      create: { badgeKey: "REVIEWED_BY_GUIDNI", relationType: "SHOP", relationId: soukCollective.id },
+    });
+    console.log("Seeded GuidniReview (PUBLISHED) — The Souk Collective");
+  }
+
+  // 5c. SHOP — Nomad Leather (UNDER_REVIEW — drafted, pending final edit)
+  if (nomadLeather) {
+    await prisma.guidniReview.upsert({
+      where: { relationType_relationId: { relationType: "SHOP", relationId: nomadLeather.id } },
+      update: {},
+      create: {
+        relationType: "SHOP",
+        relationId: nomadLeather.id,
+        status: "UNDER_REVIEW",
+        reviewerName: "Karim",
+        reviewerTitle: "Guidni Craft & Culture Editor",
+        visitedAt: new Date("2026-03-20"),
+        season: "Spring 2026",
+        summaryQuote: "Handmade leather that you can feel the difference in the moment you pick it up.",
+        fullReview: "Nomad Leather occupies a narrow shopfront in the Gold Souk area of Deira, easy to miss but impossible to forget once you've been inside. The owner, Tariq, trained as a leather craftsman in Morocco before moving to Dubai 15 years ago. Everything in the shop is made in the workshop behind the counter — a room you can see directly from the entrance, where two artisans cut and stitch throughout the day.\n\nThe camel leather wallet was the first thing we handled and the last thing we put down. The grain is distinctive — slightly more pronounced than European calfskin, with a warmth to the tone that photographs can't fully capture. The saddle stitching is done by hand using waxed linen thread, double-knotted at every fourth stitch to prevent unravelling.\n\nWe left with a wallet, a passport holder, and a journal cover. All three arrived home with us without a scratch. The packaging — tissue paper, a cotton dust bag, a handwritten note — was a final touch that felt completely sincere.",
+        whatWeLoved: "Workshop is visible from the shop — craftsmanship is transparent\nCamel leather quality is exceptional and ages beautifully\nPersonalisation (monogramming) available with 2 days' notice\nPackaging is thoughtful and gift-ready",
+        worthKnowing: "Minimum order for personalised pieces is 3 working days\nShipping available worldwide but confirm fragile fittings with the team\nCash transactions slightly discounted — worth asking",
+        bestFor: "Leather lovers, executive gift buyers, quality-over-quantity travellers",
+        scoreAccuracy: 96,
+        scoreQuality: 99,
+        scoreValue: 87,
+        scorePresent: 94,
+        scoreHost: 97,
+        scoreTotal: 95,
+        partnerOffer: "Free monogramming (2 initials) on any purchase for Guidni visitors\nMention 'Guidni' at checkout\nContact: Tariq — +971 55 xxx xxxx",
+      },
+    });
+    console.log("Seeded GuidniReview (UNDER_REVIEW) — Nomad Leather");
   }
 
   // 5. TRANSFER — first Djerba transfer (PENDING — request just submitted)
@@ -2436,7 +3568,7 @@ async function main() {
         dayNumber: 1,
         theme: "Arrival & First Impressions",
         notes: "Check in to your accommodation and get settled. Take a gentle stroll through the old medina in the afternoon.",
-        slots: [
+        blocks: [
           {
             id: "seed-slot-1",
             slotType: "afternoon",
@@ -2477,7 +3609,7 @@ async function main() {
         dayNumber: 2,
         theme: "Culture & Heritage",
         notes: "Start early for the best experience at historical sites. Book your activity in advance to secure your spot.",
-        slots: [
+        blocks: [
           {
             id: "seed-slot-3",
             slotType: "morning",
@@ -2552,7 +3684,7 @@ async function main() {
         dayNumber: 3,
         theme: "Farewell & Memories",
         notes: "Check-out time applies — confirm with your accommodation. Allow extra time for airport transfers on departure day.",
-        slots: [
+        blocks: [
           {
             id: "seed-slot-7",
             slotType: "morning",
@@ -2599,7 +3731,7 @@ async function main() {
         isPublic:    true,
         generatedBy: "algorithm",
         preferences: samplePreferences,
-        itinerary:   sampleItinerary,
+        itinerary:   { days: sampleItinerary, stays: [], rentals: [] },
         userId:      CUSTOMER_IDS.emma,
         destinationId: djerbaDest!.id,
       },
@@ -2694,7 +3826,7 @@ async function main() {
       dayNumber: 1,
       theme: "The Medina & Jewish Quarter",
       notes: "Start early — El Ghriba gets crowded after 2pm. Skip the tourist-trap cafés on the main square and head to Café Zeitoun, two streets in.",
-      slots: [
+      blocks: [
         { id: "gp1-d1-morning", slotType: "morning", time: { start: "09:00", end: "11:30" }, item: { id: "seed-gp1-attraction-1", type: "ATTRACTION", name: "El Ghriba Synagogue", slug: "el-ghriba-synagogue", price: 0, tags: ["culture", "history"], intensity: "low" } },
         { id: "gp1-d1-lunch",   slotType: "lunch",   time: { start: "12:30", end: "14:00" }, item: { id: "seed-gp1-rest-1", type: "RESTAURANT", name: "Dar Houmt Souk", slug: "dar-houmt-souk", price: 40, tags: ["tunisian", "culture"], intensity: "low" } },
         { id: "gp1-d1-afternoon", slotType: "afternoon", time: { start: "15:00", end: "17:30" }, item: { id: "seed-gp1-attraction-2", type: "ATTRACTION", name: "Houmt Souk Medina", slug: "houmt-souk-medina", price: 0, tags: ["culture", "shopping"], intensity: "low" } },
@@ -2704,7 +3836,7 @@ async function main() {
       dayNumber: 2,
       theme: "The Coastline Day",
       notes: "Rent a bicycle or scooter for today — you'll cover 12km of coast. The beach at Sidi Mahres is quieter in the morning before tour groups arrive.",
-      slots: [
+      blocks: [
         { id: "gp1-d2-morning", slotType: "morning", time: { start: "08:30", end: "12:00" }, item: { id: "seed-gp1-activity-1", type: "ACTIVITY", name: "Sidi Mahres Beach Morning", slug: "sidi-mahres-beach", price: 0, tags: ["beach", "nature_wildlife"], intensity: "low" } },
         { id: "gp1-d2-lunch",   slotType: "lunch",   time: { start: "13:00", end: "14:30" }, item: { id: "seed-gp1-rest-2", type: "RESTAURANT", name: "La Plage Café", slug: "la-plage-cafe", price: 25, tags: ["seafood", "sea_view"], intensity: "low" } },
         { id: "gp1-d2-afternoon", slotType: "afternoon", time: { start: "15:30", end: "18:00" }, item: { id: "seed-gp1-activity-2", type: "ACTIVITY", name: "Flamingo Lagoon Walk", slug: "flamingo-lagoon", price: 0, tags: ["nature_wildlife", "sightseeing"], intensity: "low" } },
@@ -2714,7 +3846,7 @@ async function main() {
       dayNumber: 3,
       theme: "Hidden Villages & Craft Workshops",
       notes: "Today is off the beaten path. Take a taxi to Guellala — the potters' village. The craft workshops are open 8am–noon, closed in the afternoon. Arrive early.",
-      slots: [
+      blocks: [
         { id: "gp1-d3-morning", slotType: "morning", time: { start: "09:00", end: "12:00" }, item: { id: "seed-gp1-activity-3", type: "ACTIVITY", name: "Guellala Pottery Village", slug: "guellala-pottery", price: 0, tags: ["culture", "workshops"], intensity: "low" } },
         { id: "gp1-d3-lunch",   slotType: "lunch",   time: { start: "13:00", end: "14:30" }, item: { id: "seed-gp1-rest-3", type: "RESTAURANT", name: "Le Berbère", slug: "le-berbere", price: 35, tags: ["north_african"], intensity: "low" } },
         { id: "gp1-d3-afternoon", slotType: "afternoon", time: { start: "15:30", end: "18:00" }, item: { id: "seed-gp1-attraction-3", type: "ATTRACTION", name: "Djerba Explore Museum", slug: "djerba-explore", price: 15, tags: ["culture", "history"], intensity: "low" } },
@@ -2736,7 +3868,7 @@ async function main() {
       tags:        ["culture", "food", "beach", "history"],
       difficulty:  "easy",
       suitableFor: ["couple", "solo", "friends"],
-      season:      "Any",
+      season: ["Any"],
       previewDays: 1,
       price:       0,
       isPaidPlan:  false,
@@ -2755,7 +3887,7 @@ async function main() {
         needsAirportPickup: false,
         needsRental:        false,
       },
-      itinerary:    guidePlan1Itinerary,
+      itinerary:    { days: guidePlan1Itinerary, stays: [], rentals: [] },
       userId:       guideUser1.id,
       guideId:      guideProfile1.id,
       destinationId: djerbaDest!.id,
@@ -2777,7 +3909,7 @@ async function main() {
       tags:        ["culture", "beach", "food", "nature", "history", "shopping"],
       difficulty:  "easy",
       suitableFor: ["family", "couple", "solo"],
-      season:      "Any",
+      season: ["Any"],
       previewDays: 2,
       price:       0,
       isPaidPlan:  false,
@@ -2797,7 +3929,7 @@ async function main() {
         needsRental:        true,
         rentalType:         "car",
       },
-      itinerary:    guidePlan1Itinerary,
+      itinerary:    { days: guidePlan1Itinerary, stays: [], rentals: [] },
       userId:       guideUser1.id,
       guideId:      guideProfile1.id,
       destinationId: djerbaDest!.id,
@@ -2819,7 +3951,7 @@ async function main() {
       tags:        ["food", "culture", "local", "city"],
       difficulty:  "easy",
       suitableFor: ["couple", "solo", "friends"],
-      season:      "Any",
+      season: ["Any"],
       previewDays: 1,
       price:       0,
       isPaidPlan:  false,
@@ -2838,7 +3970,7 @@ async function main() {
         needsAirportPickup: false,
         needsRental:        false,
       },
-      itinerary:    guidePlan1Itinerary,
+      itinerary:    { days: guidePlan1Itinerary, stays: [], rentals: [] },
       userId:       guideUser2.id,
       guideId:      guideProfile2.id,
       destinationId: djerbaDest!.id,
@@ -2922,7 +4054,6 @@ async function main() {
   });
 
   // 3. Seed AgentProfile
-  const djerbaDestination = destinations.find((d) => d.slug === "djerba");
   await prisma.agentProfile.upsert({
     where:  { slug: "fares-benhassine" },
     update: {},
@@ -2942,7 +4073,7 @@ async function main() {
       isActive:    true,
       verifiedAt:  new Date(),
       userId:      AGENT_USER_ID,
-      destinationId: djerbaDestination?.id ?? undefined,
+      destinationId: djerbaDest?.id ?? undefined,
     },
   });
   console.log("  ✓ Agent profile seeded: local_fares (Djerba, Starter, verified)");
@@ -3020,25 +4151,877 @@ async function main() {
   console.log("  ✓ 2 demo invitations + 1 earning seeded for local_fares");
 
   // ─────────────────────────────────────────────────────────────────────────
+  // Local Guides — seed data (Phase 26A)
+  // ─────────────────────────────────────────────────────────────────────────
+  console.log("\nSeeding guide profiles & plans...");
+
+  // Guide user accounts
+  const GUIDE_DJERBA_USER_ID = "seed-guide-user-amira";
+  const GUIDE_DUBAI_USER_ID  = "seed-guide-user-khalid";
+
+  await prisma.user.upsert({
+    where:  { email: "amira.guide@guidni.demo" },
+    update: {},
+    create: {
+      id:            GUIDE_DJERBA_USER_ID,
+      name:          "Amira Chaari",
+      email:         "amira.guide@guidni.demo",
+      emailVerified: true,
+      role:          "PARTNER",
+      createdAt:     new Date(),
+      updatedAt:     new Date(),
+    },
+  });
+
+  await prisma.user.upsert({
+    where:  { email: "khalid.guide@guidni.demo" },
+    update: {},
+    create: {
+      id:            GUIDE_DUBAI_USER_ID,
+      name:          "Khalid Al Mansoori",
+      email:         "khalid.guide@guidni.demo",
+      emailVerified: true,
+      role:          "PARTNER",
+      createdAt:     new Date(),
+      updatedAt:     new Date(),
+    },
+  });
+
+  // Destinations
+  const djerbaForGuide = await prisma.destination.findUnique({ where: { slug: "djerba" } });
+  const dubaiForGuide  = await prisma.destination.findUnique({ where: { slug: "dubai"  } });
+
+  // ── Amira Chaari — Djerba guide ───────────────────────────────────────────
+  const guideAmira = await prisma.guideProfile.upsert({
+    where:  { slug: "amira-chaari-djerba" },
+    update: {
+      planCount:   3,
+      nbReviews:   14,
+      note:        "4.9",
+      isFeatured:  true,
+      isVerified:  true,
+    },
+    create: {
+      slug:            "amira-chaari-djerba",
+      displayName:     "Amira Chaari",
+      tagline:         "Your insider guide to Djerba's hidden soul",
+      bio:             "Born and raised in Houmt Souk, I've spent 12 years guiding travellers through Djerba's layered history — Phoenician ruins, Jewish heritage, Berber traditions, and the island's incredible food scene. My plans are designed to go beyond the postcard and show you the real island, from secret beaches to family-run pottery workshops that no tour bus will take you to.",
+      arabicBio:       "وُلدت ونشأت في حومة السوق، وقضيت 12 عاماً في إرشاد المسافرين عبر تاريخ جربة المتعدد الطبقات — الآثار الفينيقية والتراث اليهودي والتقاليد البربرية والمشهد الغذائي الرائع للجزيرة. مخططاتي مصممة لتتجاوز ما هو مألوف وتريك الجزيرة الحقيقية.",
+      avatarUrl:       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
+      coverUrl:        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200",
+      specializations: ["culture", "food", "beaches", "history"],
+      languages:       ["English", "French", "Arabic"],
+      experienceYears: 12,
+      country:         "Tunisia",
+      destinationId:   djerbaForGuide?.id,
+      userId:          GUIDE_DJERBA_USER_ID,
+      note:            "4.9",
+      nbReviews:       14,
+      planCount:       3,
+      isVerified:      true,
+      isFeatured:      true,
+      instagram:       "amira.djerba",
+      website:         "https://amira-djerba.guidni.demo",
+    },
+  });
+
+  // ── Khalid Al Mansoori — Dubai guide ─────────────────────────────────────
+  const guideKhalid = await prisma.guideProfile.upsert({
+    where:  { slug: "khalid-al-mansoori-dubai" },
+    update: {
+      planCount:   3,
+      nbReviews:   22,
+      note:        "4.8",
+      isFeatured:  true,
+      isVerified:  true,
+    },
+    create: {
+      slug:            "khalid-al-mansoori-dubai",
+      displayName:     "Khalid Al Mansoori",
+      tagline:         "Dubai's urban explorer — luxury to local",
+      bio:             "Dubai native, third-generation Emirati, and passionate advocate for authentic local experiences in a city often seen only through the lens of luxury hotels and malls. I've built itineraries that combine the best of modern Dubai with Old Town heritage, authentic Emirati cuisine, and desert culture that most visitors never find. Whether you're coming for 3 days or 2 weeks, I know exactly how to make every hour count.",
+      arabicBio:       "مواطن دبيّ من الجيل الثالث الإماراتي ومدافع شغوف عن التجارب المحلية الأصيلة في مدينة كثيراً ما يُنظر إليها من خلال عدسة فنادق الفخامة والمجمعات التجارية. لقد بنيت مسارات تجمع بين أفضل ما في دبي الحديثة وتراث المدينة القديمة.",
+      avatarUrl:       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+      coverUrl:        "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200",
+      specializations: ["adventure", "culture", "food", "luxury"],
+      languages:       ["English", "Arabic"],
+      experienceYears: 8,
+      country:         "UAE",
+      destinationId:   dubaiForGuide?.id,
+      userId:          GUIDE_DUBAI_USER_ID,
+      note:            "4.8",
+      nbReviews:       22,
+      planCount:       3,
+      isVerified:      true,
+      isFeatured:      true,
+      instagram:       "khalid.dubai.guide",
+      tiktok:          "khalid.dubai",
+    },
+  });
+
+  // ── Djerba Plan 1 — 3-Day Cultural Immersion (FREE) ──────────────────────
+  const djerbaItinerary1 = [
+    {
+      dayNumber: 1,
+      theme: "Houmt Souk & Ancient Heritage",
+      notes: "Start in the heart of the island — the medina and its surrounding souks tell 3,000 years of layered history.",
+      blocks: [
+        {
+          id: "gp-d1-s1", slotType: "morning",
+          item: { id: "gp-attr-ghriba", type: "ATTRACTION", slug: "el-ghriba-synagogue", name: "El Ghriba Synagogue", imageUrl: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800", location: "Erriadh, Djerba", price: 3, priceLabel: "entry fee", durationMinutes: 75, intensity: "low", tags: ["history", "heritage", "culture"], idealTime: "morning", familyFriendly: true, bookingUrl: "/destinations/el-ghriba-synagogue" },
+          guideNote: "Arrive before 10am to avoid tour groups. The mosaic floor is best seen in the morning light. Don't miss the silver votive plaques on the east wall."
+        },
+        {
+          id: "gp-d1-s2", slotType: "lunch",
+          item: { id: "gp-rest-barbecue", type: "RESTAURANT", slug: "la-table-djerbi", name: "La Table Djerbi", imageUrl: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800", location: "Houmt Souk", price: 0, priceLabel: "estimated per person", durationMinutes: 75, intensity: "low", tags: ["tunisian", "seafood", "local"], idealTime: "any", familyFriendly: true, bookingUrl: "/restaurants/la-table-djerbi" },
+          guideNote: "Ask for the off-menu 'mechouia grillée' — the owner makes it fresh when the peppers are right. Pair with local palm wine if you're adventurous."
+        },
+        {
+          id: "gp-d1-s3", slotType: "afternoon",
+          item: { id: "gp-attr-medina", type: "ATTRACTION", slug: "houmt-souk-medina", name: "Houmt Souk Medina", imageUrl: "https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=800", location: "Houmt Souk", price: 0, priceLabel: "free", durationMinutes: 120, intensity: "low", tags: ["shopping", "culture", "crafts"], idealTime: "morning", familyFriendly: true, bookingUrl: "/destinations/houmt-souk-medina" },
+          guideNote: "Skip Rue de la République (tourist prices). Turn left at the blue door on Rue Taieb Mehiri and you'll find three family-run pottery stalls with genuine pieces at honest prices."
+        },
+        {
+          id: "gp-d1-s4", slotType: "evening",
+          item: { id: "gp-attr-port", type: "ATTRACTION", slug: "houmt-souk-medina", name: "Houmt Souk Harbour", imageUrl: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800", location: "Houmt Souk Port", price: 0, priceLabel: "free", durationMinutes: 60, intensity: "low", tags: ["sunset", "local"], idealTime: "evening", familyFriendly: true, bookingUrl: "/destinations/houmt-souk-medina" },
+          guideNote: "The old harbour is where local fishermen return around 6pm. Grab a mint tea at the café on the quay and watch — it's the best free show in Djerba."
+        },
+      ],
+    },
+    {
+      dayNumber: 2,
+      theme: "Beach Day & Artisan Villages",
+      notes: "Djerba's interior villages hold the island's craft secrets. Pair with the finest beach on the island.",
+      blocks: [
+        {
+          id: "gp-d2-s1", slotType: "morning",
+          item: { id: "gp-attr-beach", type: "ATTRACTION", slug: "beach-sidi-mahrez", name: "Sidi Mahrez Beach", imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800", location: "Sidi Mahrez, Djerba", price: 0, priceLabel: "free", durationMinutes: 150, intensity: "low", tags: ["beach", "swimming", "relaxation"], idealTime: "morning", familyFriendly: true, bookingUrl: "/destinations/beach-sidi-mahrez" },
+          guideNote: "Take the unmarked track 400m east of the main parking — it leads to a quieter cove that stays empty until noon. Bring shade; there are no umbrellas here."
+        },
+        {
+          id: "gp-d2-s2", slotType: "lunch",
+          item: { id: "gp-rest-guellala", type: "RESTAURANT", slug: "chez-slima-guellala", name: "Chez Slima", imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800", location: "Guellala", price: 0, priceLabel: "estimated per person", durationMinutes: 60, intensity: "low", tags: ["tunisian", "homestyle", "local"], idealTime: "any", familyFriendly: true, bookingUrl: "/restaurants/chez-slima-guellala" },
+          guideNote: "A home kitchen that seats 12. No menu — you eat whatever Slima cooked that morning. Call ahead: +216 75 xxx xxx. Best couscous on the island, full stop."
+        },
+        {
+          id: "gp-d2-s3", slotType: "afternoon",
+          item: { id: "gp-attr-guellala", type: "ATTRACTION", slug: "guellala-museum", name: "Guellala Pottery Village", imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800", location: "Guellala", price: 2, priceLabel: "entry fee", durationMinutes: 90, intensity: "low", tags: ["crafts", "culture", "pottery"], idealTime: "morning", familyFriendly: true, bookingUrl: "/destinations/guellala-museum" },
+          guideNote: "Visit the working workshop behind the museum — they let you try the wheel for free on Tuesday and Thursday afternoons. Ask for Tarek."
+        },
+        {
+          id: "gp-d2-s4", slotType: "evening",
+          item: { id: "gp-act-sunset", type: "ACTIVITY", slug: "djerba-quad-beach", name: "Sunset Quad on the Dunes", imageUrl: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800", location: "Aghir, Djerba", price: 45, priceLabel: "per person", durationMinutes: 90, intensity: "high", tags: ["adventure", "sunset", "outdoor"], idealTime: "evening", familyFriendly: false, bookingUrl: "/activities/djerba-quad-beach" },
+          guideNote: "Book the 5:30pm slot — the dune lighting at that hour is spectacular. The operators give you 15 extra minutes if the group is small."
+        },
+      ],
+    },
+    {
+      dayNumber: 3,
+      theme: "South Island: Flamingos, Salt Lakes & Berber Culture",
+      notes: "The south of the island is barely touched by tourism — and it's the most beautiful part.",
+      blocks: [
+        {
+          id: "gp-d3-s1", slotType: "morning",
+          item: { id: "gp-attr-flamingo", type: "ATTRACTION", slug: "flamingo-lake", name: "Flamingo Lagoon", imageUrl: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800", location: "Southern Djerba", price: 0, priceLabel: "free", durationMinutes: 90, intensity: "low", tags: ["nature", "wildlife", "photography"], idealTime: "morning", familyFriendly: true, bookingUrl: "/destinations/flamingo-lake" },
+          guideNote: "The flamingos feed near the salt flat edge between 7am and 9:30am. Wear muted colours and approach from the east with the sun behind you — you'll get within 30 metres."
+        },
+        {
+          id: "gp-d3-s2", slotType: "lunch",
+          item: { id: "gp-rest-ajim", type: "RESTAURANT", slug: "port-dajim-grillades", name: "Ajim Ferry Port Grillades", imageUrl: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800", location: "Ajim", price: 0, priceLabel: "estimated per person", durationMinutes: 60, intensity: "low", tags: ["seafood", "local", "grilled"], idealTime: "any", familyFriendly: true, bookingUrl: "/restaurants/port-dajim-grillades" },
+          guideNote: "The three grill stalls by the ferry dock look rough but serve the freshest fish on the island — caught that morning by the ferry operators' families. Order by weight."
+        },
+        {
+          id: "gp-d3-s3", slotType: "afternoon",
+          item: { id: "gp-attr-heritage", type: "ATTRACTION", slug: "djerba-heritage-village", name: "Berber Heritage Village", imageUrl: "https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=800", location: "Midoun Area", price: 0, priceLabel: "free", durationMinutes: 120, intensity: "low", tags: ["culture", "berber", "history"], idealTime: "afternoon", familyFriendly: true, bookingUrl: "/destinations/djerba-heritage-village" },
+          guideNote: "The weaving demonstration happens in the building with the green door, not the tourist-signposted one. Genuinely free, genuinely authentic."
+        },
+        {
+          id: "gp-d3-s4", slotType: "evening",
+          item: { id: "gp-act-camelride", type: "ACTIVITY", slug: "djerba-camel-ride", name: "Sunset Camel Ride", imageUrl: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800", location: "Aghir Beach", price: 35, priceLabel: "per person", durationMinutes: 60, intensity: "low", tags: ["sunset", "outdoor", "family"], idealTime: "evening", familyFriendly: true, bookingUrl: "/activities/djerba-camel-ride" },
+          guideNote: "End your Djerba trip on this beach — it's the best sunset view on the island. I always recommend this as the final memory to take home."
+        },
+      ],
+    },
+  ];
+
+  const djerba3DayFree = await prisma.plan.upsert({
+    where:  { id: "seed-guide-plan-djerba-3day-free" },
+    update: {
+      itinerary:   { days: djerbaItinerary1, stays: [], rentals: [] },
+      isPublic:    true,
+      planType:    "GUIDE_FREE",
+      viewCount:   87,
+    },
+    create: {
+      id:           "seed-guide-plan-djerba-3day-free",
+      title:        "3 Days in Djerba: Culture, Craft & Hidden Beaches",
+      duration:     3,
+      planType:     "GUIDE_FREE",
+      isPublic:     true,
+      generatedBy:  "guide",
+      summary:      "A carefully curated 3-day itinerary that takes you beyond the tourist trail — Djerba's ancient synagogue, artisan pottery villages, flamingo lagoons, and the freshest seafood you'll ever eat. No hotel lobbies, no postcard stops.",
+      tags:         ["culture", "beaches", "food", "local", "heritage"],
+      difficulty:   "easy",
+      suitableFor:  ["solo", "couple", "friends"],
+      season: ["year-round"],
+      viewCount:    87,
+      preferences:  { destination: "djerba", duration: 3, travelStyle: "balanced", groupType: "couple", budget: 2, interests: ["culture", "food", "beaches"] },
+      itinerary:    { days: djerbaItinerary1, stays: [], rentals: [] },
+      guideId:      guideAmira.id,
+      userId:       GUIDE_DJERBA_USER_ID,
+      destinationId: djerbaForGuide?.id,
+    },
+  });
+
+  // ── Djerba Plan 2 — 5-Day Full Island (FREE) ─────────────────────────────
+  const djerba5DayFree = await prisma.plan.upsert({
+    where:  { id: "seed-guide-plan-djerba-5day-free" },
+    update: { isPublic: true, viewCount: 54 },
+    create: {
+      id:           "seed-guide-plan-djerba-5day-free",
+      title:        "5 Days on Djerba Island: The Complete Experience",
+      duration:     5,
+      planType:     "GUIDE_FREE",
+      isPublic:     true,
+      generatedBy:  "guide",
+      summary:      "Five days to truly decompress and immerse in Djerba — from the medina's labyrinthine alleys to remote salt flats, Berber weaving villages, island seafood feasts, and the most relaxed pace the Mediterranean can offer.",
+      tags:         ["culture", "beaches", "food", "relaxation", "nature"],
+      difficulty:   "easy",
+      suitableFor:  ["solo", "couple", "family"],
+      season: ["april-october"],
+      viewCount:    54,
+      preferences:  { destination: "djerba", duration: 5, travelStyle: "relaxed", groupType: "couple", budget: 2, interests: ["culture", "food", "beaches", "wellness"] },
+      itinerary:    { days: djerbaItinerary1.slice(0, 3).map((d, i) => ({ ...d, dayNumber: i + 1 })), stays: [], rentals: [] },
+      guideId:      guideAmira.id,
+      userId:       GUIDE_DJERBA_USER_ID,
+      destinationId: djerbaForGuide?.id,
+    },
+  });
+
+  // ── Djerba Plan 3 — Private Island Week (PAID) ───────────────────────────
+  const djerba7DayPaid = await prisma.plan.upsert({
+    where:  { id: "seed-guide-plan-djerba-7day-paid" },
+    update: { isPublic: true, viewCount: 31, purchaseCount: 4 },
+    create: {
+      id:           "seed-guide-plan-djerba-7day-paid",
+      title:        "7-Day Private Djerba: Exclusive Access & Hidden Gems",
+      duration:     7,
+      planType:     "GUIDE_PAID",
+      isPaidPlan:   true,
+      price:        2900,
+      previewDays:  2,
+      isPublic:     true,
+      generatedBy:  "guide",
+      summary:      "My premium 7-day plan unlocks private family homes for dinner, a dawn fishing trip with local fishermen, exclusive pottery workshop sessions, private flamingo-watching with a naturalist, and the island's best hidden hammam. Everything that can't be Googled.",
+      tags:         ["exclusive", "private", "culture", "food", "nature", "luxury"],
+      difficulty:   "easy",
+      suitableFor:  ["couple", "solo"],
+      season: ["march-november"],
+      viewCount:    31,
+      purchaseCount: 4,
+      preferences:  { destination: "djerba", duration: 7, travelStyle: "relaxed", groupType: "couple", budget: 3, interests: ["culture", "food", "beaches", "wellness"] },
+      itinerary:    { days: djerbaItinerary1, stays: [], rentals: [] },
+      guideId:      guideAmira.id,
+      userId:       GUIDE_DJERBA_USER_ID,
+      destinationId: djerbaForGuide?.id,
+    },
+  });
+
+  // ── Dubai Plan 1 — 4-Day First-Timer (FREE) ──────────────────────────────
+  const dubaiItinerary1 = [
+    {
+      dayNumber: 1,
+      theme: "Old Dubai & Emirati Heritage",
+      notes: "Most visitors skip Old Dubai entirely. That's their loss — it's the most fascinating part of the city.",
+      blocks: [
+        {
+          id: "gp-db-d1-s1", slotType: "morning",
+          item: { id: "gp-db-attr-creek", type: "ATTRACTION", slug: "dubai-creek-old-town", name: "Dubai Creek & Al Fahidi", imageUrl: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800", location: "Al Fahidi, Dubai", price: 0, priceLabel: "free", durationMinutes: 120, intensity: "low", tags: ["history", "heritage", "culture"], idealTime: "morning", familyFriendly: true, bookingUrl: "/destinations/dubai-creek" },
+          guideNote: "Start at the Heritage House on Al Fahidi Street — it's free and gives you the context for everything else you'll see. Then cross the creek on an abra (1 AED) for the best skyline shot in Dubai."
+        },
+        {
+          id: "gp-db-d1-s2", slotType: "lunch",
+          item: { id: "gp-db-rest-arabian", type: "RESTAURANT", slug: "logma-dubai", name: "Logma Emirati Kitchen", imageUrl: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800", location: "Boxpark, Dubai", price: 0, priceLabel: "estimated per person", durationMinutes: 75, intensity: "low", tags: ["emirati", "local", "authentic"], idealTime: "any", familyFriendly: true, bookingUrl: "/restaurants/logma-dubai" },
+          guideNote: "Order the lgaimat (honey dumplings) and chebab (Emirati pancakes) — you won't find these at hotel brunches. Arrive by 12:30 to beat the queue."
+        },
+        {
+          id: "gp-db-d1-s3", slotType: "afternoon",
+          item: { id: "gp-db-attr-spice", type: "ATTRACTION", slug: "deira-gold-spice-souk", name: "Deira Gold & Spice Souks", imageUrl: "https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=800", location: "Deira, Dubai", price: 0, priceLabel: "free", durationMinutes: 90, intensity: "low", tags: ["shopping", "culture", "spices"], idealTime: "afternoon", familyFriendly: true, bookingUrl: "/destinations/deira-souks" },
+          guideNote: "In the spice souk, buy from the stalls at the back — they have the genuine saffron and dried limes. The ones near the entrance are tourist-grade. Bargain on everything except saffron."
+        },
+        {
+          id: "gp-db-d1-s4", slotType: "evening",
+          item: { id: "gp-db-act-dhow", type: "ACTIVITY", slug: "dubai-dhow-cruise", name: "Dubai Creek Dhow Cruise", imageUrl: "https://images.unsplash.com/photo-1582266255765-fa5cf1a1d501?w=800", location: "Old Dubai Creek", price: 75, priceLabel: "per person", durationMinutes: 120, intensity: "low", tags: ["cruise", "dinner", "sunset"], idealTime: "evening", familyFriendly: true, bookingUrl: "/activities/dubai-dhow-cruise" },
+          guideNote: "Book the Creek cruise, not the Marina cruise — the Creek lights are more authentic and the crowd is more local. Sit on the upper deck; the buffet below is forgettable."
+        },
+      ],
+    },
+    {
+      dayNumber: 2,
+      theme: "Modern Dubai & The Skyline",
+      notes: "Today you tackle the icons — but on local terms, not tourist ones.",
+      blocks: [
+        {
+          id: "gp-db-d2-s1", slotType: "morning",
+          item: { id: "gp-db-act-burj", type: "ACTIVITY", slug: "burj-khalifa-at-the-top", name: "Burj Khalifa At The Top", imageUrl: "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800", location: "Downtown Dubai", price: 149, priceLabel: "per person", durationMinutes: 90, intensity: "low", tags: ["landmark", "views", "photography"], idealTime: "morning", familyFriendly: true, bookingUrl: "/activities/burj-khalifa-at-the-top" },
+          guideNote: "Book the 8:30am slot — you'll have the observation deck almost entirely to yourself and the morning haze gives the city a dreamlike quality. The 9:30am slot is already crowded."
+        },
+        {
+          id: "gp-db-d2-s2", slotType: "lunch",
+          item: { id: "gp-db-rest-downtown", type: "RESTAURANT", slug: "graze-burj-khalifa", name: "Graze by Gordon Ramsay", imageUrl: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800", location: "Downtown Dubai", price: 0, priceLabel: "estimated per person", durationMinutes: 90, intensity: "low", tags: ["international", "fine-dining", "views"], idealTime: "any", familyFriendly: false, bookingUrl: "/restaurants/graze-dubai" },
+          guideNote: "If budget allows, the window table at level 3 looks straight up the Burj. Reserve 3 days ahead. Otherwise, the food court in Dubai Mall is genuinely excellent — try Eataly."
+        },
+        {
+          id: "gp-db-d2-s3", slotType: "afternoon",
+          item: { id: "gp-db-attr-mall", type: "ATTRACTION", slug: "dubai-mall-aquarium", name: "Dubai Mall & Aquarium", imageUrl: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800", location: "Downtown Dubai", price: 0, priceLabel: "free", durationMinutes: 120, intensity: "low", tags: ["shopping", "family", "aquarium"], idealTime: "afternoon", familyFriendly: true, bookingUrl: "/destinations/dubai-mall" },
+          guideNote: "The aquarium viewing panel is free from the mall side — you don't need to pay for the tunnel unless you have young children. Skip the ice rink queue; the skating here is not better than anywhere else."
+        },
+        {
+          id: "gp-db-d2-s4", slotType: "evening",
+          item: { id: "gp-db-attr-fountain", type: "ATTRACTION", slug: "dubai-fountain", name: "Dubai Fountain Show", imageUrl: "https://images.unsplash.com/photo-1582266255765-fa5cf1a1d501?w=800", location: "Downtown Dubai", price: 0, priceLabel: "free", durationMinutes: 30, intensity: "low", tags: ["entertainment", "landmark", "free"], idealTime: "evening", familyFriendly: true, bookingUrl: "/destinations/dubai-fountain" },
+          guideNote: "The 9pm show is the best. Watch from the bridge, not the mall terrace — the angle is better and you can see the full arc. Arrive 20 minutes early for a front-row spot."
+        },
+      ],
+    },
+    {
+      dayNumber: 3,
+      theme: "Desert Safari & Bedouin Camp",
+      notes: "The desert is Dubai's soul. Don't leave without experiencing it properly.",
+      blocks: [
+        {
+          id: "gp-db-d3-s1", slotType: "morning",
+          item: { id: "gp-db-act-safari", type: "ACTIVITY", slug: "dubai-desert-safari", name: "Desert Safari at Al Marmoom", imageUrl: "https://images.unsplash.com/photo-1548430769-9fb29a9e7f76?w=800", location: "Al Marmoom Desert", price: 180, priceLabel: "per person", durationMinutes: 480, intensity: "medium", tags: ["desert", "adventure", "culture", "bedouin"], idealTime: "afternoon", familyFriendly: true, bookingUrl: "/activities/dubai-desert-safari" },
+          guideNote: "Specify Al Marmoom reserve (not the cheaper Lahbab road tour) — it's a protected conservation area and the dunes are significantly more dramatic. The operators who access it are listed. Book the evening departure at 3pm."
+        },
+        {
+          id: "gp-db-d3-s2", slotType: "lunch",
+          item: { id: "gp-db-rest-marina", type: "RESTAURANT", slug: "marina-market-dubai", name: "Dubai Marina Market", imageUrl: "https://images.unsplash.com/photo-1582266255765-fa5cf1a1d501?w=800", location: "Dubai Marina", price: 0, priceLabel: "estimated per person", durationMinutes: 60, intensity: "low", tags: ["casual", "outdoor", "market"], idealTime: "any", familyFriendly: true, bookingUrl: "/restaurants/marina-market" },
+          guideNote: "Have a light lunch here before the afternoon desert trip. The shakshuka at the Lebanese corner stall is the best pre-safari meal — filling but not heavy."
+        },
+        {
+          id: "gp-db-d3-s3", slotType: "afternoon",
+          item: { id: "gp-db-act-camp", type: "ACTIVITY", slug: "bedouin-camp-dinner", name: "Bedouin Camp & BBQ Dinner", imageUrl: "https://images.unsplash.com/photo-1548430769-9fb29a9e7f76?w=800", location: "Al Marmoom Desert", price: 0, priceLabel: "included", durationMinutes: 180, intensity: "low", tags: ["culture", "dinner", "bedouin", "stargazing"], idealTime: "evening", familyFriendly: true, bookingUrl: "/activities/dubai-desert-safari" },
+          guideNote: "After the dune bashing, ask your guide to take you 500m north of the main camp to the quieter fire pit — less crowded and better stargazing. The camel milk is the real deal; try it."
+        },
+      ],
+    },
+    {
+      dayNumber: 4,
+      theme: "Dubai Marina & JBR Beach",
+      notes: "End on a relaxed note — Dubai's best beach neighbourhood.",
+      blocks: [
+        {
+          id: "gp-db-d4-s1", slotType: "morning",
+          item: { id: "gp-db-attr-jbr", type: "ATTRACTION", slug: "jbr-beach-dubai", name: "JBR The Walk & Beach", imageUrl: "https://images.unsplash.com/photo-1582266255765-fa5cf1a1d501?w=800", location: "Jumeirah Beach Residences", price: 0, priceLabel: "free", durationMinutes: 120, intensity: "low", tags: ["beach", "relaxation", "walking"], idealTime: "morning", familyFriendly: true, bookingUrl: "/destinations/jbr-beach" },
+          guideNote: "JBR is actually the best free beach in Dubai — better sand than any hotel beach and no day-pass fee. Arrive by 9am before the sun gets intense. The lifeguards here are attentive."
+        },
+        {
+          id: "gp-db-d4-s2", slotType: "lunch",
+          item: { id: "gp-db-rest-seafood", type: "RESTAURANT", slug: "sea-fu-dubai", name: "Sea Fu at Westin", imageUrl: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800", location: "JBR, Dubai", price: 0, priceLabel: "estimated per person", durationMinutes: 90, intensity: "low", tags: ["seafood", "modern", "views"], idealTime: "any", familyFriendly: false, bookingUrl: "/restaurants/sea-fu-dubai" },
+          guideNote: "The best farewell lunch in Dubai — sea views, excellent hammour (local fish), and a dessert list that takes 10 minutes to read. Worth every dirham."
+        },
+        {
+          id: "gp-db-d4-s3", slotType: "afternoon",
+          item: { id: "gp-db-act-cruise", type: "ACTIVITY", slug: "dubai-yacht-cruise", name: "Marina Yacht Cruise", imageUrl: "https://images.unsplash.com/photo-1582266255765-fa5cf1a1d501?w=800", location: "Dubai Marina", price: 120, priceLabel: "per person", durationMinutes: 90, intensity: "low", tags: ["cruise", "marina", "luxury"], idealTime: "afternoon", familyFriendly: true, bookingUrl: "/activities/dubai-yacht-cruise" },
+          guideNote: "Book the 2-hour afternoon slot — the afternoon light on the Marina towers is extraordinary for photography. Evening sunset cruises are romantic but more expensive; afternoon gives better value."
+        },
+      ],
+    },
+  ];
+
+  const dubai4DayFree = await prisma.plan.upsert({
+    where:  { id: "seed-guide-plan-dubai-4day-free" },
+    update: { isPublic: true, viewCount: 143 },
+    create: {
+      id:           "seed-guide-plan-dubai-4day-free",
+      title:        "4 Days in Dubai: First-Timer's Real Guide",
+      duration:     4,
+      planType:     "GUIDE_FREE",
+      isPublic:     true,
+      generatedBy:  "guide",
+      summary:      "The tourist guide gets you the Burj Khalifa photo. My guide gets you the dhow captain who has crossed the Creek every day for 40 years. Four days that cover the icons — but always from a local angle, with insider tips at every stop.",
+      tags:         ["city", "culture", "food", "desert", "first-timer"],
+      difficulty:   "easy",
+      suitableFor:  ["solo", "couple", "friends"],
+      season: ["october-april"],
+      viewCount:    143,
+      preferences:  { destination: "dubai", duration: 4, travelStyle: "balanced", groupType: "couple", budget: 2, interests: ["culture", "food", "adventure"] },
+      itinerary:    { days: dubaiItinerary1, stays: [], rentals: [] },
+      guideId:      guideKhalid.id,
+      userId:       GUIDE_DUBAI_USER_ID,
+      destinationId: dubaiForGuide?.id,
+    },
+  });
+
+  // ── Dubai Plan 2 — 2-Day Weekend Flash (FREE) ─────────────────────────────
+  const dubai2DayFree = await prisma.plan.upsert({
+    where:  { id: "seed-guide-plan-dubai-2day-free" },
+    update: { isPublic: true, viewCount: 209 },
+    create: {
+      id:           "seed-guide-plan-dubai-2day-free",
+      title:        "Dubai in 48 Hours: The Essential Weekend Plan",
+      duration:     2,
+      planType:     "GUIDE_FREE",
+      isPublic:     true,
+      generatedBy:  "guide",
+      summary:      "48 hours to see the best of Dubai without the fuss. Old Town in the morning, Burj Khalifa at golden hour, desert dinner under the stars, and a proper Emirati breakfast before you fly. Tight, efficient, and memorable.",
+      tags:         ["weekend", "fast", "city", "desert", "essentials"],
+      difficulty:   "moderate",
+      suitableFor:  ["solo", "couple", "friends"],
+      season: ["october-april"],
+      viewCount:    209,
+      preferences:  { destination: "dubai", duration: 2, travelStyle: "active", groupType: "friends", budget: 2, interests: ["culture", "adventure"] },
+      itinerary:    { days: dubaiItinerary1.slice(0, 2).map((d, i) => ({ ...d, dayNumber: i + 1 })), stays: [], rentals: [] },
+      guideId:      guideKhalid.id,
+      userId:       GUIDE_DUBAI_USER_ID,
+      destinationId: dubaiForGuide?.id,
+    },
+  });
+
+  // ── Dubai Plan 3 — 7-Day Luxury Insider (PAID) ────────────────────────────
+  const dubai7DayPaid = await prisma.plan.upsert({
+    where:  { id: "seed-guide-plan-dubai-7day-paid" },
+    update: { isPublic: true, viewCount: 67, purchaseCount: 9 },
+    create: {
+      id:           "seed-guide-plan-dubai-7day-paid",
+      title:        "7-Day Dubai Luxury Insider: Access Beyond the Guide Books",
+      duration:     7,
+      planType:     "GUIDE_PAID",
+      isPaidPlan:   true,
+      price:        4900,
+      previewDays:  2,
+      isPublic:     true,
+      generatedBy:  "guide",
+      summary:      "Seven days unlocking the Dubai that doesn't exist on TripAdvisor — a private falconry session with an Emirati family, sunrise camel trek through the Empty Quarter fringes, a private gallery dinner with an Emirati artist, helicopter sunrise over The Palm, a behind-the-scenes Burj Al Arab kitchen tour, and two private chef dinners in Emirati homes. This is Dubai as it lives, not as it's sold.",
+      tags:         ["luxury", "exclusive", "private", "emirati", "culture"],
+      difficulty:   "easy",
+      suitableFor:  ["couple", "solo"],
+      season: ["october-march"],
+      viewCount:    67,
+      purchaseCount: 9,
+      preferences:  { destination: "dubai", duration: 7, travelStyle: "relaxed", groupType: "couple", budget: 3, interests: ["culture", "food", "adventure", "luxury"] },
+      itinerary:    { days: dubaiItinerary1, stays: [], rentals: [] },
+      guideId:      guideKhalid.id,
+      userId:       GUIDE_DUBAI_USER_ID,
+      destinationId: dubaiForGuide?.id,
+    },
+  });
+
+  // ── Guide reviews ─────────────────────────────────────────────────────────
+  const newGuideReviewsData = [
+    // Amira reviews
+    { userId: CUSTOMER_IDS.sarah,   userName: "Sarah Johnson",  relationType: "GUIDE" as const, relationId: guideAmira.id, rating: 5, title: "Best investment of our Djerba trip", comment: "Amira's plan saved us from spending 3 days at the resort pool. Every single recommendation was perfect — the flamingo lagoon at 7am with nobody else there was a moment I'll remember forever. The Chez Slima lunch felt like eating at a friend's home.", createdAt: d(8)  },
+    { userId: CUSTOMER_IDS.marco,   userName: "Marco Rossi",    relationType: "GUIDE" as const, relationId: guideAmira.id, rating: 5, title: "Djerba through local eyes",            comment: "I've been to Tunisia three times and Amira's plan showed me things I had never found on my own. The pottery workshop behind the museum was extraordinary — 40 minutes of hands-on experience for free.", createdAt: d(22) },
+    { userId: CUSTOMER_IDS.emma,    userName: "Emma Wilson",    relationType: "GUIDE" as const, relationId: guideAmira.id, rating: 5, title: "Worth every penny and then some",       comment: "The guide notes on every slot are gold. 'Turn left at the blue door' — that sentence saved us from 45 minutes of tourist shops and led us to one of the best craft purchases of our lives.", createdAt: d(34) },
+    { userId: CUSTOMER_IDS.amir,    userName: "Amir Hassan",    relationType: "GUIDE" as const, relationId: guideAmira.id, rating: 5, title: "Amira knows her island",               comment: "As a Tunisian living abroad, I was sceptical that a guide plan could show me anything new. I was completely wrong. The south island day was a revelation — I had never seen the flamingos from that side.", createdAt: d(45) },
+    { userId: CUSTOMER_IDS.youssef, userName: "Youssef Benali", relationType: "GUIDE" as const, relationId: guideAmira.id, rating: 4, title: "Excellent for culture lovers",          comment: "Four stars only because Day 2 felt slightly rushed on the pottery village visit. The rest was absolutely outstanding — the harbour evening was the highlight of our trip.", createdAt: d(12) },
+    // Khalid reviews
+    { userId: CUSTOMER_IDS.emma,    userName: "Emma Wilson",    relationType: "GUIDE" as const, relationId: guideKhalid.id, rating: 5, title: "The only Dubai guide you need",       comment: "Khalid's 4-day plan was the most efficient use of time in any city I've ever visited. Old Dubai in the morning followed by the evening dhow cruise is the perfect first day structure. The Burj Khalifa tip about the 8:30am slot is genuinely game-changing.", createdAt: d(5)  },
+    { userId: CUSTOMER_IDS.sarah,   userName: "Sarah Johnson",  relationType: "GUIDE" as const, relationId: guideKhalid.id, rating: 5, title: "Finally! A non-mall Dubai itinerary", comment: "Every Dubai itinerary I had found online was basically 'go to the mall'. Khalid's plan puts the real city first. The abra ride across the Creek for 1 AED and the spice souk tips were exactly what I had been hoping to find.", createdAt: d(18) },
+    { userId: CUSTOMER_IDS.marco,   userName: "Marco Rossi",    relationType: "GUIDE" as const, relationId: guideKhalid.id, rating: 5, title: "Exceptional local knowledge",         comment: "The insider notes at every stop are worth the price alone. 'Arrive by 9am', 'sit on the upper deck', 'buy from the stalls at the back' — three pieces of advice that transformed three different experiences.", createdAt: d(27) },
+    { userId: CUSTOMER_IDS.amir,    userName: "Amir Hassan",    relationType: "GUIDE" as const, relationId: guideKhalid.id, rating: 5, title: "Perfect for first-timers",             comment: "Brought my wife to Dubai for the first time and Khalid's plan made us feel like regulars within 24 hours. The Logma restaurant for Emirati breakfast was an incredible discovery.", createdAt: d(38) },
+    { userId: CUSTOMER_IDS.youssef, userName: "Youssef Benali", relationType: "GUIDE" as const, relationId: guideKhalid.id, rating: 4, title: "Great but Day 3 is very ambitious",    comment: "The desert day is genuinely outstanding but fitting the Marina lunch between the beach morning and the desert afternoon pickup was tight. Everything else is perfectly calibrated.", createdAt: d(14) },
+  ];
+
+  for (const rev of newGuideReviewsData) {
+    await prisma.review.upsert({
+      where:  { id: `seed-guide-review-${rev.userId.slice(-6)}-${rev.relationId.slice(-6)}` },
+      update: {},
+      create: {
+        id:           `seed-guide-review-${rev.userId.slice(-6)}-${rev.relationId.slice(-6)}`,
+        userId:       rev.userId,
+        userName:     rev.userName,
+        relationType: rev.relationType,
+        relationId:   rev.relationId,
+        rating:       rev.rating,
+        title:        rev.title,
+        comment:      rev.comment,
+        createdAt:    rev.createdAt,
+      },
+    });
+  }
+
+  // Update planCount on guide profiles
+  await prisma.guideProfile.update({ where: { id: guideAmira.id  }, data: { planCount: 3 } });
+  await prisma.guideProfile.update({ where: { id: guideKhalid.id }, data: { planCount: 3 } });
+
+  console.log(`  ✓ 2 guide profiles (Amira Djerba + Khalid Dubai)`);
+  console.log(`  ✓ 6 guide plans (3 Djerba + 3 Dubai — 4 free, 2 paid)`);
+  console.log(`  ✓ ${newGuideReviewsData.length} guide reviews`);
+
+  // ─────────────────────────────────────────────────────────────────────────
+
+  await seedExtendedData();
+  await seedTripadvisorData();
 
   console.log(`
 Done.
   ${destinations.length} destinations
   2 business profiles + 5 demo customers
-  ${djerbaActivities.length} Djerba activities
+  ${djerbaActivities.length} Djerba activities + ${extendedActivities.length} extended
   ${dubaiActivities.length} Dubai activities
-  ${djerbaStays.length} Djerba stays
+  ${djerbaStays.length} Djerba stays + ${extendedStays.length} extended
   ${dubaiStays.length} Dubai stays
-  6 restaurants (3 Djerba + 3 Dubai)
+  6 restaurants (3 Djerba + 3 Dubai) + ${extendedRestaurants.length} extended
   3 passes (2 Djerba + 1 Dubai)
   6 rentals (3 Djerba + 3 Dubai)
   6 shops (3 Djerba + 3 Dubai)
   ${allProducts.length} products
   4 transfers (Djerba)
-  6 attractions (Djerba)
+  6 attractions (Djerba) + ${extendedAttractions.length} extended
   ${reviewsData.length} reviews
   1 local agent (local_fares, Djerba)
+  2 guide profiles + 6 guide plans + ${newGuideReviewsData.length} guide reviews
 `);
+}
+
+function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+async function seedTripadvisorData() {
+  console.log("\nSeeding TripAdvisor data...");
+
+  const djerbaDest = await prisma.destination.findUnique({ where: { slug: "djerba" } });
+  if (!djerbaDest) {
+    throw new Error("Djerba destination not found in DB! Please seed destinations first.");
+  }
+
+  // 1. Attractions -> Activity model
+  console.log("  - Seeding TripAdvisor Attractions as Activities...");
+  try {
+    const filePath = path.join(process.cwd(), "prisma", "attraction_data .json");
+    if (fs.existsSync(filePath)) {
+      const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+      console.log(`    Read ${data.length} attractions from ${filePath}`);
+      for (const item of data) {
+        if (!item.name) continue;
+        const slug = `${slugify(item.name)}-${item.id}`;
+
+        let price = 0;
+        if (item.offerGroup?.lowestPrice) {
+          const match = item.offerGroup.lowestPrice.replace(/[^0-9.]/g, "");
+          if (match) price = Math.round(parseFloat(match));
+        }
+        if (price === 0) {
+          price = Math.floor(Math.random() * (140 - 40 + 1)) + 40;
+        }
+
+        const rawImages = [item.image, ...(item.photos || [])];
+        const uniqueImages = [...new Set(rawImages.filter(url => url && typeof url === "string" && url.trim().length > 0))];
+
+        const created = await prisma.activity.upsert({
+          where: { slug },
+          update: {
+            title: item.name,
+            arabicTitle: item.localName || null,
+            description: item.description || `Experience ${item.name} in Djerba.`,
+            arabicDescription: item.localName ? `تجربة ${item.localName} في جربة.` : null,
+            categories: item.subcategories || ["Attraction"],
+            price,
+            phone: item.phone || null,
+            country: item.addressObj?.country || "Tunisia",
+            region: item.addressObj?.state || "Medenine",
+            city: item.addressObj?.city || "Djerba",
+            address: item.address || null,
+            location: item.locationString || null,
+            note: item.rating ? String(item.rating) : "4.0",
+            nbReviews: item.numberOfReviews || 0,
+            duration: "2h",
+            capacity: 50,
+            availableTimes: "09:00,14:00",
+            cancelation: item.booking ? true : false,
+            paynow: item.booking ? true : false,
+            guide: "en,fr,ar",
+            latitude: item.latitude ? parseFloat(item.latitude) : null,
+            longitude: item.longitude ? parseFloat(item.longitude) : null,
+            status: "ACTIVE",
+            profileId: DJERBA_PROFILE_ID,
+            destinationId: djerbaDest.id,
+          },
+          create: {
+            slug,
+            title: item.name,
+            arabicTitle: item.localName || null,
+            description: item.description || `Experience ${item.name} in Djerba.`,
+            arabicDescription: item.localName ? `تجربة ${item.localName} في جربة.` : null,
+            categories: item.subcategories || ["Attraction"],
+            price,
+            phone: item.phone || null,
+            country: item.addressObj?.country || "Tunisia",
+            region: item.addressObj?.state || "Medenine",
+            city: item.addressObj?.city || "Djerba",
+            address: item.address || null,
+            location: item.locationString || null,
+            note: item.rating ? String(item.rating) : "4.0",
+            nbReviews: item.numberOfReviews || 0,
+            duration: "2h",
+            capacity: 50,
+            availableTimes: "09:00,14:00",
+            cancelation: item.booking ? true : false,
+            paynow: item.booking ? true : false,
+            guide: "en,fr,ar",
+            latitude: item.latitude ? parseFloat(item.latitude) : null,
+            longitude: item.longitude ? parseFloat(item.longitude) : null,
+            status: "ACTIVE",
+            profileId: DJERBA_PROFILE_ID,
+            destinationId: djerbaDest.id,
+          },
+        });
+
+        if (uniqueImages.length > 0) {
+          await prisma.images.deleteMany({ where: { activityId: created.id } });
+          await prisma.images.createMany({
+            data: uniqueImages.map((url, index) => ({
+              url,
+              activityId: created.id,
+              order: index,
+              alt: item.name,
+            })),
+          });
+        }
+      }
+      console.log(`    ✓ Successfully seeded ${data.length} attractions as Activities.`);
+    } else {
+      console.warn(`    ⚠️ File not found: ${filePath}`);
+    }
+  } catch (err) {
+    console.error("    ❌ Error seeding TripAdvisor Attractions:", err);
+  }
+
+  // 2. Hotels -> Stay model
+  console.log("  - Seeding TripAdvisor Hotels as Stays...");
+  try {
+    const filePath = path.join(process.cwd(), "prisma", "hotel_data.json");
+    if (fs.existsSync(filePath)) {
+      const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+      console.log(`    Read ${data.length} hotels from ${filePath}`);
+      for (const item of data) {
+        if (!item.name) continue;
+        const slug = `${slugify(item.name)}-${item.id}`;
+
+        let price = 0;
+        if (item.priceRange) {
+          const match = item.priceRange.replace(/[^0-9.-]/g, "").split("-")[0];
+          if (match) price = Math.round(parseFloat(match));
+        } else if (item.priceLevel) {
+          price = item.priceLevel.length * 40;
+        }
+        if (price === 0) {
+          price = Math.floor(Math.random() * (140 - 40 + 1)) + 40;
+        }
+
+        const amenitiesList = item.amenities || [];
+        const hasWifi = amenitiesList.some((a: string) => /wifi|internet/i.test(a));
+        const hasPool = amenitiesList.some((a: string) => /pool/i.test(a));
+        const hasAirConditioning = amenitiesList.some((a: string) => /air conditioning/i.test(a));
+        const hasParking = amenitiesList.some((a: string) => /parking/i.test(a));
+        const hasGarden = amenitiesList.some((a: string) => /garden/i.test(a));
+        const hasBalcony = amenitiesList.some((a: string) => /balcony/i.test(a));
+        const hasKitchen = amenitiesList.some((a: string) => /kitchen/i.test(a));
+        const elevatorAvailable = amenitiesList.some((a: string) => /elevator/i.test(a));
+        const wheelchairAccessible = amenitiesList.some((a: string) => /wheelchair/i.test(a));
+
+        const rawImages = [item.image, ...(item.photos || [])];
+        const uniqueImages = [...new Set(rawImages.filter(url => url && typeof url === "string" && url.trim().length > 0))];
+
+        const created = await prisma.stay.upsert({
+          where: { slug },
+          update: {
+            title: item.name,
+            arabicTitle: item.localName || null,
+            description: item.description || `A comfortable stay at ${item.name} in Djerba.`,
+            arabicDescription: item.localName ? `إقامة مريحة في ${item.localName} في جربة.` : null,
+            propertyType: "HOTEL",
+            category: "hotel",
+            price,
+            country: item.addressObj?.country || "Tunisia",
+            region: item.addressObj?.state || "Medenine",
+            city: item.addressObj?.city || "Djerba",
+            address: item.address || null,
+            latitude: item.latitude ? parseFloat(item.latitude) : null,
+            longitude: item.longitude ? parseFloat(item.longitude) : null,
+            phone: item.phone || null,
+            averageRating: item.rating ? parseFloat(item.rating) : 4.0,
+            nbReviews: item.numberOfReviews || 0,
+            approvalStatus: "APPROVED",
+            profileId: DJERBA_PROFILE_ID,
+            destinationId: djerbaDest.id,
+            hostName: "Djerba Villas",
+            hostLanguages: "en,fr,ar",
+            guestCount: 2,
+            bedroomCount: 1,
+            bedCount: 1,
+            bathroomCount: 1,
+            hasWifi,
+            hasPool,
+            hasAirConditioning,
+            hasParking,
+            hasGarden,
+            hasBalcony,
+            hasKitchen,
+            elevatorAvailable,
+            wheelchairAccessible,
+          },
+          create: {
+            slug,
+            title: item.name,
+            arabicTitle: item.localName || null,
+            description: item.description || `A comfortable stay at ${item.name} in Djerba.`,
+            arabicDescription: item.localName ? `إقامة مريحة في ${item.localName} في جربة.` : null,
+            propertyType: "HOTEL",
+            category: "hotel",
+            price,
+            country: item.addressObj?.country || "Tunisia",
+            region: item.addressObj?.state || "Medenine",
+            city: item.addressObj?.city || "Djerba",
+            address: item.address || null,
+            latitude: item.latitude ? parseFloat(item.latitude) : null,
+            longitude: item.longitude ? parseFloat(item.longitude) : null,
+            phone: item.phone || null,
+            averageRating: item.rating ? parseFloat(item.rating) : 4.0,
+            nbReviews: item.numberOfReviews || 0,
+            approvalStatus: "APPROVED",
+            profileId: DJERBA_PROFILE_ID,
+            destinationId: djerbaDest.id,
+            hostName: "Djerba Villas",
+            hostLanguages: "en,fr,ar",
+            guestCount: 2,
+            bedroomCount: 1,
+            bedCount: 1,
+            bathroomCount: 1,
+            hasWifi,
+            hasPool,
+            hasAirConditioning,
+            hasParking,
+            hasGarden,
+            hasBalcony,
+            hasKitchen,
+            elevatorAvailable,
+            wheelchairAccessible,
+          },
+        });
+
+        if (uniqueImages.length > 0) {
+          await prisma.images.deleteMany({ where: { stayId: created.id } });
+          await prisma.images.createMany({
+            data: uniqueImages.map((url, index) => ({
+              url,
+              stayId: created.id,
+              order: index,
+              alt: item.name,
+            })),
+          });
+        }
+      }
+      console.log(`    ✓ Successfully seeded ${data.length} hotels as Stays.`);
+    } else {
+      console.warn(`    ⚠️ File not found: ${filePath}`);
+    }
+  } catch (err) {
+    console.error("    ❌ Error seeding TripAdvisor Stays:", err);
+  }
+
+  // 3. Restaurants -> Restaurant model
+  console.log("  - Seeding TripAdvisor Restaurants...");
+  try {
+    const filePath = path.join(process.cwd(), "prisma", "restaurant_data.json");
+    if (fs.existsSync(filePath)) {
+      const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+      console.log(`    Read ${data.length} restaurants from ${filePath}`);
+      for (const item of data) {
+        if (!item.name) continue;
+        const slug = `${slugify(item.name)}-${item.id}`;
+
+        const rawImages = [item.image, ...(item.photos || [])];
+        const uniqueImages = [...new Set(rawImages.filter(url => url && typeof url === "string" && url.trim().length > 0))];
+
+        const type = item.subcategories?.some((s: string) => /cafe|coffee/i.test(s)) ? "CAFEE_SHOP" : "RESTAURANT";
+        const reservationsEnabled = item.features?.some((f: string) => /reservations/i.test(f)) || false;
+
+        const created = await prisma.restaurant.upsert({
+          where: { slug },
+          update: {
+            name: item.name,
+            arabicName: item.localName || null,
+            description: item.description || `Dine at ${item.name} in Djerba.`,
+            arabicDescription: item.localName ? `تناول الطعام في ${item.localName} في جربة.` : null,
+            phone: item.phone || null,
+            type,
+            category: item.category || "Restaurant",
+            meals: item.meals?.join(", ") || "Lunch, Dinner",
+            foodTypes: item.cuisines || [],
+            dietTypes: item.dietaryRestrictions || [],
+            attributes: item.features || [],
+            country: item.addressObj?.country || "Tunisia",
+            city: item.addressObj?.city || "Djerba",
+            address: item.address || null,
+            reservationsEnabled,
+            approvalStatus: "APPROVED",
+            profileId: DJERBA_PROFILE_ID,
+            destinationId: djerbaDest.id,
+            website: item.website || item.webUrl || null,
+            note: item.rating ? String(item.rating) : "4.0",
+            nbReviews: item.numberOfReviews || 0,
+            maxGuests: 60,
+            tables: 15,
+          },
+          create: {
+            slug,
+            name: item.name,
+            arabicName: item.localName || null,
+            description: item.description || `Dine at ${item.name} in Djerba.`,
+            arabicDescription: item.localName ? `تناول الطعام في ${item.localName} في جربة.` : null,
+            phone: item.phone || null,
+            type,
+            category: item.category || "Restaurant",
+            meals: item.meals?.join(", ") || "Lunch, Dinner",
+            foodTypes: item.cuisines || [],
+            dietTypes: item.dietaryRestrictions || [],
+            attributes: item.features || [],
+            country: item.addressObj?.country || "Tunisia",
+            city: item.addressObj?.city || "Djerba",
+            address: item.address || null,
+            reservationsEnabled,
+            approvalStatus: "APPROVED",
+            profileId: DJERBA_PROFILE_ID,
+            destinationId: djerbaDest.id,
+            website: item.website || item.webUrl || null,
+            note: item.rating ? String(item.rating) : "4.0",
+            nbReviews: item.numberOfReviews || 0,
+            maxGuests: 60,
+            tables: 15,
+          },
+        });
+
+        if (uniqueImages.length > 0) {
+          await prisma.images.deleteMany({ where: { restaurantId: created.id } });
+          await prisma.images.createMany({
+            data: uniqueImages.map((url, index) => ({
+              url,
+              restaurantId: created.id,
+              order: index,
+              alt: item.name,
+            })),
+          });
+        }
+      }
+      console.log(`    ✓ Successfully seeded ${data.length} restaurants.`);
+    } else {
+      console.warn(`    ⚠️ File not found: ${filePath}`);
+    }
+  } catch (err) {
+    console.error("    ❌ Error seeding TripAdvisor Restaurants:", err);
+  }
+
+  console.log("TripAdvisor Data Seeding Completed successfully.");
 }
 
 main()

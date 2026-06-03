@@ -17,9 +17,11 @@ import {
   FiX,
   FiAward,
   FiTrendingUp,
+  FiActivity,
 } from "react-icons/fi";
 import { HiViewGrid } from "react-icons/hi";
-import { FaTicket, FaStore, FaCompass, FaUserSecret } from "react-icons/fa6";
+import { FaTicket, FaStore, FaCompass, FaUserSecret, FaCar } from "react-icons/fa6";
+import { IoRestaurant } from "react-icons/io5";
 import { cn } from "@/lib/utils";
 
 const groups = [
@@ -33,7 +35,10 @@ const groups = [
   {
     label: "Content",
     items: [
-      { key: "listings",      icon: HiViewGrid,  path: "/listings" },
+      { key: "activities",   icon: FiActivity,    path: "/activities" },
+      { key: "stays",        icon: HiViewGrid,    path: "/stays" },
+      { key: "restaurants",  icon: IoRestaurant,  path: "/restaurants" },
+      { key: "listings",     icon: HiViewGrid,    path: "/listings" },
       { key: "passes",        icon: FaTicket,    path: "/passes" },
       { key: "destinations",  icon: FiMapPin,    path: "/destinations" },
       { key: "badges",        icon: FiAward,     path: "/badges" },
@@ -46,10 +51,18 @@ const groups = [
     ],
   },
   {
+    label: "Transport",
+    items: [
+      { key: "transport", icon: FaCar, path: "/transport" },
+    ],
+  },
+  {
     label: "Guides",
     items: [
-      { key: "guides",       icon: FaCompass, path: "/guides" },
-      { key: "guide-plans",  icon: FaCompass, path: "/guide-plans" },
+      { key: "guides",            icon: FaCompass,    path: "/guides" },
+      { key: "guide-plans",       icon: FaCompass,    path: "/guide-plans" },
+      { key: "guide-purchases",   icon: FiTrendingUp, path: "/guide-purchases" },
+      { key: "planner",           icon: FiActivity,   path: "/planner" },
     ],
   },
   {
@@ -67,13 +80,19 @@ const groups = [
 const labels: Record<string, string> = {
   overview:     "Overview",
   bookings:     "Bookings",
+  activities:   "Activities",
+  stays:        "Stays",
+  restaurants:  "Restaurants",
   listings:     "Listings",
   passes:       "Passes",
   destinations: "Destinations",
   badges:       "Badges",
   shops:        "Shops",
+  transport:    "Transport",
   guides:       "Guides",
-  "guide-plans": "Guide Plans",
+  "guide-plans":       "Guide Plans",
+  "guide-purchases":   "Plan Purchases",
+  planner:             "Planner Stats",
   users:        "Users",
   partners:     "Partners",
   agents:              "Local Agents",

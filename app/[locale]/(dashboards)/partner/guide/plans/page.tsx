@@ -3,8 +3,11 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getMyGuideProfile, getMyGuidePlans } from "@/lib/actions/partner-guides";
+import { getDestinations } from "@/lib/actions/destinations";
 import { FiEdit, FiEye } from "react-icons/fi";
 import { FaBookOpen } from "react-icons/fa6";
+import { DuplicatePlanButton } from "./_components/DuplicatePlanButton";
+import { NewPlanButton } from "../_components/NewPlanButton";
 
 type Params = Promise<{ locale: string }>;
 
@@ -19,7 +22,10 @@ export default async function GuidePlansPage({ params }: { params: Params }) {
   const profile = await getMyGuideProfile();
   if (!profile) redirect(`/${locale}/partner/guide/profile`);
 
-  const plans = await getMyGuidePlans();
+  const [plans, destinations] = await Promise.all([
+    getMyGuidePlans(),
+    getDestinations(),
+  ]);
   const base = `/${locale}/partner/guide`;
 
   return (
@@ -29,12 +35,11 @@ export default async function GuidePlansPage({ params }: { params: Params }) {
           <h1 className="text-2xl font-bold text-gray-900">My Plans</h1>
           <p className="text-sm text-gray-400 mt-1">{plans.length} plan{plans.length !== 1 ? "s" : ""}</p>
         </div>
-        <Link
-          href={`${base}/plans/new`}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors"
-        >
-          + New Plan
-        </Link>
+        <NewPlanButton
+          locale={locale}
+          destinations={destinations}
+          defaultDestinationId={profile.destination?.id}
+        />
       </div>
 
       {plans.length === 0 ? (
@@ -44,12 +49,13 @@ export default async function GuidePlansPage({ params }: { params: Params }) {
           <p className="text-gray-400 text-sm mb-5">
             Publish your first trip plan to start reaching travelers.
           </p>
-          <Link
-            href={`${base}/plans/new`}
+          <NewPlanButton
+            locale={locale}
+            destinations={destinations}
+            defaultDestinationId={profile.destination?.id}
+            label="Create your first plan"
             className="px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors"
-          >
-            Create your first plan
-          </Link>
+          />
         </div>
       ) : (
         <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
@@ -102,12 +108,13 @@ export default async function GuidePlansPage({ params }: { params: Params }) {
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2">
                       <Link
-                        href={`${base}/plans/${plan.id}`}
+                        href={`/${locale}/planner/${plan.id}/edit`}
                         className="p-1.5 text-gray-400 hover:text-primary transition-colors"
                         title="Edit"
                       >
                         <FiEdit className="h-4 w-4" />
                       </Link>
+                      <DuplicatePlanButton planId={plan.id} locale={locale} />
                       {plan.isPublic && (
                         <Link
                           href={`/${locale}/planner/${plan.id}`}

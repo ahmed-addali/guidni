@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const ALLOWED_ENTITIES = ["activity", "stay", "restaurant", "rental", "transfer", "business-profile", "shop", "product"] as const;
+const ALLOWED_ENTITIES = ["activity", "stay", "restaurant", "rental", "transfer", "business-profile", "shop", "product", "menu-item", "guide-profile"] as const;
 type Entity = (typeof ALLOWED_ENTITIES)[number];
 
 function getUploadDir(): string {
@@ -115,6 +115,22 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
     if (!profile || profile.id !== entityId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
+  } else if (entity === "menu-item") {
+    const record = await prisma.restaurantMenu.findUnique({
+      where: { id: entityId },
+      select: { restaurant: { select: { profileId: true } } },
+    });
+    if (!record || record.restaurant.profileId !== profile?.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+  } else if (entity === "guide-profile") {
+    const record = await prisma.guideProfile.findUnique({
+      where: { id: entityId },
+      select: { userId: true },
+    });
+    if (!record || record.userId !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
   // Write file to disk
@@ -136,17 +152,23 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
     return NextResponse.json({ success: true, url });
   }
 
+  // Guide profile images: return URL only — caller decides which field to update
+  if (entity === "guide-profile") {
+    return NextResponse.json({ success: true, url });
+  }
+
   // All other entities: save to the Images table
   const image = await prisma.images.create({
     data: {
       url,
-      ...(entity === "activity"   ? { activityId: entityId }   : {}),
-      ...(entity === "stay"       ? { stayId: entityId }        : {}),
-      ...(entity === "restaurant" ? { restaurantId: entityId }  : {}),
-      ...(entity === "rental"     ? { rentalId: entityId }      : {}),
-      ...(entity === "transfer"   ? { transferId: entityId }    : {}),
-      ...(entity === "shop"       ? { shopId: entityId }        : {}),
-      ...(entity === "product"    ? { productId: entityId }     : {}),
+      ...(entity === "activity"   ? { activityId: entityId }          : {}),
+      ...(entity === "stay"       ? { stayId: entityId }               : {}),
+      ...(entity === "restaurant" ? { restaurantId: entityId }         : {}),
+      ...(entity === "rental"     ? { rentalId: entityId }             : {}),
+      ...(entity === "transfer"   ? { transferId: entityId }           : {}),
+      ...(entity === "shop"       ? { shopId: entityId }               : {}),
+      ...(entity === "product"    ? { productId: entityId }            : {}),
+      ...(entity === "menu-item"  ? { restaurantMenuId: entityId }     : {}),
     },
     select: { id: true, url: true },
   });
@@ -208,6 +230,12 @@ export async function DELETE(req: NextRequest, { params }: { params: Params }) {
       select: { shop: { select: { profileId: true } } },
     });
     profileId = r?.shop.profileId ?? null;
+  } else if (image.restaurantMenuId) {
+    const r = await prisma.restaurantMenu.findUnique({
+      where: { id: image.restaurantMenuId },
+      select: { restaurant: { select: { profileId: true } } },
+    });
+    profileId = r?.restaurant.profileId ?? null;
   }
 
   if (!profile || profileId !== profile.id) {

@@ -22,18 +22,63 @@ async function getPartnerProfile() {
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
-export const getPartnerRestaurants = cache(async () => {
-  const profile = await getPartnerProfile();
-  if (!profile) return [];
+const PARTNER_RESTAURANTS_PER_PAGE = 12;
 
-  return prisma.restaurant.findMany({
-    where: { profileId: profile.id },
-    include: {
-      images: { select: { id: true, url: true }, take: 1 },
-      _count: { select: { reservations: true } },
-    },
-    orderBy: { name: "asc" },
-  });
+export const getPartnerRestaurants = cache(async (page = 1) => {
+  const profile = await getPartnerProfile();
+  if (!profile) return { restaurants: [], total: 0, totalPages: 0 };
+
+  const where = { profileId: profile.id };
+  const [rows, total] = await Promise.all([
+    prisma.restaurant.findMany({
+      where,
+      select: {
+        id:                  true,
+        slug:                true,
+        name:                true,
+        type:                true,
+        category:            true,
+        city:                true,
+        country:             true,
+        note:                true,
+        nbReviews:           true,
+        approvalStatus:      true,
+        reservationsEnabled: true,
+        coverPhoto:          true,
+        images:              { select: { id: true, url: true }, take: 1 },
+        _count:              { select: { reservations: true } },
+      },
+      orderBy: { name: "asc" },
+      skip: (page - 1) * PARTNER_RESTAURANTS_PER_PAGE,
+      take: PARTNER_RESTAURANTS_PER_PAGE,
+    }),
+    prisma.restaurant.count({ where }),
+  ]);
+
+  const ids = rows.map((r) => r.id);
+  const badges = ids.length
+    ? await prisma.listingBadge.findMany({
+        where: { relationType: "RESTAURANT", relationId: { in: ids } },
+        select: { relationId: true, badgeKey: true },
+      })
+    : [];
+
+  const badgeMap = new Map<string, string[]>();
+  for (const b of badges) {
+    const keys = badgeMap.get(b.relationId) ?? [];
+    keys.push(b.badgeKey);
+    badgeMap.set(b.relationId, keys);
+  }
+
+  return {
+    restaurants: rows.map((r) => ({
+      ...r,
+      badges: (badgeMap.get(r.id) ?? []).map((key) => ({ badgeKey: key })),
+    })),
+    total,
+    totalPages: Math.ceil(total / PARTNER_RESTAURANTS_PER_PAGE),
+    page,
+  };
 });
 
 export const getPartnerRestaurantBySlug = cache(async (slug: string) => {
@@ -297,4 +342,38 @@ export async function removeRestaurantImage(imageId: string) {
   } catch (error) {
     return { success: false, error: "Failed to remove image." };
   }
+}
+
+// ─── Reviews ──────────────────────────────────────────────────────────────────
+
+export async function getRestaurantReviews(restaurantId: string) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return { reviews: [], guidniReview: null };
+
+  const [reviews, guidniReview] = await Promise.all([
+    prisma.review.findMany({
+      where: { relationType: "RESTAURANT", relationId: restaurantId },
+      include: { user: { select: { name: true, image: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.guidniReview.findUnique({
+      where: { relationType_relationId: { relationType: "RESTAURANT", relationId: restaurantId } },
+      select: {
+        id: true,
+        status: true,
+        reviewerName: true,
+        visitedAt: true,
+        summaryQuote: true,
+        fullReview: true,
+        whatWeLoved: true,
+        worthKnowing: true,
+        bestFor: true,
+        scoreTotal: true,
+        publishedAt: true,
+        images: { select: { url: true }, take: 3 },
+      },
+    }),
+  ]);
+
+  return { reviews, guidniReview };
 }

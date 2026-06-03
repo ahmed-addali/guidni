@@ -39,7 +39,7 @@ export const getAttractionBySlug = cache(
             arabicTitle: true,
             price: true,
             duration: true,
-            category: true,
+            categories: true,
             images: { take: 1, select: { url: true } },
           },
         },

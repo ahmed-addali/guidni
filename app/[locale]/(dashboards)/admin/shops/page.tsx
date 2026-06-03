@@ -1,84 +1,91 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { getAdminShops, getAdminProducts, getAdminOrders } from "@/lib/actions/admin-shops";
 import { getShopCategoryLabel, getProductCategoryLabel } from "@/lib/utils/shop-categories";
 import { OrderStatusBadge } from "@/components/shared/OrderStatusBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShopFeaturedToggle }    from "./_components/ShopFeaturedToggle";
 import { ProductFeaturedToggle } from "./_components/ProductFeaturedToggle";
+import { ShopStatusActions }    from "./_components/ShopStatusActions";
 
 type Params = Promise<{ locale: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
-  void params;
-  return { title: "Shops — Admin" };
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Admin.shops" });
+  return { title: t("pageTitle") };
 }
-
-const ORDER_STATUS_LABEL: Record<string, string> = {
-  PENDING:    "Pending",
-  CONFIRMED:  "Confirmed",
-  PROCESSING: "Processing",
-  SHIPPED:    "Shipped",
-  DELIVERED:  "Delivered",
-  CANCELLED:  "Cancelled",
-  REFUNDED:   "Refunded",
-};
-
-const DELIVERY_LABEL: Record<string, string> = {
-  PICKUP:         "Pickup",
-  LOCAL_DELIVERY: "Local",
-  NATIONWIDE:     "National",
-  INTERNATIONAL:  "International",
-};
 
 export default async function AdminShopsPage({ params }: { params: Params }) {
   const { locale } = await params;
 
-  const [shops, products, orders] = await Promise.all([
+  const [shops, products, orders, t] = await Promise.all([
     getAdminShops(),
     getAdminProducts(),
     getAdminOrders(),
+    getTranslations({ locale, namespace: "Admin.shops" }),
   ]);
 
-  const featuredShops    = shops.filter((s) => s.featuredInHome).length;
+  const activeShops      = shops.filter((s) => s.status === "ACTIVE").length;
+  const draftShops       = shops.filter((s) => s.status === "DRAFT").length;
   const featuredProducts = products.filter((p) => p.featured).length;
   const pendingOrders    = orders.filter((o) => o.status === "PENDING").length;
+
+  const statusActionLabels = {
+    approveLabel:       t("approve"),
+    suspendLabel:       t("suspend"),
+    featureLabel:       t("feature"),
+    unfeatureLabel:     t("unfeature"),
+    activeLabel:        t("statusActive"),
+    suspendedLabel:     t("statusSuspended"),
+    draftLabel:         t("statusDraft"),
+    toastApproved:      t("toastApproved"),
+    toastSuspended:     t("toastSuspended"),
+    toastDraft:         t("toastDraft"),
+    toastStatusFailed:  t("toastStatusFailed"),
+    toastFeatureFailed: t("toastFeatureFailed"),
+  };
 
   return (
     <div className="space-y-6 max-w-screen-xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Shops</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t("pageTitle")}</h1>
         <p className="text-sm text-gray-400 mt-1">
-          {shops.length} shops ({featuredShops} featured) ·{" "}
-          {products.length} products ({featuredProducts} featured) ·{" "}
-          {orders.length} orders ({pendingOrders} pending)
+          {t("summary", {
+            total:    shops.length,
+            active:   activeShops,
+            draft:    draftShops,
+            products: products.length,
+            featured: featuredProducts,
+            orders:   orders.length,
+            pending:  pendingOrders,
+          })}
         </p>
       </div>
 
       <Tabs defaultValue="shops">
         <TabsList className="bg-gray-100 mb-4">
-          <TabsTrigger value="shops">Shops ({shops.length})</TabsTrigger>
-          <TabsTrigger value="products">Products ({products.length})</TabsTrigger>
-          <TabsTrigger value="orders">Orders ({orders.length})</TabsTrigger>
+          <TabsTrigger value="shops">{t("tabShops")} ({shops.length})</TabsTrigger>
+          <TabsTrigger value="products">{t("tabProducts")} ({products.length})</TabsTrigger>
+          <TabsTrigger value="orders">{t("tabOrders")} ({orders.length})</TabsTrigger>
         </TabsList>
 
         {/* ── Shops tab ──────────────────────────────────────────────── */}
         <TabsContent value="shops">
           <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
             {shops.length === 0 ? (
-              <div className="py-16 text-center text-sm text-gray-400">No shops yet.</div>
+              <div className="py-16 text-center text-sm text-gray-400">{t("noShops")}</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wide">
-                      <th className="text-left px-6 py-3 font-medium">Shop</th>
-                      <th className="text-left px-6 py-3 font-medium">Category</th>
-                      <th className="text-left px-6 py-3 font-medium">Location</th>
-                      <th className="text-left px-6 py-3 font-medium">Partner</th>
-                      <th className="text-right px-6 py-3 font-medium">Products</th>
-                      <th className="text-right px-6 py-3 font-medium">Orders</th>
-                      <th className="text-center px-6 py-3 font-medium">Status</th>
-                      <th className="text-center px-6 py-3 font-medium">Featured</th>
+                      <th className="text-left px-6 py-3 font-medium">{t("colShop")}</th>
+                      <th className="text-left px-6 py-3 font-medium">{t("colCategory")}</th>
+                      <th className="text-left px-6 py-3 font-medium">{t("colLocation")}</th>
+                      <th className="text-left px-6 py-3 font-medium">{t("colPartner")}</th>
+                      <th className="text-right px-6 py-3 font-medium">{t("colProducts")}</th>
+                      <th className="text-right px-6 py-3 font-medium">{t("colOrders")}</th>
+                      <th className="text-center px-6 py-3 font-medium">{t("colStatus")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -87,6 +94,7 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
                         <td className="px-6 py-3.5">
                           <Link
                             href={`/${locale}/shops/${shop.slug}`}
+                            target="_blank"
                             className="font-medium text-gray-800 hover:text-primary transition-colors"
                           >
                             {shop.name}
@@ -94,7 +102,7 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
                         </td>
                         <td className="px-6 py-3.5">
                           <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
-                            {getShopCategoryLabel(shop.category, "en")}
+                            {getShopCategoryLabel(shop.category, locale === "ar" ? "ar" : "en")}
                           </span>
                         </td>
                         <td className="px-6 py-3.5 text-gray-600">
@@ -104,7 +112,7 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
                           <div className="flex items-center gap-1.5">
                             {shop.businessProfile.name}
                             {shop.businessProfile.isVerified && (
-                              <span className="text-green-600" title="Verified">✓</span>
+                              <span className="text-green-600" title={t("verified")}>✓</span>
                             )}
                           </div>
                         </td>
@@ -114,17 +122,13 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
                         <td className="px-6 py-3.5 text-right text-gray-600">
                           {shop._count.orders}
                         </td>
-                        <td className="px-6 py-3.5 text-center">
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${
-                            shop.isOpen
-                              ? "bg-green-50 text-green-700 border-green-200"
-                              : "bg-gray-50 text-gray-500 border-gray-200"
-                          }`}>
-                            {shop.isOpen ? "Open" : "Closed"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-3.5 flex justify-center">
-                          <ShopFeaturedToggle shopId={shop.id} featured={shop.featuredInHome} />
+                        <td className="px-6 py-3.5">
+                          <ShopStatusActions
+                            id={shop.id}
+                            status={shop.status as "DRAFT" | "ACTIVE" | "SUSPENDED"}
+                            featured={shop.featuredInHome}
+                            labels={statusActionLabels}
+                          />
                         </td>
                       </tr>
                     ))}
@@ -139,20 +143,20 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
         <TabsContent value="products">
           <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
             {products.length === 0 ? (
-              <div className="py-16 text-center text-sm text-gray-400">No products yet.</div>
+              <div className="py-16 text-center text-sm text-gray-400">{t("noProducts")}</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wide">
-                      <th className="text-left px-6 py-3 font-medium">Product</th>
-                      <th className="text-left px-6 py-3 font-medium">Category</th>
-                      <th className="text-left px-6 py-3 font-medium">Shop</th>
-                      <th className="text-left px-6 py-3 font-medium">Destination</th>
-                      <th className="text-right px-6 py-3 font-medium">Price</th>
-                      <th className="text-right px-6 py-3 font-medium">Stock</th>
-                      <th className="text-center px-6 py-3 font-medium">Handmade</th>
-                      <th className="text-center px-6 py-3 font-medium">Featured</th>
+                      <th className="text-left px-6 py-3 font-medium">{t("colProduct")}</th>
+                      <th className="text-left px-6 py-3 font-medium">{t("colCategory")}</th>
+                      <th className="text-left px-6 py-3 font-medium">{t("colShop")}</th>
+                      <th className="text-left px-6 py-3 font-medium">{t("colLocation")}</th>
+                      <th className="text-right px-6 py-3 font-medium">{t("colPrice")}</th>
+                      <th className="text-right px-6 py-3 font-medium">{t("colStock")}</th>
+                      <th className="text-center px-6 py-3 font-medium">{t("colHandmade")}</th>
+                      <th className="text-center px-6 py-3 font-medium">{t("colFeatured")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -161,6 +165,7 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
                         <td className="px-6 py-3.5">
                           <Link
                             href={`/${locale}/shops/${product.shop.slug}/products/${product.slug}`}
+                            target="_blank"
                             className="font-medium text-gray-800 hover:text-primary transition-colors max-w-[200px] truncate block"
                           >
                             {product.name}
@@ -168,12 +173,13 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
                         </td>
                         <td className="px-6 py-3.5">
                           <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
-                            {getProductCategoryLabel(product.category, "en")}
+                            {getProductCategoryLabel(product.category, locale === "ar" ? "ar" : "en")}
                           </span>
                         </td>
                         <td className="px-6 py-3.5">
                           <Link
                             href={`/${locale}/shops/${product.shop.slug}`}
+                            target="_blank"
                             className="text-gray-600 hover:text-primary transition-colors text-xs"
                           >
                             {product.shop.name}
@@ -182,8 +188,8 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
                         <td className="px-6 py-3.5 text-gray-500 text-xs">
                           {product.shop.destination?.city ?? "—"}
                         </td>
-                        <td className="px-6 py-3.5 text-right font-medium text-gray-700">
-                          {product.price} TND
+                        <td className="px-6 py-3.5 text-right font-medium text-gray-700 whitespace-nowrap">
+                          {(product.price / 1000).toFixed(3)} TND
                         </td>
                         <td className="px-6 py-3.5 text-right">
                           <span className={`text-xs font-medium ${
@@ -193,7 +199,11 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
                               ? "text-amber-600"
                               : "text-gray-600"
                           }`}>
-                            {product.stock}
+                            {product.stock === 0
+                              ? t("outOfStock")
+                              : product.stock <= 5
+                              ? `${product.stock} (${t("lowStock")})`
+                              : product.stock}
                           </span>
                         </td>
                         <td className="px-6 py-3.5 text-center text-xs text-gray-400">
@@ -215,20 +225,20 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
         <TabsContent value="orders">
           <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
             {orders.length === 0 ? (
-              <div className="py-16 text-center text-sm text-gray-400">No orders yet.</div>
+              <div className="py-16 text-center text-sm text-gray-400">{t("noOrders")}</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wide">
-                      <th className="text-left px-6 py-3 font-medium">Ref</th>
-                      <th className="text-left px-6 py-3 font-medium">Shop</th>
-                      <th className="text-left px-6 py-3 font-medium">Customer</th>
-                      <th className="text-left px-6 py-3 font-medium">Delivery</th>
-                      <th className="text-right px-6 py-3 font-medium">Items</th>
-                      <th className="text-right px-6 py-3 font-medium">Total</th>
-                      <th className="text-center px-6 py-3 font-medium">Status</th>
-                      <th className="text-right px-6 py-3 font-medium">Date</th>
+                      <th className="text-left px-6 py-3 font-medium">{t("colRef")}</th>
+                      <th className="text-left px-6 py-3 font-medium">{t("colShop")}</th>
+                      <th className="text-left px-6 py-3 font-medium">{t("colCustomer")}</th>
+                      <th className="text-left px-6 py-3 font-medium">{t("colDelivery")}</th>
+                      <th className="text-right px-6 py-3 font-medium">{t("colItems")}</th>
+                      <th className="text-right px-6 py-3 font-medium">{t("colTotal")}</th>
+                      <th className="text-center px-6 py-3 font-medium">{t("colStatus")}</th>
+                      <th className="text-right px-6 py-3 font-medium">{t("colDate")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -240,6 +250,7 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
                         <td className="px-6 py-3.5">
                           <Link
                             href={`/${locale}/shops/${order.shop.slug}`}
+                            target="_blank"
                             className="text-gray-700 hover:text-primary transition-colors text-xs"
                           >
                             {order.shop.name}
@@ -253,7 +264,7 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
                         </td>
                         <td className="px-6 py-3.5">
                           <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-                            {DELIVERY_LABEL[order.deliveryMethod] ?? order.deliveryMethod}
+                            {order.deliveryMethod === "PICKUP" ? t("deliveryPickup") : t("deliveryDelivery")}
                           </span>
                         </td>
                         <td className="px-6 py-3.5 text-right text-gray-600">
@@ -265,11 +276,15 @@ export default async function AdminShopsPage({ params }: { params: Params }) {
                         <td className="px-6 py-3.5 text-center">
                           <OrderStatusBadge
                             status={order.status}
-                            label={ORDER_STATUS_LABEL[order.status] ?? order.status}
+                            label={t(`orderStatus.${order.status}`)}
                           />
                         </td>
                         <td className="px-6 py-3.5 text-right text-gray-400 text-xs whitespace-nowrap">
-                          {new Date(order.createdAt).toLocaleDateString()}
+                          {new Date(order.createdAt).toLocaleDateString(locale, {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
                         </td>
                       </tr>
                     ))}

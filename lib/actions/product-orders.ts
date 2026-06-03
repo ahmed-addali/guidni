@@ -7,23 +7,16 @@ import { prisma } from "@/lib/db";
 import { generateBookingRef } from "@/lib/utils/booking-ref";
 import { ProductOrderSchema } from "@/lib/validations/shop";
 
-const DELIVERY_COSTS: Record<string, number> = {
-  PICKUP:         0,
-  LOCAL_DELIVERY: 5,
-  NATIONWIDE:     10,
-  INTERNATIONAL:  20,
-};
-
 // ─── Create ───────────────────────────────────────────────────────────────────
 
 export async function createProductOrders(
   rawItems: { productId: string; shopId: string; quantity: number; unitPrice: number }[],
   rawDelivery: {
-    deliveryMethod:  string;
+    deliveryMethod:   string;
     deliveryAddress?: string;
-    deliveryCity?:   string;
+    deliveryCity?:    string;
     deliveryCountry?: string;
-    notes?:          string;
+    notes?:           string;
   }
 ): Promise<{ success: true; data: { orderRefs: string[] } } | { success: false; error: string }> {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -37,17 +30,18 @@ export async function createProductOrders(
   const { items, deliveryMethod, deliveryAddress, deliveryCity, deliveryCountry, notes } = parsed.data;
   const productIds = items.map((i) => i.productId);
 
-  // Fetch authoritative prices + stock from DB
+  // Fetch authoritative prices + stock + shop delivery fee from DB
   const products = await prisma.product.findMany({
     where: { id: { in: productIds } },
     select: {
-      id:    true,
-      price: true,
-      stock: true,
+      id:     true,
+      price:  true,
+      stock:  true,
       shopId: true,
       shop: {
         select: {
-          id:               true,
+          id:                true,
+          deliveryFee:       true,
           freeShippingAbove: true,
         },
       },
@@ -56,12 +50,10 @@ export async function createProductOrders(
 
   const productMap = new Map(products.map((p) => [p.id, p]));
 
-  // Validate stock
+  // Pre-validate all products exist
   for (const item of items) {
-    const product = productMap.get(item.productId);
-    if (!product) return { success: false, error: `Product not found: ${item.productId}` };
-    if (product.stock < item.quantity) {
-      return { success: false, error: `Insufficient stock for one or more products.` };
+    if (!productMap.has(item.productId)) {
+      return { success: false, error: `Product not found: ${item.productId}` };
     }
   }
 
@@ -69,59 +61,87 @@ export async function createProductOrders(
   const shopGroups: Record<string, typeof items> = {};
   for (const item of items) {
     const product = productMap.get(item.productId)!;
-    const shopId = product.shopId;
-    (shopGroups[shopId] ??= []).push(item);
+    (shopGroups[product.shopId] ??= []).push(item);
   }
 
-  const orderRefs: string[] = [];
+  try {
+    const orderRefs = await prisma.$transaction(async (tx) => {
+      const refs: string[] = [];
 
-  // Create one ProductOrder per shop
-  for (const [shopId, shopItems] of Object.entries(shopGroups)) {
-    const shopProduct = productMap.get(shopItems[0].productId)!;
-    const shop = shopProduct.shop;
+      for (const [shopId, shopItems] of Object.entries(shopGroups)) {
+        const shopProduct = productMap.get(shopItems[0].productId)!;
+        const shop = shopProduct.shop;
 
-    // Use server-side price snapshots
-    const subtotal = shopItems.reduce((sum, item) => {
-      const product = productMap.get(item.productId)!;
-      return sum + product.price * item.quantity;
-    }, 0);
+        // Verify stock atomically inside transaction
+        for (const item of shopItems) {
+          const product = await tx.product.findUnique({
+            where:  { id: item.productId },
+            select: { stock: true, name: true },
+          });
+          if (!product) throw new Error(`Product not found: ${item.productId}`);
+          if (product.stock < item.quantity) {
+            throw new Error(`Insufficient stock for "${product.name}"`);
+          }
+        }
 
-    const baseCost  = DELIVERY_COSTS[deliveryMethod] ?? 0;
-    const deliveryCost =
-      shop.freeShippingAbove != null && subtotal >= shop.freeShippingAbove
-        ? 0
-        : baseCost;
-    const total = subtotal + deliveryCost;
+        // Calculate totals using server-side prices
+        const subtotal = shopItems.reduce((sum, item) => {
+          return sum + productMap.get(item.productId)!.price * item.quantity;
+        }, 0);
 
-    const orderRef = generateBookingRef();
-    orderRefs.push(orderRef);
+        // Delivery fee from shop, respecting free-shipping threshold
+        const baseDeliveryCost = deliveryMethod === "DELIVERY" ? (shop.deliveryFee ?? 0) : 0;
+        const deliveryCost =
+          shop.freeShippingAbove != null && subtotal >= shop.freeShippingAbove
+            ? 0
+            : baseDeliveryCost;
+        const total = subtotal + deliveryCost;
 
-    await prisma.productOrder.create({
-      data: {
-        orderRef,
-        status:          "PENDING",
-        deliveryMethod:  deliveryMethod as never,
-        deliveryAddress: deliveryAddress ?? null,
-        deliveryCity:    deliveryCity    ?? null,
-        deliveryCountry: deliveryCountry ?? null,
-        notes:           notes           ?? null,
-        subtotal,
-        deliveryCost,
-        total,
-        userId:  session.user.id,
-        shopId,
-        items: {
-          create: shopItems.map((item) => ({
-            quantity:  item.quantity,
-            unitPrice: productMap.get(item.productId)!.price,
-            productId: item.productId,
-          })),
-        },
-      },
+        const orderRef = generateBookingRef();
+        refs.push(orderRef);
+
+        // Create the order
+        await tx.productOrder.create({
+          data: {
+            orderRef,
+            status:          "PENDING",
+            deliveryMethod:  deliveryMethod as "PICKUP" | "DELIVERY",
+            deliveryAddress: deliveryAddress ?? null,
+            deliveryCity:    deliveryCity    ?? null,
+            deliveryCountry: deliveryCountry ?? null,
+            notes:           notes           ?? null,
+            subtotal,
+            deliveryCost,
+            total,
+            userId: session.user.id,
+            shopId,
+            items: {
+              create: shopItems.map((item) => ({
+                quantity:  item.quantity,
+                unitPrice: productMap.get(item.productId)!.price,
+                productId: item.productId,
+              })),
+            },
+          },
+        });
+
+        // Decrement stock for each product
+        for (const item of shopItems) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data:  { stock: { decrement: item.quantity } },
+          });
+        }
+      }
+
+      return refs;
     });
-  }
 
-  return { success: true, data: { orderRefs } };
+    return { success: true, data: { orderRefs } };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to place order";
+    return { success: false, error: message };
+  }
 }
 
 // ─── Read ──────────────────────────────────────────────────────────────────────

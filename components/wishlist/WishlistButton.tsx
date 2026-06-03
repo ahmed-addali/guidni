@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 import { toggleWishlist } from "@/lib/actions/wishlist";
+import { recTracker } from "@/lib/recommendation/tracker";
 
 type WishlistRelationType = "ACTIVITY" | "STAY" | "RESTAURANT" | "RENTAL" | "SHOP" | "PRODUCT" | "TRANSFER";
 
@@ -45,6 +46,9 @@ export function WishlistButton({
       }
       if ("isWishlisted" in result) {
         setIsWishlisted(result.isWishlisted);
+        if (result.isWishlisted) {
+          recTracker.trackWishlist(listingId, relationType);
+        }
       }
     });
   };

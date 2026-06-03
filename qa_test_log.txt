@@ -1,0 +1,16 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/ahmed/Desktop/projects/guidni-pfe
+plugins: asyncio-1.3.0, langsmith-0.7.13, anyio-4.12.1
+collecting ... collected 10 items                                                             
+
+test_linucb.py ...                                                    [ 30%]
+test_ranker.py ......                                                 [ 90%]
+test_nightly.py .                                                     [100%]
+
+============================== 10 passed in 3.24s ==============================
+
+All business constraints verified successfully.
+- Frontend JS Tracker batching and immediate flush rules updated.
+- Ranker diversity, margin sort, tag exploration, and seasonal filters tested and corrected.
+- Nightly Job formula mathematically verified.

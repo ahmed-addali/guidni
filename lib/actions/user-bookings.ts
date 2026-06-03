@@ -147,3 +147,118 @@ export async function cancelStayBooking(bookingId: string) {
 
   return { success: true };
 }
+
+// ─── Rental Bookings ──────────────────────────────────────────────────────────
+
+export async function getRentalBookingById(bookingId: string) {
+  const userId = await getSessionUserId();
+  if (!userId) return null;
+
+  return prisma.rentalReservation.findFirst({
+    where: { id: bookingId, userId },
+    select: {
+      id: true,
+      bookingRef: true,
+      startDate: true,
+      endDate: true,
+      days: true,
+      totalPrice: true,
+      status: true,
+      notes: true,
+      createdAt: true,
+      rental: {
+        select: {
+          id: true,
+          title: true,
+          type: true,
+          pricePerDay: true,
+          city: true,
+          region: true,
+          country: true,
+          images: { select: { url: true }, take: 1 },
+        },
+      },
+    },
+  });
+}
+
+export async function cancelRentalBooking(bookingId: string) {
+  const userId = await getSessionUserId();
+  if (!userId) return { success: false as const, error: "Not authenticated." };
+
+  const booking = await prisma.rentalReservation.findFirst({
+    where: { id: bookingId, userId },
+  });
+
+  if (!booking) return { success: false as const, error: "Booking not found." };
+  if (booking.status === "CANCELLED" || booking.status === "COMPLETED")
+    return { success: false as const, error: "Cannot cancel this booking." };
+
+  await prisma.rentalReservation.update({
+    where: { id: bookingId },
+    data: { status: "CANCELLED" },
+  });
+
+  return { success: true as const };
+}
+
+// ─── Transfer Bookings ────────────────────────────────────────────────────────
+
+export async function getTransferBookingById(bookingId: string) {
+  const userId = await getSessionUserId();
+  if (!userId) return null;
+
+  return prisma.transferReservation.findFirst({
+    where: { id: bookingId, userId },
+    select: {
+      id: true,
+      bookingRef: true,
+      date: true,
+      time: true,
+      pickupLocation: true,
+      dropoffLocation: true,
+      passengers: true,
+      hoursRequested: true,
+      flightNumber: true,
+      contactName: true,
+      contactPhone: true,
+      notes: true,
+      totalPrice: true,
+      status: true,
+      createdAt: true,
+      transfer: {
+        select: {
+          id: true,
+          title: true,
+          type: true,
+          pricePerTrip: true,
+          pricePerHour: true,
+          pricePerPerson: true,
+          city: true,
+          country: true,
+          images: { select: { url: true }, take: 1 },
+        },
+      },
+    },
+  });
+}
+
+export async function cancelTransferBooking(bookingId: string) {
+  const userId = await getSessionUserId();
+  if (!userId) return { success: false as const, error: "Not authenticated." };
+
+  const booking = await prisma.transferReservation.findFirst({
+    where: { id: bookingId, userId },
+  });
+
+  if (!booking) return { success: false as const, error: "Booking not found." };
+  if (booking.status === "CANCELLED" || booking.status === "COMPLETED")
+    return { success: false as const, error: "Cannot cancel this booking." };
+
+  await prisma.transferReservation.update({
+    where: { id: bookingId },
+    data: { status: "CANCELLED" },
+  });
+
+  return { success: true as const };
+}

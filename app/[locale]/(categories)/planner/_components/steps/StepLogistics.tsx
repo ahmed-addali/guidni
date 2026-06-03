@@ -78,7 +78,7 @@ export function StepLogistics({ preferences, onChange }: Props) {
       })}
 
       {preferences.needsRental && (
-        <div className="ml-9 space-y-2">
+        <div className="ml-9 space-y-3">
           <p className="text-xs font-semibold text-gray-600">{t("rentalTypeTitle")}</p>
           <div className="flex gap-2">
             {RENTAL_TYPES.map(({ value, label, icon }) => {
@@ -98,6 +98,7 @@ export function StepLogistics({ preferences, onChange }: Props) {
               );
             })}
           </div>
+
         </div>
       )}
 

@@ -1,9 +1,12 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { ArrowRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { auth } from "@/lib/auth";
 import { getFeaturedRestaurants } from "@/lib/actions/restaurants";
 import { getDestinationSlug } from "@/lib/actions/destination-cookie";
 import { getBadgesForListings } from "@/lib/actions/badges";
+import { getRecommendedOrder } from "@/lib/recommendation/client";
 import { RestaurantsCarousel } from "./RestaurantsCarousel";
 
 interface Props {
@@ -12,13 +15,36 @@ interface Props {
 
 export async function HomeRestaurantsSection({ locale }: Props) {
   const destinationSlug = await getDestinationSlug();
-  const [restaurants, t] = await Promise.all([
+  const [restaurants, t, tRestaurant, session] = await Promise.all([
     getFeaturedRestaurants(destinationSlug),
     getTranslations({ locale, namespace: "HomePage.restaurants" }),
+    getTranslations({ locale, namespace: "RestaurantPage" }),
+    auth.api.getSession({ headers: await headers() }).catch(() => null),
   ]);
   const badgesMap = await getBadgesForListings(restaurants.map((r) => r.id), "RESTAURANT");
 
   if (restaurants.length === 0) return null;
+
+  const rankedIds = await getRecommendedOrder(
+    "homepage_restaurant", "RESTAURANT", destinationSlug, session?.user?.id,
+  );
+
+  const sorted = rankedIds.length > 0
+    ? rankedIds
+        .map((id) => restaurants.find((r) => r.id === id))
+        .filter(Boolean)
+        .concat(restaurants.filter((r) => !rankedIds.includes(r.id)))
+    : restaurants;
+
+  const cardLabels = {
+    typeLabels: {
+      RESTAURANT: tRestaurant("type.RESTAURANT"),
+      CAFEE_SHOP: tRestaurant("type.CAFEE_SHOP"),
+      BOTH:       tRestaurant("type.BOTH"),
+    },
+    reservationAvailable: tRestaurant("card.reservationsAvailable"),
+    walkinOnly:           tRestaurant("card.walkinOnly"),
+  };
 
   return (
     <section className="py-12 w-full">
@@ -35,7 +61,7 @@ export async function HomeRestaurantsSection({ locale }: Props) {
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
-      <RestaurantsCarousel restaurants={restaurants} locale={locale} badgesMap={badgesMap} />
+      <RestaurantsCarousel restaurants={sorted as typeof restaurants} locale={locale} badgesMap={badgesMap} cardLabels={cardLabels} />
     </section>
   );
 }

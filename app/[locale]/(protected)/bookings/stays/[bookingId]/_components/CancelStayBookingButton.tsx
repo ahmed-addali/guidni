@@ -13,6 +13,7 @@ interface Props {
   label: string;
   confirmLabel: string;
   cancelLabel: string;
+  successLabel: string;
 }
 
 export function CancelStayBookingButton({
@@ -21,6 +22,7 @@ export function CancelStayBookingButton({
   label,
   confirmLabel,
   cancelLabel,
+  successLabel,
 }: Props) {
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
@@ -31,7 +33,7 @@ export function CancelStayBookingButton({
     const result = await cancelStayBooking(bookingId);
     setLoading(false);
     if (result.success) {
-      toast.success("Booking cancelled.");
+      toast.success(successLabel);
       router.push(`/${locale}/bookings`);
       router.refresh();
     } else {

@@ -2,9 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
 import { saveHours } from "@/lib/actions/partner-restaurants";
 
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const DAY_KEYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
 
 type HourEntry = {
   day:              string;
@@ -24,7 +26,7 @@ type RestaurantHour = {
 };
 
 function buildInitialHours(existing: RestaurantHour[]): HourEntry[] {
-  return DAYS.map((day) => {
+  return DAY_KEYS.map((day) => {
     const found = existing.find((h) => h.day === day);
     return {
       day,
@@ -45,6 +47,7 @@ export function HoursTab({
   restaurantId:  string;
   initialHours:  RestaurantHour[];
 }) {
+  const t = useTranslations("PartnerDashboard.editRestaurant.hours");
   const [hours, setHours] = useState<HourEntry[]>(buildInitialHours(initialHours));
   const [pending, start]  = useTransition();
 
@@ -57,23 +60,25 @@ export function HoursTab({
   function handleSubmit() {
     start(async () => {
       const res = await saveHours(restaurantId, hours);
-      if (res.success) toast.success("Hours saved");
-      else toast.error((res as any).error ?? "Failed to save hours");
+      if (res.success) toast.success(t("saveSuccess"));
+      else toast.error((res as any).error ?? t("saveFailed"));
     });
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-base font-semibold text-gray-800">Opening hours</h2>
-        <p className="text-xs text-gray-400 mt-0.5">Set your weekly schedule. Guests will see this on your listing.</p>
+        <h2 className="text-base font-semibold text-gray-800">{t("heading")}</h2>
+        <p className="text-xs text-gray-400 mt-0.5">{t("subheading")}</p>
       </div>
 
       <div className="space-y-2">
         {hours.map(({ day, opening, closing, isClosed, isFullDayOpening }) => (
           <div key={day} className={`flex items-center gap-4 px-4 py-3 rounded-xl border transition-colors ${isClosed ? "bg-gray-50 border-gray-100" : "bg-white border-gray-200"}`}>
             {/* Day label */}
-            <span className="w-24 text-sm font-medium text-gray-700 shrink-0">{day}</span>
+            <span className="w-24 text-sm font-medium text-gray-700 shrink-0">
+              {t(`days.${day}` as any)}
+            </span>
 
             {/* Closed toggle */}
             <label className="flex items-center gap-1.5 cursor-pointer shrink-0">
@@ -83,7 +88,7 @@ export function HoursTab({
                 onChange={(e) => update(day, "isClosed", e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300"
               />
-              <span className="text-xs text-gray-500">Closed</span>
+              <span className="text-xs text-gray-500">{t("closed")}</span>
             </label>
 
             {!isClosed && (
@@ -96,7 +101,7 @@ export function HoursTab({
                     onChange={(e) => update(day, "isFullDayOpening", e.target.checked)}
                     className="h-4 w-4 rounded border-gray-300"
                   />
-                  <span className="text-xs text-gray-500">24h</span>
+                  <span className="text-xs text-gray-500">{t("open24h")}</span>
                 </label>
 
                 {!isFullDayOpening && (
@@ -107,7 +112,7 @@ export function HoursTab({
                       onChange={(e) => update(day, "opening", e.target.value)}
                       className={inputCls}
                     />
-                    <span className="text-xs text-gray-400">to</span>
+                    <span className="text-xs text-gray-400">{t("to")}</span>
                     <input
                       type="time"
                       value={closing}
@@ -118,13 +123,15 @@ export function HoursTab({
                 )}
 
                 {isFullDayOpening && (
-                  <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-lg">Open all day</span>
+                  <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-lg">
+                    {t("openAllDay")}
+                  </span>
                 )}
               </>
             )}
 
             {isClosed && (
-              <span className="text-xs text-gray-400 italic">Closed all day</span>
+              <span className="text-xs text-gray-400 italic">{t("closedAllDay")}</span>
             )}
           </div>
         ))}
@@ -135,9 +142,10 @@ export function HoursTab({
           type="button"
           disabled={pending}
           onClick={handleSubmit}
-          className="px-6 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50"
         >
-          {pending ? "Saving…" : "Save hours"}
+          {pending && <Loader2 className="h-4 w-4 animate-spin" />}
+          {pending ? t("saving") : t("saveHours")}
         </button>
       </div>
     </div>
