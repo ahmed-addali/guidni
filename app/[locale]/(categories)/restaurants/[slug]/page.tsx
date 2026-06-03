@@ -9,7 +9,6 @@ import { getManualBadges, getGuidniReview } from "@/lib/actions/badges";
 import { getAutoBadges } from "@/lib/utils/badge-utils";
 import { BadgeList } from "@/components/badges/BadgeList";
 import { GuidniReviewSection } from "@/components/badges/GuidniReviewSection";
-import { RelationType } from "@prisma/client";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { ReviewsSection } from "@/components/activities/ReviewsSection";
 import { RatingSummary } from "@/components/shared/RatingSummary";
@@ -53,11 +52,11 @@ export default async function RestaurantDetailPage({ params }: { params: Params 
 
   const [reviews, alreadyReviewed, completedBooking, manualBadges, guidniReview, relatedRestaurants] =
     await Promise.all([
-      getReviews(restaurant.id, RelationType.RESTAURANT),
+      getReviews(restaurant.id, "RESTAURANT"),
       hasReviewed(restaurant.id, "RESTAURANT"),
       hasCompletedBooking(restaurant.id, "RESTAURANT"),
-      getManualBadges(restaurant.id, RelationType.RESTAURANT),
-      getGuidniReview(restaurant.id, RelationType.RESTAURANT),
+      getManualBadges(restaurant.id, "RESTAURANT"),
+      getGuidniReview(restaurant.id, "RESTAURANT"),
       restaurant.destinationId
         ? getRelatedRestaurants(restaurant.id, restaurant.destinationId)
         : Promise.resolve([]),

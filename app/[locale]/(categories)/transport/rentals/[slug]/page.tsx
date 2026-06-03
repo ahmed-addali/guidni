@@ -17,7 +17,6 @@ import { ReviewsSection } from "@/components/activities/ReviewsSection";
 import { RatingSummary } from "@/components/shared/RatingSummary";
 import { DescriptionWithToggle } from "@/components/shared/DescriptionWithToggle";
 import { ImageGallery } from "@/components/shared/ImageGallery";
-import { RelationType } from "@prisma/client";
 import { RentalAnchorNav } from "./_components/RentalAnchorNav";
 import { RentalMobileBar } from "./_components/RentalMobileBar";
 import { RentalBookingWidget } from "./_components/RentalBookingWidget";
@@ -50,12 +49,12 @@ export default async function RentalDetailPage({ params }: { params: Params }) {
 
   const [reviews, alreadyReviewed, completedBooking, wishlisted, manualBadges, guidniReview, relatedRentals] =
     await Promise.all([
-      getReviews(rental.id, RelationType.RENTAL),
+      getReviews(rental.id, "RENTAL"),
       hasReviewed(rental.id, "RENTAL"),
       hasCompletedBooking(rental.id, "RENTAL"),
       isInWishlist(rental.id, "RENTAL"),
-      getManualBadges(rental.id, RelationType.RENTAL),
-      getGuidniReview(rental.id, RelationType.RENTAL),
+      getManualBadges(rental.id, "RENTAL"),
+      getGuidniReview(rental.id, "RENTAL"),
       rental.destinationId
         ? getRelatedRentals(rental.id, rental.destinationId)
         : Promise.resolve([]),

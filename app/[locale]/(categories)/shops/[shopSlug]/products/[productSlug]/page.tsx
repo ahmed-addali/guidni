@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { RelationType } from "@prisma/client";
 import { Separator } from "@/components/ui/separator";
 import { getProductBySlug, getShopProducts } from "@/lib/actions/shops";
 import { getReviews, hasCompletedBooking, hasReviewed } from "@/lib/actions/reviews";
@@ -42,7 +41,7 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
   if (!product) notFound();
 
   const [reviews, completedBooking, alreadyReviewed, moreProducts] = await Promise.all([
-    getReviews(product.id, RelationType.PRODUCT),
+    getReviews(product.id, "PRODUCT"),
     hasCompletedBooking(product.id, "PRODUCT"),
     hasReviewed(product.id, "PRODUCT"),
     getShopProducts(product.shopId, product.id),

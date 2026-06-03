@@ -25,7 +25,6 @@ import { StayAnchorNav } from "./_components/StayAnchorNav";
 import { StayMobileBookingBar } from "./_components/StayMobileBookingBar";
 import { StayRelatedSection } from "./_components/StayRelatedSection";
 import { ShareButton } from "./_components/ShareButton";
-import { RelationType } from "@prisma/client";
 
 type Params = Promise<{ locale: string; staySlug: string }>;
 
@@ -52,11 +51,11 @@ export default async function StayPage({ params }: { params: Params }) {
   if (!stay) notFound();
 
   const [reviews, completedBooking, alreadyReviewed, manualBadges, guidniReview, relatedStays] = await Promise.all([
-    getReviews(stay.id, RelationType.STAY),
+    getReviews(stay.id, "STAY"),
     hasCompletedBooking(stay.id, "STAY"),
     hasReviewed(stay.id, "STAY"),
-    getManualBadges(stay.id, RelationType.STAY),
-    getGuidniReview(stay.id, RelationType.STAY),
+    getManualBadges(stay.id, "STAY"),
+    getGuidniReview(stay.id, "STAY"),
     stay.destinationId
       ? getRelatedStays(stay.id, stay.destinationId)
       : Promise.resolve([]),

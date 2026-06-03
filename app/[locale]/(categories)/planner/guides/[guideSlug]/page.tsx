@@ -11,7 +11,6 @@ import { ReviewsSection } from "@/components/activities/ReviewsSection";
 import { FiStar, FiBookOpen, FiMapPin, FiGlobe, FiInstagram } from "react-icons/fi";
 import { FaCircleCheck, FaFacebook, FaTiktok } from "react-icons/fa6";
 import { ArrowLeft } from "lucide-react";
-import { RelationType } from "@prisma/client";
 
 type Props = {
   params: Promise<{ locale: string; guideSlug: string }>;
@@ -39,7 +38,7 @@ export default async function GuideProfilePage({ params }: Props) {
   if (!guide) notFound();
 
   const [reviews, alreadyReviewed, canLeaveReview] = await Promise.all([
-    getReviews(guide.id, RelationType.GUIDE),
+    getReviews(guide.id, "GUIDE"),
     session?.user ? hasReviewed(guide.id, "GUIDE") : Promise.resolve(false),
     session?.user ? hasCompletedBooking(guide.id, "GUIDE") : Promise.resolve(false),
   ]);

@@ -26,7 +26,6 @@ import { ActivityMobileBookingBar } from "./_components/ActivityMobileBookingBar
 import { ActivityHostStrip } from "./_components/ActivityHostStrip";
 import { ActivityRelatedSection } from "./_components/ActivityRelatedSection";
 import { DescriptionWithToggle } from "@/components/shared/DescriptionWithToggle";
-import { RelationType } from "@prisma/client";
 
 type Params = Promise<{ locale: string; activitySlug: string }>;
 
@@ -57,11 +56,11 @@ export default async function ActivityPage({ params }: { params: Params }) {
   if (!activity) notFound();
 
   const [reviews, completedBooking, alreadyReviewed, manualBadges, guidniReview, relatedActivities] = await Promise.all([
-    getReviews(activity.id, RelationType.ACTIVITY),
+    getReviews(activity.id, "ACTIVITY"),
     hasCompletedBooking(activity.id, "ACTIVITY"),
     hasReviewed(activity.id, "ACTIVITY"),
-    getManualBadges(activity.id, RelationType.ACTIVITY),
-    getGuidniReview(activity.id, RelationType.ACTIVITY),
+    getManualBadges(activity.id, "ACTIVITY"),
+    getGuidniReview(activity.id, "ACTIVITY"),
     activity.destinationId
       ? getRelatedActivities(activity.id, activity.destinationId)
       : Promise.resolve([]),

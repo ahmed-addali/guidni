@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { RelationType } from "@prisma/client";
 import { Separator } from "@/components/ui/separator";
 import { getShopBySlug, getRelatedShops } from "@/lib/actions/shops";
 import { getReviews, hasCompletedBooking, hasReviewed } from "@/lib/actions/reviews";
@@ -43,13 +42,13 @@ export default async function ShopDetailPage({ params }: { params: Params }) {
   if (!shop) notFound();
 
   const [reviews, completedBooking, alreadyReviewed, , relatedShops, manualBadges, guidniReview] = await Promise.all([
-    getReviews(shop.id, RelationType.SHOP),
+    getReviews(shop.id, "SHOP"),
     hasCompletedBooking(shop.id, "SHOP"),
     hasReviewed(shop.id, "SHOP"),
     isInWishlist(shop.id, "SHOP"),
     getRelatedShops(shop.id, shop.destinationId, 3),
-    getManualBadges(shop.id, RelationType.SHOP),
-    getGuidniReview(shop.id, RelationType.SHOP),
+    getManualBadges(shop.id, "SHOP"),
+    getGuidniReview(shop.id, "SHOP"),
   ]);
 
   const autoBadges = getAutoBadges({ note: shop.note, nbReviews: shop.nbReviews });

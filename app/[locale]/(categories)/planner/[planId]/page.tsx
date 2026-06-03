@@ -4,7 +4,6 @@ import { auth } from "@/lib/auth";
 import { getPlan } from "@/lib/actions/planner";
 import { getReviews, hasReviewed, hasCompletedBooking } from "@/lib/actions/reviews";
 import { PlanView } from "./_components/PlanView";
-import { RelationType } from "@prisma/client";
 
 type Props = {
   params: Promise<{ locale: string; planId: string }>;
@@ -25,7 +24,7 @@ export default async function PlanDetailPage({ params }: Props) {
 
   const [reviews, alreadyReviewed, canReview] = isGuidePlan
     ? await Promise.all([
-        getReviews(plan.id, RelationType.PLAN),
+        getReviews(plan.id, "PLAN"),
         session?.user ? hasReviewed(plan.id, "PLAN") : Promise.resolve(false),
         session?.user ? hasCompletedBooking(plan.id, "PLAN") : Promise.resolve(false),
       ])

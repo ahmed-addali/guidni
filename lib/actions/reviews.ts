@@ -5,8 +5,10 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
-import { RelationType } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { ReviewSchema } from "@/lib/validations/review";
+
+type RelationType = Prisma.ReviewCreateInput["relationType"];
 
 // ─── Read ─────────────────────────────────────────────────────────────────────
 

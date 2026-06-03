@@ -17,7 +17,6 @@ import { ReviewsSection } from "@/components/activities/ReviewsSection";
 import { RatingSummary } from "@/components/shared/RatingSummary";
 import { DescriptionWithToggle } from "@/components/shared/DescriptionWithToggle";
 import { ImageGallery } from "@/components/shared/ImageGallery";
-import { RelationType } from "@prisma/client";
 import { TransferAnchorNav } from "./_components/TransferAnchorNav";
 import { TransferMobileBar } from "./_components/TransferMobileBar";
 import { TransferBookingWidget } from "./_components/TransferBookingWidget";
@@ -50,12 +49,12 @@ export default async function TransferDetailPage({ params }: { params: Params })
 
   const [reviews, alreadyReviewed, completedBooking, wishlisted, manualBadges, guidniReview, relatedTransfers] =
     await Promise.all([
-      getReviews(transfer.id, RelationType.TRANSFER),
+      getReviews(transfer.id, "TRANSFER"),
       hasReviewed(transfer.id, "TRANSFER"),
       hasCompletedBooking(transfer.id, "TRANSFER"),
       isInWishlist(transfer.id, "TRANSFER"),
-      getManualBadges(transfer.id, RelationType.TRANSFER),
-      getGuidniReview(transfer.id, RelationType.TRANSFER),
+      getManualBadges(transfer.id, "TRANSFER"),
+      getGuidniReview(transfer.id, "TRANSFER"),
       transfer.destinationId
         ? getRelatedTransfers(transfer.id, transfer.destinationId)
         : Promise.resolve([]),

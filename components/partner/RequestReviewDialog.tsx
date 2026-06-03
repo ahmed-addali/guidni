@@ -4,7 +4,8 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { BookOpen, X } from "lucide-react";
 import { requestGuidniReview } from "@/lib/actions/partner-badges";
-import type { RelationType } from "@prisma/client";
+
+type RelationType = Parameters<typeof requestGuidniReview>[1];
 
 interface Props {
   listingId:    string;
