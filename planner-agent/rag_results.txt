@@ -1,0 +1,35 @@
+╭───────────────────────────────── Paramètres ─────────────────────────────────╮
+│ Recherche RAG avec Qdrant                                                    │
+│ Requête: restaurant traditionnel avec des plats de fruits de mer et une      │
+│ belle vue                                                                    │
+│ Filtres: {'entity_type': 'restaurant', 'destination_id':                     │
+│ 'cmonnw3kr0000i04asq31gi8a'}                                                 │
+╰──────────────────────────────────────────────────────────────────────────────╯
+       Exemple de résultats d'une recherche RAG avec scores de similarité       
+┏━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃        ┃            ┃             ┃            ┃              ┃ Extrait de   ┃
+┃  Score ┃ Type       ┃ Nom du lieu ┃ Prix (TND) ┃ Tags         ┃ Description  ┃
+┡━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━┩
+│ 0.5554 │ restaurant │             │          - │ authentic,   │              │
+│        │            │             │            │ local        │              │
+│        │            │             │            │ favorite     │              │
+├────────┼────────────┼─────────────┼────────────┼──────────────┼──────────────┤
+│ 0.5539 │ restaurant │             │          - │ authentic,   │              │
+│        │            │             │            │ local        │              │
+│        │            │             │            │ favorite     │              │
+├────────┼────────────┼─────────────┼────────────┼──────────────┼──────────────┤
+│ 0.5538 │ restaurant │             │          - │ authentic,   │              │
+│        │            │             │            │ local        │              │
+│        │            │             │            │ favorite     │              │
+├────────┼────────────┼─────────────┼────────────┼──────────────┼──────────────┤
+│ 0.5512 │ restaurant │             │          - │ authentic,   │              │
+│        │            │             │            │ local        │              │
+│        │            │             │            │ favorite     │              │
+├────────┼────────────┼─────────────┼────────────┼──────────────┼──────────────┤
+│ 0.5491 │ restaurant │             │          - │ authentic,   │              │
+│        │            │             │            │ local        │              │
+│        │            │             │            │ favorite     │              │
+└────────┴────────────┴─────────────┴────────────┴──────────────┴──────────────┘
+
+Note: The search uses hybrid fusion (RRF) and BGE-Reranker for high-precision 
+scoring.

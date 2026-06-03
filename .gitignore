@@ -46,3 +46,6 @@ planner-agent/venv/
 planner-agent/logs/
 __pycache__/
 rag_storage/
+brain/
+planner-agent/
+rapport/

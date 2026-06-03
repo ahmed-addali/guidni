@@ -1,0 +1,279 @@
+{
+    "conversation_id": "835e0559-cde2-459d-856b-fdd97ddcd1a4",
+    "response_type": "plan",
+    "content": "**Your 2‑day cultural & culinary getaway in Djerba**  \n\nBelow is a complete, balanced itinerary for a couple who wants a mix of culture, good food and a touch of romance, all while staying within a mid‑range budget.\n\n---\n\n### 📅 Day 1 – “Island Highlights & Sunset Romance”\n\n| Time | Activity | Type | Price (TND) | Why we chose it |\n|------|----------|------|-------------|-----------------|\n| **09:00 – 15:00** | **Djerba Full Island Discovery Tour** – visit El Ghriba Synagogue, Guellala village & Houmt Souk | Guided cultural tour (activity) | **150  (75 × 2)** | Gives you the best overview of Djerba’s history and heritage in one day. |\n| **17:30 – 19:00** | **Sunset Horse Carriage Ride** over the lagoon | Romantic adventure (activity) | **50  (25 × 2)** | A peaceful, scenic way to watch the sunset together. |\n| **20:00 – 22:00** | **Dinner at Café Toumana** – authentic Tunisian dishes in a chic lounge | Meal | **Review Required** (local‑price) | Beloved by locals, perfect for a relaxed dinner after the ride. |\n\n---\n\n### 📅 Day 2 – “Heritage Walks, Market Flavors & Beach Fun”\n\n| Time | Activity | Type | Price (TND) | Why we chose it |\n|------|----------|------|-------------|-----------------|\n| **09:00 – 11:00** | **Djerba Heritage Village** – living museum of traditional crafts & architecture | Attraction (low‑fee) | **16  (8 × 2)** | Immersive look at Berber‑Arab culture in a beautiful setting. |\n| **11:30 – 13:00** | **Houmt Souk Medina** – wander the souks, spice market & historic fondouks | Free attraction | **0** | The heart of Djerba’s market life – great for photos and souvenirs. |\n| **13:30 – 15:00** | **Lunch at La Marina Djerba** – fresh seafood & Tunisian specialties by the harbor | Meal | **Review Required** | Enjoy the sea breeze and the best local fish dishes. |\n| **15:30 – 16:30** | **Camel Ride on Djerba Beach** – gentle ride along the golden shore | Adventure (activity) | **90  (45 × 2)** | A unique, fun experience and perfect photo op on the beach. |\n| **20:00 – 22:00** | **Dinner at Dar Maison** – refined Tunisian cuisine in a restored menzel | Meal | **Review Required** | Fine‑dining finale to celebrate the trip. |\n\n---\n\n### 🏨 Overnight stay (both nights)\n\n**Hotel Ksar Djerba – Charming Stay**  \n*Boutique hotel, pool, garden, central Midoun location – 75 TND per night*  \n\n*Why this hotel?* It offers authentic décor and excellent amenities at a comfortable mid‑range price, keeping you close to the day‑1 activities and the beach for day‑2.\n\n---\n\n### 💰 Budget summary (for the couple)\n\n| Category | Cost (TND) |\n|----------|------------|\n| Accommodation (2 nights) | **150** |\n| Activities (tours, rides, entry fees) | **306** |\n| Meals (estimated 4 meals × ≈ 40 TND per person) | **160** |\n| Local transport (taxi, moderate) | **40** |\n| **Total** | **656 TND** |\n\n*This fits a moderate, mid‑range budget while still giving you memorable experiences.*\n\n---\n\n### 📝 Handy tips\n\n1. **Book early** – the Full Island Tour and Camel Ride have limited spots.  \n2. **Comfortable shoes** are a must for the heritage village and market walk.  \n3. **Carry cash** for small purchases in the souks; many vendors don’t take cards.  \n4. **Sun protection** (hat, sunscreen) is essential for the beach ride and outdoor walking.  \n\n---\n\n**What do you think?**  \nIf everything looks good, I can lock in the bookings and send you the final plan. Let me know if you’d like any tweaks (e.g., different restaurant, extra free time, or a different stay).",
+    "plan": {
+        "days": [
+            {
+                "day_number": 1,
+                "date": "",
+                "theme": "Cultural & Culinary",
+                "slots": [
+                    {
+                        "time": "09:00",
+                        "end_time": "15:00",
+                        "type": "activity",
+                        "activity_id": "cmonnw3n5001qi04a79poif09",
+                        "title": "Djerba Full Island Discovery Tour",
+                        "description": "Full Island Discovery Tour – explore El Ghriba Synagogue, Guellala village, and Houmt Souk.",
+                        "category": "Culture & History",
+                        "price": 150,
+                        "duration": 6,
+                        "reason": "Comprehensive cultural immersion covering major heritage sites.",
+                        "image": null,
+                        "bookable": true,
+                        "latitude": 33.873963,
+                        "longitude": 10.85563
+                    },
+                    {
+                        "time": "17:30",
+                        "end_time": "19:00",
+                        "type": "activity",
+                        "activity_id": "cmonnw4i800uxi04a12lgb2ix",
+                        "title": "Sunset Horse Carriage Ride",
+                        "description": "Sunset Horse Carriage Ride – romantic carriage ride over the lagoon at sunset.",
+                        "category": "Adventure",
+                        "price": 50,
+                        "duration": 1.5,
+                        "reason": "Adds a romantic, relaxed evening experience.",
+                        "image": null,
+                        "bookable": true,
+                        "latitude": 33.808157,
+                        "longitude": 11.024398
+                    },
+                    {
+                        "time": "20:00",
+                        "end_time": "22:00",
+                        "type": "meal",
+                        "activity_id": "cmono1lob01hki0h98wrshjqh",
+                        "title": "Café Toumana",
+                        "description": "Dinner at Café Toumana – authentic Tunisian dishes in a chic lounge.",
+                        "category": "",
+                        "price": "Review Required",
+                        "duration": 2,
+                        "reason": "Local favorite for a relaxed dinner with Tunisian flavors.",
+                        "image": null,
+                        "bookable": true,
+                        "latitude": null,
+                        "longitude": null
+                    }
+                ]
+            },
+            {
+                "day_number": 2,
+                "date": "",
+                "theme": "Cultural & Culinary",
+                "slots": [
+                    {
+                        "time": "09:00",
+                        "end_time": "11:00",
+                        "type": "attraction",
+                        "activity_id": "cmono1lnq01gqi0h9dwg0767t",
+                        "title": "Djerba Heritage Village",
+                        "description": "Djerba Heritage Village – living museum of traditional crafts and architecture.",
+                        "category": "Culture",
+                        "price": 16,
+                        "duration": 2,
+                        "reason": "Deep dive into Djerba’s Berber‑Arab heritage.",
+                        "image": null,
+                        "bookable": true,
+                        "latitude": null,
+                        "longitude": null
+                    },
+                    {
+                        "time": "11:30",
+                        "end_time": "13:00",
+                        "type": "attraction",
+                        "activity_id": "baa77737-0045-4408-ae7c-99cccab5bf1c",
+                        "title": "Houmt Souk Medina",
+                        "description": "Stroll through Houmt Souk Medina – explore souks, spice market and historic fondouks.",
+                        "category": "Culture",
+                        "price": 0,
+                        "duration": 1.5,
+                        "reason": "Free cultural immersion in the island’s main market.",
+                        "image": null,
+                        "bookable": true,
+                        "latitude": null,
+                        "longitude": null
+                    },
+                    {
+                        "time": "13:30",
+                        "end_time": "15:00",
+                        "type": "meal",
+                        "activity_id": "cmono1lo701hei0h96gk7uir3",
+                        "title": "La Marina Djerba",
+                        "description": "Lunch at La Marina – fresh seafood and Tunisian specialties by the harbor.",
+                        "category": "",
+                        "price": "Review Required",
+                        "duration": 1.5,
+                        "reason": "Seafood experience with a view of the marina.",
+                        "image": null,
+                        "bookable": true,
+                        "latitude": null,
+                        "longitude": null
+                    },
+                    {
+                        "time": "15:30",
+                        "end_time": "16:30",
+                        "type": "activity",
+                        "activity_id": "cmonnw3mx001hi04aixu8sj5u",
+                        "title": "Camel Ride on Djerba Beach",
+                        "description": "Camel Ride on Djerba Beach – gentle camel ride along the golden shoreline.",
+                        "category": "Adventure",
+                        "price": 90,
+                        "duration": 1,
+                        "reason": "Unique local experience and a fun photo opportunity.",
+                        "image": null,
+                        "bookable": true,
+                        "latitude": 33.811774,
+                        "longitude": 11.01635
+                    },
+                    {
+                        "time": "20:00",
+                        "end_time": "22:00",
+                        "type": "meal",
+                        "activity_id": "cmono1lpl01jei0h9kjl55me2",
+                        "title": "Dar Maison",
+                        "description": "Dinner at Dar Maison – refined Tunisian cuisine in a restored Djerbian menzel.",
+                        "category": "",
+                        "price": "Review Required",
+                        "duration": 2,
+                        "reason": "Fine‑dining finale to celebrate the trip.",
+                        "image": null,
+                        "bookable": true,
+                        "latitude": null,
+                        "longitude": null
+                    }
+                ]
+            }
+        ],
+        "summary": "2‑day cultural & culinary escape for a couple, blending guided heritage tours, authentic market strolls, a romantic sunset carriage ride, and memorable meals at top local restaurants. Overnight stay at a charming boutique hotel in Midoun.",
+        "total_budget": 656,
+        "stay_suggestions": [
+            {
+                "stay_id": "cmono1kvf00npi0h90a0o440z",
+                "title": "Hotel Ksar Djerba - Charming Stay",
+                "price": 75,
+                "rating": null,
+                "image": null,
+                "reason": "Boutique hotel offering authentic décor, pool and central location in Midoun – good value for a mid‑range budget."
+            }
+        ],
+        "tips": [
+            "Book the Full Island Discovery Tour and Camel Ride a few days in advance – they have limited spots.",
+            "Wear comfortable shoes for the heritage village and market walks.",
+            "Carry cash for small purchases in the souks; many vendors don’t accept cards.",
+            "Sun protection is essential for the beach camel ride and outdoor walking."
+        ],
+        "budget_breakdown": {
+            "activities": 306,
+            "accommodation": 150,
+            "food": 0.0,
+            "transport": 40,
+            "total": 0.0
+        }
+    },
+    "thinking_steps": [
+        {
+            "step": "Bonjour !  \n\nPour préparer votre séjour de 2 jours à Djerba, j’ai besoin d’une petite précision : quelles sont les dates exactes de votre voyage ? Cel...",
+            "tool_used": "rag_search_for_plan",
+            "result_summary": null
+        },
+        {
+            "step": "✅ rag_search_for_plan completed",
+            "tool_used": "rag_search_for_plan",
+            "result_summary": "Got: theme, num_days, WARNING..."
+        },
+        {
+            "step": "✅ rag_search_for_plan completed",
+            "tool_used": "rag_search_for_plan",
+            "result_summary": "Got: theme, num_days, WARNING..."
+        },
+        {
+            "step": "✅ rag_search_for_plan completed",
+            "tool_used": "rag_search_for_plan",
+            "result_summary": "Got: theme, num_days, WARNING..."
+        },
+        {
+            "step": "✅ rag_search completed",
+            "tool_used": "rag_search",
+            "result_summary": "Found 5 items"
+        },
+        {
+            "step": "✅ rag_search completed",
+            "tool_used": "rag_search",
+            "result_summary": "Found 5 items"
+        },
+        {
+            "step": "✅ rag_search completed",
+            "tool_used": "rag_search",
+            "result_summary": "Found 5 items"
+        },
+        {
+            "step": "**Your 2‑day cultural & culinary getaway in Djerba**  \n\nBelow is a complete, balanced itinerary for a couple who wants a mix of culture, good food and...",
+            "tool_used": "estimate_daily_budget",
+            "result_summary": null
+        },
+        {
+            "step": "✅ estimate_daily_budget completed",
+            "tool_used": "estimate_daily_budget",
+            "result_summary": "Got: activities_cost, food_estimate, transport_estimate..."
+        },
+        {
+            "step": "✅ check_availability completed",
+            "tool_used": "check_availability",
+            "result_summary": "Available (8 spots)"
+        },
+        {
+            "step": "✅ check_availability completed",
+            "tool_used": "check_availability",
+            "result_summary": "Available (8 spots)"
+        },
+        {
+            "step": "✅ create_plan_structure completed",
+            "tool_used": "create_plan_structure",
+            "result_summary": "Got: valid, plan, activity_count..."
+        },
+        {
+            "step": "🤔 Thinking...",
+            "tool_used": null,
+            "result_summary": null
+        },
+        {
+            "step": "✅ Validation passed!",
+            "tool_used": null,
+            "result_summary": null
+        }
+    ],
+    "questions": null,
+    "ids": [
+        {
+            "id": "cmonnw3n5001qi04a79poif09",
+            "type": "activity"
+        },
+        {
+            "id": "cmonnw4i800uxi04a12lgb2ix",
+            "type": "activity"
+        },
+        {
+            "id": "cmono1lob01hki0h98wrshjqh",
+            "type": "yummy"
+        },
+        {
+            "id": "cmono1lo701hei0h96gk7uir3",
+            "type": "yummy"
+        },
+        {
+            "id": "cmonnw3mx001hi04aixu8sj5u",
+            "type": "activity"
+        },
+        {
+            "id": "cmono1lpl01jei0h9kjl55me2",
+            "type": "yummy"
+        },
+        {
+            "id": "cmono1kvf00npi0h90a0o440z",
+            "type": "accommodation"
+        }
+    ]
+}
