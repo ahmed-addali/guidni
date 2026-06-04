@@ -8,7 +8,7 @@ import { StepDestination } from "./steps/StepDestination";
 import { StepInterests } from "./steps/StepInterests";
 import { StepBudgetGroup } from "./steps/StepBudgetGroup";
 import { StepLogistics } from "./steps/StepLogistics";
-import type { UserPreferences } from "@/lib/planner/types";
+import type { PlannerData, UserPreferences } from "@/lib/planner/types";
 
 export const PREVIEW_KEY = "guidni_planner_preview";
 
@@ -42,6 +42,7 @@ type Props = {
   defaultDestinationId?: string;
   defaultDestinationName?: string;
   defaultDestinationCity?: string;
+  plannerData: PlannerData;
 };
 
 export function PlannerWizard({
