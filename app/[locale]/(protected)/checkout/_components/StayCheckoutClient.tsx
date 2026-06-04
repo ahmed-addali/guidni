@@ -150,7 +150,7 @@ export function StayCheckoutClient({
       setStep(3);
       toast.success(labels.success);
       // Track reservation for recommendation system
-      recTracker.trackReservation(stay.id, "STAY", computeStayTotal(stay.price, checkIn, checkOut));
+      recTracker.trackReservation(stay.id, "STAY", total);
     } else {
       setFailed(true);
       toast.error(result.error ?? labels.error);

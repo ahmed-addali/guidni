@@ -66,7 +66,6 @@ export function QRInviteModal({ url, activityTitle, expiresLabel }: Props) {
                 value={url}
                 size={200}
                 level="M"
-                includeMargin={false}
               />
             </div>
 

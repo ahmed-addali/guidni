@@ -42,7 +42,7 @@ type Props = {
   defaultDestinationId?: string;
   defaultDestinationName?: string;
   defaultDestinationCity?: string;
-  plannerData: PlannerData;
+  plannerData?: PlannerData;
 };
 
 export function PlannerWizard({

@@ -29,7 +29,7 @@ type QueuePlan = {
   isPublic: boolean;
   price: number | null;
   summary: string | null;
-  createdAt: string;
+  createdAt: Date;
   destination?: { city: string } | null;
   guide?: { slug: string; displayName: string; isVerified: boolean } | null;
 };

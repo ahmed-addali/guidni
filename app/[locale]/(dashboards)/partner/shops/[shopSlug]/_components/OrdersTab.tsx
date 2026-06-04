@@ -164,11 +164,10 @@ export function OrdersTab({ orders: initialOrders }: { orders: Order[] }) {
           {filtered.map((order) => {
             const nextStatuses = STATUS_FLOW[order.status] ?? [];
             const deliveryKey  = order.deliveryMethod as "PICKUP" | "DELIVERY";
-            const deliveryLabel = t(
-              `deliveryMethods.${deliveryKey}` as Parameters<typeof t>[0],
-              undefined,
-              { defaultValue: order.deliveryMethod.replace(/_/g, " ") }
-            );
+            const translationKey = `deliveryMethods.${deliveryKey}` as Parameters<typeof t>[0];
+            const deliveryLabel = t.has(translationKey)
+              ? t(translationKey)
+              : order.deliveryMethod.replace(/_/g, " ");
             const date = new Date(order.createdAt).toLocaleDateString(locale, {
               day: "numeric", month: "short", year: "numeric",
             });

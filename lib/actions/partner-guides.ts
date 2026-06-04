@@ -201,7 +201,7 @@ export async function publishGuidePlan(
         tags:         parsed.data.tags,
         difficulty:   parsed.data.difficulty ?? null,
         suitableFor:  parsed.data.suitableFor,
-        season:       parsed.data.season ?? null,
+        season:       parsed.data.season ? [parsed.data.season] : [],
         previewDays:  parsed.data.previewDays,
         price:        0,
         isPaidPlan:   false,
@@ -270,7 +270,15 @@ export async function updateGuidePlanMeta(
   if (!plan || plan.guideId !== guide.id)
     return { success: false as const, error: "Plan not found" };
 
-  await prisma.plan.update({ where: { id: planId }, data });
+  const { season, ...rest } = data;
+
+  await prisma.plan.update({
+    where: { id: planId },
+    data: {
+      ...rest,
+      ...(season !== undefined ? { season: season ? [season] : [] } : {}),
+    },
+  });
   return { success: true as const };
 }
 

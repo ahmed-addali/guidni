@@ -13,7 +13,7 @@ import { TrackedCard } from "@/components/shared/TrackedCard";
 import { getShopCategoryLabel } from "@/lib/utils/shop-categories";
 import type { BadgeKey } from "@prisma/client";
 
-type DeliveryMethod = "PICKUP" | "LOCAL_DELIVERY" | "NATIONWIDE" | "INTERNATIONAL";
+type DeliveryMethod = "PICKUP" | "DELIVERY";
 
 interface ShopItem {
   id:              string;

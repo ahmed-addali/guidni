@@ -136,7 +136,7 @@ function RecommendationCard({ item, locale }: { item: any; locale: string }) {
     <Link 
       href={getHref()}
       className="group relative flex flex-col gap-2 h-full border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow bg-white overflow-hidden"
-      onClick={() => recTracker.trackClick(item.listing_id, item.listing_type, price)}
+      onClick={() => recTracker.trackClick(item.listing_id, item.listing_type)}
     >
       <div ref={cardRef} className="flex flex-col h-full">
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 mb-3">

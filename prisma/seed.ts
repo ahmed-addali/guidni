@@ -908,8 +908,8 @@ async function seedExtendedData() {
     
     const created = await prisma.activity.upsert({
       where: { slug: act.slug },
-      update: { ...act, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id },
-      create: { ...act, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id },
+      update: { ...act, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id } as any,
+      create: { ...act, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id } as any,
     });
 
     const existingImages = await prisma.images.count({ where: { activityId: created.id } });
@@ -934,8 +934,8 @@ async function seedExtendedData() {
 
     const created = await prisma.stay.upsert({
       where: { slug: stay.slug },
-      update: { ...stay, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id },
-      create: { ...stay, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id },
+      update: { ...stay, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id } as any,
+      create: { ...stay, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id } as any,
     });
 
     const existingImages = await prisma.images.count({ where: { stayId: created.id } });
@@ -960,8 +960,8 @@ async function seedExtendedData() {
 
     const created = await prisma.attraction.upsert({
       where: { slug: attr.slug },
-      update: { ...attr, destinationId: dest?.id || tunis!.id }, 
-      create: { ...attr, destinationId: dest?.id || tunis!.id },
+      update: { ...attr, destinationId: dest?.id || tunis!.id } as any, 
+      create: { ...attr, destinationId: dest?.id || tunis!.id } as any,
     });
 
     const existingImages = await prisma.images.count({ where: { attractionId: created.id } });
@@ -975,13 +975,13 @@ async function seedExtendedData() {
   console.log("  - Restaurants...");
   for (const rest of extendedRestaurants) {
     const dest = await prisma.destination.findFirst({
-      where: { OR: [{ city: rest.city }, { region: rest.region || "" }] }
+      where: { OR: [{ city: rest.city }, { region: (rest as any).region || "" }] }
     });
 
     const created = await prisma.restaurant.upsert({
       where: { slug: rest.slug },
-      update: { ...rest, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id },
-      create: { ...rest, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id },
+      update: { ...rest, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id } as any,
+      create: { ...rest, profileId: DJERBA_PROFILE_ID, destinationId: dest?.id || djerba!.id } as any,
     });
 
     const existingImages = await prisma.images.count({ where: { restaurantId: created.id } });
@@ -1914,8 +1914,8 @@ async function main() {
   };
   const djerbaShop1 = await prisma.shop.upsert({
     where:  { slug: "artisanat-djerba" },
-    update: djerbaShop1Data,
-    create: { slug: "artisanat-djerba", ...djerbaShop1Data },
+    update: djerbaShop1Data as any,
+    create: { slug: "artisanat-djerba", ...djerbaShop1Data } as any,
   });
   console.log("  ✓ Artisanat Djerba");
 
@@ -1945,8 +1945,8 @@ async function main() {
   };
   const djerbaShop2 = await prisma.shop.upsert({
     where:  { slug: "epicerie-du-sahel" },
-    update: djerbaShop2Data,
-    create: { slug: "epicerie-du-sahel", ...djerbaShop2Data },
+    update: djerbaShop2Data as any,
+    create: { slug: "epicerie-du-sahel", ...djerbaShop2Data } as any,
   });
   console.log("  ✓ Épicerie du Sahel");
 
@@ -1976,8 +1976,8 @@ async function main() {
   };
   const djerbaShop3 = await prisma.shop.upsert({
     where:  { slug: "soierie-houmt-souk" },
-    update: djerbaShop3Data,
-    create: { slug: "soierie-houmt-souk", ...djerbaShop3Data },
+    update: djerbaShop3Data as any,
+    create: { slug: "soierie-houmt-souk", ...djerbaShop3Data } as any,
   });
   console.log("  ✓ La Soierie de Houmt Souk");
 
@@ -2008,8 +2008,8 @@ async function main() {
   };
   const dubaiShop1 = await prisma.shop.upsert({
     where:  { slug: "the-souk-collective" },
-    update: dubaiShop1Data,
-    create: { slug: "the-souk-collective", ...dubaiShop1Data },
+    update: dubaiShop1Data as any,
+    create: { slug: "the-souk-collective", ...dubaiShop1Data } as any,
   });
   console.log("  ✓ The Souk Collective");
 
@@ -2038,8 +2038,8 @@ async function main() {
   };
   const dubaiShop2 = await prisma.shop.upsert({
     where:  { slug: "desert-spice-market" },
-    update: dubaiShop2Data,
-    create: { slug: "desert-spice-market", ...dubaiShop2Data },
+    update: dubaiShop2Data as any,
+    create: { slug: "desert-spice-market", ...dubaiShop2Data } as any,
   });
   console.log("  ✓ Desert Spice Market");
 
@@ -2068,8 +2068,8 @@ async function main() {
   };
   const dubaiShop3 = await prisma.shop.upsert({
     where:  { slug: "nomad-leather-dubai" },
-    update: dubaiShop3Data,
-    create: { slug: "nomad-leather-dubai", ...dubaiShop3Data },
+    update: dubaiShop3Data as any,
+    create: { slug: "nomad-leather-dubai", ...dubaiShop3Data } as any,
   });
   console.log("  ✓ Nomad Leather");
 

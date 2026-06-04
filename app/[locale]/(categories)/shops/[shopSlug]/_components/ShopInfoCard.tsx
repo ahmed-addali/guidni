@@ -1,7 +1,7 @@
 import { FiMapPin, FiGlobe, FiInstagram, FiFacebook, FiTruck } from "react-icons/fi";
 import { DescriptionWithToggle } from "@/components/shared/DescriptionWithToggle";
 
-type DeliveryMethod = "PICKUP" | "LOCAL_DELIVERY" | "NATIONWIDE" | "INTERNATIONAL";
+type DeliveryMethod = "PICKUP" | "DELIVERY";
 
 interface Props {
   description:       string;

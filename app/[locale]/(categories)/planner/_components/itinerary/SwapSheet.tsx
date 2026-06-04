@@ -55,9 +55,17 @@ export function SwapSheet({
     if (!slot) return;
     setLoading(true);
     setAlternatives([]);
+    const safeSlotType =
+      slot.slotType === "morning" ||
+      slot.slotType === "lunch" ||
+      slot.slotType === "afternoon" ||
+      slot.slotType === "evening"
+        ? slot.slotType
+        : "morning";
+
     const result = await getSwapAlternatives({
       itemType: slot.item.type,
-      slotType: slot.slotType,
+      slotType: safeSlotType,
       currentItemId: slot.item.id,
       destinationId,
       preferences,

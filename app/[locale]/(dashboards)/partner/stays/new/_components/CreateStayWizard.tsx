@@ -213,7 +213,7 @@ export function CreateStayWizard({
         arabicDescription: form.arabicDescription || undefined,
         destinationId:     form.destinationId     || undefined,
       });
-      if (res.success) {
+      if (res.success && res.data) {
         setCreatedId(res.data.id);
       } else {
         toast.error(res.error ?? t("createFailed"));

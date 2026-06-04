@@ -170,7 +170,6 @@ export function StayBookingCard({
             onDateChange={handleCheckInChange}
             minDate={today}
             placeholder={labels.checkIn}
-            locale={locale}
             disabledDates={unavailableDates}
           />
         </div>
@@ -183,7 +182,6 @@ export function StayBookingCard({
             onDateChange={setCheckOut}
             minDate={checkIn ?? today}
             placeholder={labels.checkOut}
-            locale={locale}
             disabledDates={unavailableDates}
           />
         </div>

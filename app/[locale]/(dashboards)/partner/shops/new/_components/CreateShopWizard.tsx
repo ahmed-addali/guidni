@@ -381,7 +381,7 @@ export function CreateShopWizard({
                   const dest = destinations.find((d) => d.id === v);
                   setForm((p) => ({
                     ...p,
-                    destinationId: v,
+                    destinationId: v ?? "",
                     ...(dest
                       ? { country: dest.country, region: dest.region || p.region, city: dest.city }
                       : {}),

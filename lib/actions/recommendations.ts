@@ -23,37 +23,47 @@ export async function getRecommendationDetails(items: { listing_id: string, list
       select: { id: true, slug: true, title: true, arabicTitle: true, price: true, images: { take: 1, select: { url: true } }, destination: { select: { city: true } }, note: true, nbReviews: true }
     });
     const badges = await getBadgesForListings(typeGroups.ACTIVITY, "ACTIVITY");
-    activities.forEach(a => results[`ACTIVITY-${a.id}`] = { ...a, badge: badges.find(b => b.listingId === a.id) });
+    activities.forEach(a => results[`ACTIVITY-${a.id}`] = { ...a, badge: badges[a.id]?.[0] });
   }
 
   // Fetch Stays
   if (typeGroups.STAY.length > 0) {
     const stays = await prisma.stay.findMany({
       where: { id: { in: typeGroups.STAY } },
-      select: { id: true, slug: true, name: true, price: true, images: { take: 1, select: { url: true } }, destination: { select: { city: true } }, note: true, nbReviews: true }
+      select: { id: true, slug: true, title: true, price: true, images: { take: 1, select: { url: true } }, destination: { select: { city: true } }, averageRating: true, nbReviews: true }
     });
     const badges = await getBadgesForListings(typeGroups.STAY, "STAY");
-    stays.forEach(a => results[`STAY-${a.id}`] = { ...a, title: a.name, badge: badges.find(b => b.listingId === a.id) });
+    stays.forEach(a => {
+      const { averageRating, ...rest } = a;
+      results[`STAY-${a.id}`] = { ...rest, note: averageRating ? String(averageRating) : null, badge: badges[a.id]?.[0] };
+    });
   }
 
   // Fetch Restaurants
   if (typeGroups.RESTAURANT.length > 0) {
     const restaurants = await prisma.restaurant.findMany({
       where: { id: { in: typeGroups.RESTAURANT } },
-      select: { id: true, slug: true, name: true, priceRange: true, images: { take: 1, select: { url: true } }, destination: { select: { city: true } }, note: true, nbReviews: true }
+      select: { id: true, slug: true, name: true, images: { take: 1, select: { url: true } }, destination: { select: { city: true } }, note: true, nbReviews: true }
     });
     const badges = await getBadgesForListings(typeGroups.RESTAURANT, "RESTAURANT");
-    restaurants.forEach(a => results[`RESTAURANT-${a.id}`] = { ...a, title: a.name, price: 0, badge: badges.find(b => b.listingId === a.id) });
+    restaurants.forEach(a => results[`RESTAURANT-${a.id}`] = { ...a, title: a.name, price: 0, badge: badges[a.id]?.[0] });
   }
 
   // Fetch Transfers
   if (typeGroups.TRANSFER.length > 0) {
     const transfers = await prisma.transfer.findMany({
       where: { id: { in: typeGroups.TRANSFER } },
-      select: { id: true, slug: true, title: true, arabicTitle: true, price: true, images: { take: 1, select: { url: true } }, destination: { select: { city: true } }, note: true, nbReviews: true }
+      select: { id: true, slug: true, title: true, arabicTitle: true, pricePerTrip: true, pricePerHour: true, pricePerPerson: true, images: { take: 1, select: { url: true } }, destination: { select: { city: true } }, note: true, nbReviews: true }
     });
     const badges = await getBadgesForListings(typeGroups.TRANSFER, "TRANSFER");
-    transfers.forEach(a => results[`TRANSFER-${a.id}`] = { ...a, badge: badges.find(b => b.listingId === a.id) });
+    transfers.forEach(a => {
+      const { pricePerTrip, pricePerHour, pricePerPerson, ...rest } = a;
+      results[`TRANSFER-${a.id}`] = {
+        ...rest,
+        price: pricePerTrip ?? pricePerHour ?? pricePerPerson ?? 0,
+        badge: badges[a.id]?.[0]
+      };
+    });
   }
 
   // Map back to original sorted order and format standard card data

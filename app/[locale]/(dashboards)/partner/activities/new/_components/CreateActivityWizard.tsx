@@ -227,7 +227,7 @@ export function CreateActivityWizard({
         availableTimes:    form.availableTimes,
         destinationId:     form.destinationId     || undefined,
       });
-      if (res.success) {
+      if (res.success && res.data) {
         toast.success(t("photos.heading"));
         setCreatedId(res.data.id);
       } else {

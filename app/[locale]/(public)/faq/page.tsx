@@ -62,7 +62,7 @@ export default async function FAQPage({ params }: Props) {
 
         {tabs.map((tab) => (
           <TabsContent key={tab.key} value={tab.key}>
-            <Accordion type="single" collapsible className="space-y-2">
+            <Accordion className="space-y-2">
               {tab.items.map((item, i) => (
                 <AccordionItem
                   key={i}

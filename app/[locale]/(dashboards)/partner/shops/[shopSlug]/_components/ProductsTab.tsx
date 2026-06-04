@@ -199,13 +199,11 @@ export function ProductsTab({
                 </Link>
 
                 <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <button
-                      type="button"
-                      className="p-2 text-gray-400 hover:text-red-600 border border-gray-200 rounded-lg hover:border-red-200 transition-colors"
-                    >
-                      <FiTrash2 className="h-3.5 w-3.5" />
-                    </button>
+                  <AlertDialogTrigger
+                    type="button"
+                    className="p-2 text-gray-400 hover:text-red-600 border border-gray-200 rounded-lg hover:border-red-200 transition-colors"
+                  >
+                    <FiTrash2 className="h-3.5 w-3.5" />
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>

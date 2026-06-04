@@ -6,13 +6,11 @@ import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { BadgeList } from "@/components/badges/BadgeList";
 import type { BadgeKey } from "@prisma/client";
 
-type DeliveryMethod = "PICKUP" | "LOCAL_DELIVERY" | "NATIONWIDE" | "INTERNATIONAL";
+type DeliveryMethod = "PICKUP" | "DELIVERY";
 
 const DELIVERY_LABELS: Record<DeliveryMethod, string> = {
   PICKUP:         "Pickup",
-  LOCAL_DELIVERY: "Local delivery",
-  NATIONWIDE:     "Nationwide",
-  INTERNATIONAL:  "International",
+  DELIVERY:       "Delivery",
 };
 
 interface Props {

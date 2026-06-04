@@ -280,13 +280,13 @@ export async function getTransferAvailabilityData(transferId: string) {
   const profile = await getProfile();
   if (!profile) return {
     blocked: [] as string[],
-    reservations: [] as { date: string; time: string; status: string; bookingRef: string; passengers: number }[],
+    reservations: [] as { date: string; time: string; status: string; bookingRef: string; passengers: number; hoursRequested: number | null; contactName: string }[],
   };
 
   const transfer = await prisma.transfer.findUnique({ where: { id: transferId } });
   if (!transfer || transfer.profileId !== profile.id) return {
     blocked: [] as string[],
-    reservations: [] as { date: string; time: string; status: string; bookingRef: string; passengers: number }[],
+    reservations: [] as { date: string; time: string; status: string; bookingRef: string; passengers: number; hoursRequested: number | null; contactName: string }[],
   };
 
   const today = new Date();
