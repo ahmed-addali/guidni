@@ -27,7 +27,13 @@ type Props = { locale: string };
 export function PlanPreview({ locale }: Props) {
   const t = useTranslations("PlanPreview");
   const router = useRouter();
-  const { convertPrice } = useCurrency();
+  const { currency } = useCurrency();
+
+  const formatPrice = (price: number) => {
+    if (currency === "EUR") return `${(price / 3.5).toFixed(1)} €`;
+    if (currency === "USD") return `$${(price / 3.0).toFixed(1)}`;
+    return `${price} DT`;
+  };
 
   const [phase, setPhase] = useState<"idle" | "loading" | "ready" | "empty">("idle");
   const [data, setData] = useState<PreviewData | null>(null);
@@ -276,7 +282,7 @@ export function PlanPreview({ locale }: Props) {
                       <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                         {block.item.location && <span className="text-xs text-gray-400">{block.item.location}</span>}
                         {block.item.price > 0 && (
-                          <span className="text-xs text-gray-500 font-medium">{convertPrice(block.item.price).formatted}{t("perNight")}</span>
+                          <span className="text-xs text-gray-500 font-medium">{formatPrice(block.item.price)}{t("perNight")}</span>
                         )}
                       </div>
                       {block.note && <p className="text-xs text-gray-400 mt-0.5 truncate">{block.note}</p>}
@@ -310,7 +316,7 @@ export function PlanPreview({ locale }: Props) {
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold text-gray-900 truncate">{block.item.name}</p>
                       {block.item.price > 0 && (
-                        <span className="text-xs text-gray-500 font-medium">{convertPrice(block.item.price).formatted}{t("perDay")}</span>
+                        <span className="text-xs text-gray-500 font-medium">{formatPrice(block.item.price)}{t("perDay")}</span>
                       )}
                       {block.note && <p className="text-xs text-gray-400 mt-0.5 truncate">{block.note}</p>}
                     </div>

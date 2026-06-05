@@ -8,16 +8,27 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Heart, Star, Sparkles } from "lucide-react";
 import { getRecommendationDetails } from "@/lib/actions/recommendations";
+import { useSession } from "@/lib/auth/client";
 
 export function RecommendationsSection({ locale }: { locale: string }) {
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const t = useTranslations("HomePage"); // Using standard namespace
+  const { data: session, isPending } = useSession();
+
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
-    // Initialize context
-    recTracker.setContext({ destinationId: "djerba" });
+    if (isPending) return; // Wait for auth state to resolve
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+
+    // Initialize context with explicit userId to avoid race conditions with RecTrackerProvider
+    recTracker.setContext({ 
+      destinationId: "djerba",
+      userId: session?.user?.id || undefined
+    });
     recTracker.start();
     
     recTracker.getRecommendations("djerba", 4)
@@ -25,14 +36,14 @@ export function RecommendationsSection({ locale }: { locale: string }) {
         if (data && data.items && data.items.length > 0) {
           // Map backend items (camelCase) to what getRecommendationDetails expects
           const mappedItems = data.items.map((i: any) => ({
-            listing_id: i.listingId,
-            listing_type: i.listingType,
+            listing_id: i.listingId || i.listing_id,
+            listing_type: i.listingType || i.listing_type,
             tags: [],
             rank: 0,
             is_new_listing: false,
-            theta: i.theta,
-            alpha: i.alpha,
-            beta: i.beta,
+            score: i.score,
+            exploitation: i.exploitation,
+            ucb_bonus: i.ucb_bonus,
             impressions: i.impressions,
             conversions: i.conversions
           }));
@@ -60,9 +71,10 @@ export function RecommendationsSection({ locale }: { locale: string }) {
     return () => recTracker.stop();
   }, []);
 
-  if (error || (!loading && recommendations.length === 0)) {
-    return null; // Hide section if failed or empty
-  }
+  // If there's an error or no items, we can still show a fallback or empty state for testing
+  // if (error || (!loading && recommendations.length === 0)) {
+  //   return null; // Hide section if failed or empty
+  // }
 
   return (
     <section className="py-8 w-full">
@@ -89,11 +101,15 @@ export function RecommendationsSection({ locale }: { locale: string }) {
             </div>
           ))}
         </div>
-      ) : (
+      ) : recommendations.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {recommendations.map((item, idx) => (
             <RecommendationCard key={`${item.listing_type}-${item.listing_id}-${idx}`} item={item} locale={locale} />
           ))}
+        </div>
+      ) : (
+        <div className="p-8 text-center text-gray-500 bg-gray-50 rounded-xl">
+          {error ? "Failed to load recommendations. Make sure the backend is running on localhost:8001." : "No recommendations available at the moment."}
         </div>
       )}
     </section>
@@ -197,13 +213,13 @@ function RecommendationCard({ item, locale }: { item: any; locale: string }) {
               <span className="text-[10px] text-gray-400 font-medium">+{item.tags.length - 2}</span>
             )}
             
-            {/* Display Thompson Sampling metrics for testing */}
+            {/* Display LinUCB metrics for testing */}
             <div className="w-full flex justify-between items-center mt-2 pt-2 border-t border-gray-50 text-[10px] text-gray-400">
-              <span title="Expected Reward (Theta)" className="font-mono bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">
-                θ: {item.theta?.toFixed(3)}
+              <span title="Total Score" className="font-mono bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">
+                ★ {item.score?.toFixed(3)}
               </span>
-              <span title="Alpha (Successes) / Beta (Failures)" className="font-mono">
-                α:{item.alpha?.toFixed(1)} / β:{item.beta?.toFixed(1)}
+              <span title="Exploitation / UCB Bonus" className="font-mono">
+                expl:{item.exploitation?.toFixed(3)} / ucb:{item.ucb_bonus?.toFixed(3)}
               </span>
             </div>
           </div>

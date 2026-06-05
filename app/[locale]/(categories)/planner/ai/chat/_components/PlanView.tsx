@@ -33,7 +33,13 @@ const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 export function PlanView({ userId }: Props) {
-  const { convertPrice } = useCurrency();
+  const { currency } = useCurrency();
+
+  const formatPrice = (price: number) => {
+    if (currency === "EUR") return `${(price / 3.5).toFixed(1)} €`;
+    if (currency === "USD") return `$${(price / 3.0).toFixed(1)}`;
+    return `${price} DT`;
+  };
   const {
     plan,
     selectedSlotIds,
@@ -106,7 +112,7 @@ export function PlanView({ userId }: Props) {
               {plan.days.length} days ·{" "}
               {plan.days.reduce((a, d) => a + d.slots.length, 0)} activities
               {plan.total_budget > 0 &&
-                ` · ~${convertPrice(plan.total_budget).formatted}`}
+                ` · ~${formatPrice(plan.total_budget)}`}
             </p>
           </div>
           {plan.summary && (
@@ -270,7 +276,7 @@ export function PlanView({ userId }: Props) {
                                       </span>
                                       {slot.price > 0 && (
                                         <span className="text-gray-500 font-medium">
-                                          {convertPrice(slot.price).formatted}
+                                          {formatPrice(slot.price)}
                                         </span>
                                       )}
                                     </div>

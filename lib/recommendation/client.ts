@@ -3,7 +3,7 @@
  * Called from Server Components to get MAB-ranked listing IDs.
  */
 
-const BRAIN_URL = process.env.BRAIN_URL ?? "http://localhost:8000";
+const RECO_URL = process.env.NEXT_PUBLIC_RECO_URL ?? "http://localhost:8001";
 
 interface FeedResponse {
   items: { listingId: string; listingType: string; theta: number }[];
@@ -24,28 +24,44 @@ export async function getRecommendedOrder(
   limit: number = 8,
 ): Promise<string[]> {
   try {
-    const res = await fetch(`${BRAIN_URL}/api/recommend/feed`, {
-      method: "POST",
+    // LinUCB needs time context
+    const now = new Date();
+    const hour = now.getHours();
+    const month = now.getMonth() + 1;
+    
+    // session_id is required. Since this is often called server-side,
+    // we might need a stable one or generate a transient one.
+    // For now, use a stable 'server-side' prefix.
+    const sessionId = `ssr_${destinationSlug}`;
+
+    const params = new URLSearchParams({
+      location_zone: destinationSlug,
+      session_id: sessionId,
+      hour: hour.toString(),
+      month: month.toString(),
+      listing_types: listingType,
+      top_k: limit.toString(),
+    });
+
+    if (userId) {
+      params.append("user_id", userId);
+    }
+
+    const res = await fetch(`${RECO_URL}/api/recommendations?${params.toString()}`, {
+      method: "GET",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        section,
-        destination_id: destinationSlug,
-        listing_type: listingType,
-        limit,
-        user_id: userId || null,
-      }),
       next: { revalidate: 0 }, // always fresh
     });
 
     if (!res.ok) {
-      console.warn(`[Recommend] Brain returned ${res.status} for ${section}`);
+      console.warn(`[Recommend] LinUCB returned ${res.status} for ${section}`);
       return [];
     }
 
-    const data: FeedResponse = await res.json();
-    return data.items.map((i) => i.listingId);
-  } catch {
-    console.warn("[Recommend] Brain unreachable for recommendations");
+    const data = await res.json();
+    return data.items.map((i: any) => i.listing_id);
+  } catch (err) {
+    console.warn("[Recommend] LinUCB unreachable for recommendations", err);
     return [];
   }
 }

@@ -14,16 +14,16 @@
  *   recTracker.trackClick(item.id, "ACTIVITY");
  */
 
-const BRAIN_URL = process.env.NEXT_PUBLIC_BRAIN_URL ?? "http://localhost:8000";
-const BATCH_SIZE = 5;
-const FLUSH_INTERVAL_MS = 10_000; // flush every 10s even if batch not full
+const BRAIN_URL = process.env.NEXT_PUBLIC_RECO_URL ?? "http://localhost:8001";
+const BATCH_SIZE = 20;
+const FLUSH_INTERVAL_MS = 15_000; // flush every 15s even if batch not full
 
 // ── Types ────────────────────────────────────────────────────
 
 type EventType =
   | "impression"
   | "click"
-  | "dwell_time"
+  | "dwell_exit"
   | "gallery_swipe"
   | "wishlist"
   | "reservation";
@@ -66,43 +66,48 @@ class RecommendationTracker {
   private trackedDwells = new Set<string>();
   private flushTimer: ReturnType<typeof setInterval> | null = null;
 
+  private sessionState = {
+    scrollDepth: 0.0,
+    priceRangeViewed: { min: 0, max: 0 },
+    clickSequence: [] as string[],
+    deviceType: "desktop",
+    lat: null as number | null,
+    lon: null as number | null,
+    sessionStartMs: Date.now(),
+  };
+
   /**
    * Set the current user context (destination, budget, group type).
    * Called once on page load or when destination changes.
    */
-  setContext(ctx: TrackerContext) {
-    this.context = ctx;
-    console.log("[RecTracker] Context set:", ctx);
+  setContext(ctx: Partial<TrackerContext>) {
+    this.context = { ...this.context, ...ctx };
+    console.log("[RecTracker] Context updated:", this.context);
   }
 
   /**
-   * Fetch recommendations from the brain service for the current user/context.
+   * Handle user login / identity change.
    */
-  async getRecommendations(destinationId: string, limit: number = 8) {
-    if (typeof window === "undefined") return null;
+  setUserId(userId: string | null) {
+    this.context.userId = userId ?? undefined;
+    if (userId) {
+      this.mergeSession(userId);
+    }
+  }
+
+  private async mergeSession(userId: string) {
     try {
-      const payload = {
-        section: "homepage",
-        destination_id: destinationId,
-        limit,
-        user_id: this.context.userId || null,
-      };
-      
-      const res = await fetch(`${BRAIN_URL}/api/recommend/feed`, {
+      await fetch(`${BRAIN_URL}/api/recommendations/merge-session`, {
         method: "POST",
+        body: JSON.stringify({
+          session_id: getSessionId(),
+          user_id: userId,
+        }),
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
       });
-
-      if (!res.ok) {
-        console.warn(`[RecTracker] Brain returned ${res.status} for feed`);
-        return null;
-      }
-
-      return await res.json();
-    } catch (err) {
-      console.error("[RecTracker] Failed to fetch recommendations:", err);
-      return null;
+      console.log("[RecTracker] Session merged for user:", userId);
+    } catch (e) {
+      console.warn("[RecTracker] Session merge failed:", e);
     }
   }
 
@@ -114,6 +119,33 @@ class RecommendationTracker {
     if (this.flushTimer) return;
     console.log("[RecTracker] ▶️ Started — flush interval:", FLUSH_INTERVAL_MS, "ms, BRAIN_URL:", BRAIN_URL);
     this.flushTimer = setInterval(() => this.flush(), FLUSH_INTERVAL_MS);
+
+    // Device detection
+    const ua = navigator.userAgent;
+    if (/tablet|ipad/i.test(ua)) this.sessionState.deviceType = "tablet";
+    else if (/mobile|android|iphone/i.test(ua)) this.sessionState.deviceType = "mobile";
+    else this.sessionState.deviceType = "desktop";
+
+    // Geolocation detection
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          this.sessionState.lat = pos.coords.latitude;
+          this.sessionState.lon = pos.coords.longitude;
+        },
+        () => { } // Silently ignore denied permissions
+      );
+    }
+
+    // Scroll depth tracking
+    window.addEventListener("scroll", () => {
+      const scrolled = window.scrollY + window.innerHeight;
+      const total = document.documentElement.scrollHeight;
+      const depth = Math.min(scrolled / total, 1.0);
+      if (depth > this.sessionState.scrollDepth) {
+        this.sessionState.scrollDepth = depth;
+      }
+    }, { passive: true });
 
     // Flush on page unload
     window.addEventListener("beforeunload", () => this.flush());
@@ -203,8 +235,26 @@ class RecommendationTracker {
   /**
    * Track a click on a listing card (user opens detail page).
    */
-  trackClick(listingId: string, listingType: string) {
-    this.enqueue("click", listingId, listingType);
+  trackClick(listingId: string, listingType: string, price?: number) {
+    // Add to click sequence
+    if (!this.sessionState.clickSequence.includes(listingId)) {
+      this.sessionState.clickSequence.push(listingId);
+      if (this.sessionState.clickSequence.length > 20) {
+        this.sessionState.clickSequence.shift();
+      }
+    }
+
+    // Update price range viewed
+    if (price && price > 0) {
+      if (this.sessionState.priceRangeViewed.min === 0 || price < this.sessionState.priceRangeViewed.min) {
+        this.sessionState.priceRangeViewed.min = price;
+      }
+      if (price > this.sessionState.priceRangeViewed.max) {
+        this.sessionState.priceRangeViewed.max = price;
+      }
+    }
+
+    this.enqueue("click", listingId, listingType, price ? { price } : undefined);
   }
 
   // ── DWELL TIME ─────────────────────────────────────────────
@@ -221,8 +271,8 @@ class RecommendationTracker {
     const startTime = Date.now();
     const timer = setTimeout(() => {
       this.trackedDwells.add(key);
-      this.enqueue("dwell_time", listingId, listingType, {
-        dwellMs: Date.now() - startTime,
+      this.enqueue("dwell_exit", listingId, listingType, {
+        dwell_seconds: Math.floor((Date.now() - startTime) / 1000),
       });
     }, 15_000); // 15 seconds
 
@@ -259,6 +309,7 @@ class RecommendationTracker {
    */
   trackWishlist(listingId: string, listingType: string) {
     this.enqueue("wishlist", listingId, listingType);
+    this.flush(); // Immediate flush
   }
 
   // ── RESERVATION ────────────────────────────────────────────
@@ -268,6 +319,41 @@ class RecommendationTracker {
    */
   trackReservation(listingId: string, listingType: string, price: number) {
     this.enqueue("reservation", listingId, listingType, { price });
+    this.flush(); // Immediate flush
+  }
+
+  // ── RECOMMENDATIONS FETCHING ───────────────────────────────
+
+  /**
+   * Fetch personalized recommendations from the API
+   */
+  async getRecommendations(locationZone: string, topK: number = 10) {
+    const now = new Date();
+    const params = new URLSearchParams({
+      location_zone: locationZone,
+      session_id: getSessionId(),
+      hour: now.getHours().toString(),
+      month: (now.getMonth() + 1).toString(),
+      listing_types: "STAY,ACTIVITY,RESTAURANT,TRANSFER",
+      scroll_depth: this.sessionState.scrollDepth.toString(),
+      dwell_seconds: Math.floor((Date.now() - this.sessionState.sessionStartMs) / 1000).toString(),
+      top_k: topK.toString(),
+    });
+    console.log("Auth State:", this.context)
+
+    if (this.context.userId) params.append("user_id", this.context.userId);
+    if (this.sessionState.lat) params.append("lat", this.sessionState.lat.toString());
+    if (this.sessionState.lon) params.append("lon", this.sessionState.lon.toString());
+    if (this.context.budget) params.append("budget_estimate", this.context.budget.toString());
+
+    try {
+      const res = await fetch(`${BRAIN_URL}/api/recommendations?${params.toString()}`);
+      if (!res.ok) throw new Error("Failed to fetch recommendations");
+      return await res.json();
+    } catch (e) {
+      console.error("[RecTracker] Error getting recommendations:", e);
+      return { items: [] };
+    }
   }
 
   // ── Internal: queue + batch flush ──────────────────────────
@@ -286,35 +372,46 @@ class RecommendationTracker {
   }
 
   private async flush() {
-    if (this.queue.length === 0 || !this.context.destinationId) {
-      if (this.queue.length > 0 && !this.context.destinationId) {
-        console.warn("[RecTracker] ⚠️ Flush skipped — no destinationId set!");
-      }
+    if (this.queue.length === 0) {
       return;
     }
 
     const batch = [...this.queue];
     this.queue = [];
 
+    const now = new Date();
+
+    // Map to BatchRequest expected by FastAPI
     const payload = {
-      sessionId: getSessionId(),
-      userId: this.context.userId || null,
-      destinationId: this.context.destinationId,
-      budget: this.context.budget || null,
-      groupType: this.context.groupType || null,
+      session_id: getSessionId(),
+      user_id: this.context.userId || null,
+      location_zone: this.context.destinationId || "unknown",
+      session_state: {
+        scroll_depth: this.sessionState.scrollDepth,
+        dwell_seconds: Math.floor((Date.now() - this.sessionState.sessionStartMs) / 1000),
+        price_range_viewed: this.sessionState.priceRangeViewed,
+        click_sequence: this.sessionState.clickSequence,
+        lat: this.sessionState.lat,
+        lon: this.sessionState.lon,
+        device_type: this.sessionState.deviceType,
+        hour: now.getHours(),
+        month: now.getMonth() + 1,
+        budget_segment: this.context.budget ? (this.context.budget > 200 ? "premium" : "budget") : "unknown",
+      },
+      session_rewards: {},
       events: batch.map((e) => ({
         event: e.event,
-        listingId: e.listingId,
-        listingType: e.listingType,
-        meta: e.meta || null,
+        listing_id: e.listingId,
+        listing_type: e.listingType,
+        meta: e.meta || {},
       })),
     };
 
-    console.log(`[RecTracker] 🚀 Flushing ${batch.length} events to ${BRAIN_URL}/api/recommend/event`);
+    console.log(`[RecTracker] 🚀 Flushing ${batch.length} events to ${BRAIN_URL}/api/recommendations/events`);
     console.log("[RecTracker] Payload:", JSON.stringify(payload, null, 2));
 
     try {
-      const res = await fetch(`${BRAIN_URL}/api/recommend/event`, {
+      const res = await fetch(`${BRAIN_URL}/api/recommendations/events`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
