@@ -69,7 +69,7 @@ export function RecommendationsSection({ locale }: { locale: string }) {
       });
 
     return () => recTracker.stop();
-  }, []);
+  }, [isPending, session?.user?.id]);
 
   // If there's an error or no items, we can still show a fallback or empty state for testing
   // if (error || (!loading && recommendations.length === 0)) {
